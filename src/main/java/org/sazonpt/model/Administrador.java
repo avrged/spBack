@@ -8,5 +8,6 @@ public class Administrador extends Usuario{
         this.codigo_usuario = codigo_usuario;
     }
 
+    
     public int getCodigo_admin() {return codigo_usuario;}
 }
