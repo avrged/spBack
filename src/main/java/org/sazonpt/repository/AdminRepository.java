@@ -16,7 +16,7 @@ public class AdminRepository {
         String query = "INSERT INTO administrador (id_usuario, nombreU, correo, contrasena, tipo, status) VALUES (?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+            PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setInt(1, admin.getId_usuario());
             stmt.setString(2, admin.getNombreU());
@@ -32,7 +32,7 @@ public class AdminRepository {
     }
 
     public Administrador findAdminById(int idAdmin) throws SQLException {
-        String query = "SELECT * FROM administrador WHERE id_usuario = ?";
+        String query = "SELECT * FROM administrador WHERE codigo_usuario = ?";
         Administrador admin = null;
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -54,7 +54,7 @@ public class AdminRepository {
 
     public List<Administrador> getAllAdmins() throws SQLException {
         List<Administrador> admins = new ArrayList<>();
-        String query = "SELECT * FROM administrador WHERE status = 1";
+        String query = "SELECT * FROM administrador WHERE status= 1";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -71,7 +71,7 @@ public class AdminRepository {
     }
 
     public void updateAdmin(Administrador admin) throws SQLException {
-        String query = "UPDATE administrador SET nombreU = ?, correo = ?, contrasena = ?, tipo = ? WHERE id_usuario = ?";
+        String query = "UPDATE administrador SET nombre = ?, correo = ?, contrasena = ?, tipo = ?, status= ? WHERE id_usuario = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -81,6 +81,7 @@ public class AdminRepository {
             stmt.setString(3, admin.getContrasena());
             stmt.setString(4, admin.getTipo());
             stmt.setInt(5, admin.getId_usuario());
+            stmt.setInt(6, admin.getStatus());
             
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -89,7 +90,7 @@ public class AdminRepository {
     }
 
     public void deleteAdmin(int idAdmin) throws SQLException {
-        String query = "UPDATE administrador SET status = 0 WHERE id_usuario = ?";
+        String query = "UPDATE administrador SET status = 0 WHERE codigo_usuario = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -104,10 +105,11 @@ public class AdminRepository {
     private Administrador mapResultSetToAdmin(ResultSet rs) throws SQLException {
         return new Administrador(
             rs.getInt("id_usuario"),
-            rs.getString("nombreU"),
+            rs.getString("nombre"),
             rs.getString("correo"),
             rs.getString("contrasena"),
             rs.getString("tipo"),
+            rs.getInt("codigo_usuario"),
             rs.getInt("status")
         );
     }

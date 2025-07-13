@@ -6,15 +6,18 @@ public class Usuario {
     private String correo;
     private String contrasena;
     private String tipo;
+    private int status;
 
-    public Usuario(int id_usuario, String nombre, String correo, String contrasena, String tipo){
+    public Usuario(int id_usuario, String nombre, String correo, String contrasena, String tipo, int status){
         this.id_usuario=id_usuario;
         this.nombre=nombre;
         this.correo=correo;
         this.contrasena=contrasena;
         this.tipo=tipo;
+        this.status = status;
     }
 
+    public void setIdUsuario(int id_usuario){this.id_usuario = id_usuario;}
     public int getId_usuario() {return id_usuario;}
     public String getNombreU(){return nombre;}
 
@@ -26,4 +29,7 @@ public class Usuario {
 
     public void setTipo(String tipo){this.tipo=tipo;}
     public String getTipo(){return tipo;}
+
+    public void setStatus(int status){this.status = status;}
+    public int getStatus(){return status;}
 }
