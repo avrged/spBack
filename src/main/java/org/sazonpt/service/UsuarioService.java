@@ -13,35 +13,35 @@ public class UsuarioService {
         this.userRepo = userRepo;
     }
 
-    public List<Usuario> getAllUsers() throws SQLException{
-        return userRepo.getAllUsers();
+    public List<Usuario> getAllUsers() throws SQLException {
+        return userRepo.findAll();
     }
 
-    public Usuario findUserById(int idUser) throws SQLException{
-        return userRepo.findUserById(idUser);
+    public Usuario getByIdUser(int idUser) throws SQLException {
+        return userRepo.findByIdUser(idUser);
     }
 
-    public void CreateUser(Usuario user) throws SQLException {
-
-        if(user.getNombreU() == null || user.getCorreo() == null || user.getContrasena() == null){
+    public void createUser(Usuario user) throws SQLException {
+        if (user.getNombreU() == null || user.getCorreo() == null || user.getContrasena() == null) {
             throw new IllegalArgumentException("Nombre, correo y contraseña obligatorios");
         }
 
-        if(userRepo.findUserById(user.getId_usuario()) != null){
+        if (userRepo.findByIdUser(user.getId_usuario()) != null) {
             throw new IllegalArgumentException("Ya existe un usuario con este id");
         }
 
-        if(!user.getCorreo().contains("@")){
+        if (!user.getCorreo().contains("@")) {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
-        userRepo.CreateUser(user);
+        
+        userRepo.save(user);
     }
 
-    public void UpdateUser(Usuario user) throws SQLException{
+    public void updateUser(Usuario user) throws SQLException {
         userRepo.UpdateUser(user);
     }
 
-    public void DeleteUser(int idUser) throws SQLException{
+    public void deleteUser(int idUser) throws SQLException {
         userRepo.deleteUser(idUser);
     }
 }
