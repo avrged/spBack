@@ -11,10 +11,7 @@ public class Main {
             });
         }).start(7070);
 
-        // Ruta de prueba
         app.get("/", ctx -> ctx.result("SazonPT API - Sistema de Catálogo de Restaurantes"));
-
-        // Registrar rutas de administradores
         
     }
 }
