@@ -44,9 +44,15 @@ public class UsuarioController {
         try {
             Usuario user = ctx.bodyAsClass(Usuario.class);
             userService.createUser(user);
-            ctx.status(201).result("Usuario creado");
+            ctx.status(201).json(java.util.Map.of(
+                    "success", true,
+                    "message", "Usuario creado correctamente"
+            ));
         } catch (Exception e) {
-            ctx.status(400).result("Error al crear usuario");
+            ctx.status(400).json(java.util.Map.of(
+                    "success", false,
+                    "message", "Error al crear usuario"
+            ));
         }
     }
 
