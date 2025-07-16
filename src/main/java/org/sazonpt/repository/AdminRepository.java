@@ -13,26 +13,53 @@ import org.sazonpt.model.Administrador;
 public class AdminRepository {
     
     public void createAdmin(Administrador admin) throws SQLException {
-        String query = "INSERT INTO administrador (id_usuario, nombreU, correo, contrasena, tipo, status) VALUES (?, ?, ?, ?, ?, ?)";
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)) {
+        Connection conn = null;
+        try {
+            conn = DBConfig.getDataSource().getConnection();
+            conn.setAutoCommit(false);
             
-            stmt.setInt(1, admin.getId_usuario());
-            stmt.setString(2, admin.getNombreU());
-            stmt.setString(3, admin.getCorreo());
-            stmt.setString(4, admin.getContrasena());
-            stmt.setString(5, admin.getTipo());
-            stmt.setInt(6, 1); // Status activo por defecto
+            // Primero insertar en tabla usuario
+            String queryUsuario = "INSERT INTO usuario(nombre, correo, contrasena, tipo, status) VALUES(?, ?, ?, ?, ?)";
+            PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario, PreparedStatement.RETURN_GENERATED_KEYS);
+            stmtUsuario.setString(1, admin.getNombreU());
+            stmtUsuario.setString(2, admin.getCorreo());
+            stmtUsuario.setString(3, admin.getContrasena());
+            stmtUsuario.setString(4, "administrador");
+            stmtUsuario.setInt(5, 1);
+            stmtUsuario.executeUpdate();
             
-            stmt.executeUpdate();
-        } catch (SQLException e) {
+            // Obtener el ID generado
+            ResultSet generatedKeys = stmtUsuario.getGeneratedKeys();
+            int idUsuario = 0;
+            if (generatedKeys.next()) {
+                idUsuario = generatedKeys.getInt(1);
+            }
+            
+            // Luego insertar en tabla administrador
+            String queryAdmin = "INSERT INTO administrador(codigo_usuario) VALUES(?)";
+            PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
+            stmtAdmin.setInt(1, idUsuario);
+            stmtAdmin.executeUpdate();
+            
+            conn.commit();
+            
+        } catch(SQLException e){
+            if (conn != null) {
+                conn.rollback();
+            }
             throw new SQLException("Error al crear el administrador: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
         }
     }
 
     public Administrador findAdminById(int idAdmin) throws SQLException {
-        String query = "SELECT * FROM administrador WHERE codigo_usuario = ?";
+        String query = "SELECT u.*, a.codigo_usuario FROM usuario u " +
+                      "INNER JOIN administrador a ON u.id_usuario = a.codigo_usuario " +
+                      "WHERE u.id_usuario = ? AND u.status = 1";
         Administrador admin = null;
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -54,7 +81,9 @@ public class AdminRepository {
 
     public List<Administrador> getAllAdmins() throws SQLException {
         List<Administrador> admins = new ArrayList<>();
-        String query = "SELECT * FROM administrador WHERE status= 1";
+        String query = "SELECT u.*, a.codigo_usuario FROM usuario u " +
+                      "INNER JOIN administrador a ON u.id_usuario = a.codigo_usuario " +
+                      "WHERE u.status = 1";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -71,7 +100,7 @@ public class AdminRepository {
     }
 
     public void updateAdmin(Administrador admin) throws SQLException {
-        String query = "UPDATE administrador SET nombre = ?, correo = ?, contrasena = ?, tipo = ?, status= ? WHERE id_usuario = ?";
+        String query = "UPDATE usuario SET nombre = ?, correo = ?, contrasena = ?, status = ? WHERE id_usuario = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -79,9 +108,8 @@ public class AdminRepository {
             stmt.setString(1, admin.getNombreU());
             stmt.setString(2, admin.getCorreo());
             stmt.setString(3, admin.getContrasena());
-            stmt.setString(4, admin.getTipo());
+            stmt.setInt(4, admin.getStatus());
             stmt.setInt(5, admin.getId_usuario());
-            stmt.setInt(6, admin.getStatus());
             
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -90,7 +118,7 @@ public class AdminRepository {
     }
 
     public void deleteAdmin(int idAdmin) throws SQLException {
-        String query = "UPDATE administrador SET status = 0 WHERE codigo_usuario = ?";
+        String query = "UPDATE usuario SET status = 0 WHERE id_usuario = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
