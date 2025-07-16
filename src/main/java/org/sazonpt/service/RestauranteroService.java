@@ -1,5 +1,5 @@
 package org.sazonpt.service;
 
-public class RestauranteService {
+public class RestauranteroService {
     
 }
