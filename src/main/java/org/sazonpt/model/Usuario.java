@@ -8,6 +8,9 @@ public class Usuario {
     private String tipo;
     private int status;
 
+    // Constructor vacío requerido por Jackson
+    public Usuario() {}
+
     public Usuario(int id_usuario, String nombre, String correo, String contrasena, String tipo, int status){
         this.id_usuario=id_usuario;
         this.nombre=nombre;
@@ -19,6 +22,8 @@ public class Usuario {
 
     public void setIdUsuario(int id_usuario){this.id_usuario = id_usuario;}
     public int getId_usuario() {return id_usuario;}
+    
+    public void setNombre(String nombre) {this.nombre = nombre;}
     public String getNombreU(){return nombre;}
 
     public void setCorreo(String correo){this.correo=correo;}
