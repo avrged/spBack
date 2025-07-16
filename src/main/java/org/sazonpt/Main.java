@@ -9,7 +9,7 @@ public class Main {
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(it -> {
-                    it.allowHost("http://localhost:5501", "http://localhost:63342", "http://localhost:5500");
+                    it.allowHost("http://localhost:5501", "http://localhost:63342", "http://localhost:5500", "http://127.0.0.1:5501");
                     it.allowCredentials = true;
                 });
             });

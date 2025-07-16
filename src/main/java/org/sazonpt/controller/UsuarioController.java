@@ -85,4 +85,34 @@ public class UsuarioController {
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }
+
+    public void login(Context ctx) {
+        try {
+            var body = ctx.bodyAsClass(java.util.Map.class);
+            String correo = (String) body.get("correo");
+            String contrasena = (String) body.get("contrasena");
+            String rol = (String) body.get("rol");
+
+            // Busca el usuario por correo, contraseña y rol
+            Usuario usuario = userService.login(correo, contrasena, rol);
+
+            if (usuario != null) {
+                ctx.json(java.util.Map.of(
+                        "success", true,
+                        "rol", usuario.getTipo(),
+                        "message", "Login exitoso"
+                ));
+            } else {
+                ctx.json(java.util.Map.of(
+                        "success", false,
+                        "message", "Credenciales incorrectas o rol no válido"
+                ));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(java.util.Map.of(
+                    "success", false,
+                    "message", "Error en el servidor"
+            ));
+        }
+    }
 }

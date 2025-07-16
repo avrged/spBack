@@ -148,6 +148,25 @@ public class UsuarioRepository {
         }
     }
 
+    public Usuario findByCorreoAndContrasenaAndRol(String correo, String contrasena, String rol) throws SQLException {
+        String query = "SELECT * FROM usuario WHERE correo = ? AND contrasena = ? AND tipo = ?;";
+        Usuario user = null;
+        try(Connection conn = DBConfig.getDataSource().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setString(1, correo);
+            stmt.setString(2, contrasena);
+            stmt.setString(3, rol);
+            try(ResultSet rs = stmt.executeQuery()){
+                if(rs.next()){
+                    user = mapResulsetToUser(rs);
+                }
+            }
+        } catch(SQLException e){
+            throw new SQLException("Error al buscar el usuario: "+e.getMessage());
+        }
+        return user;
+    }
+
     private Usuario mapResulsetToUser(ResultSet rs) throws SQLException {
         return new Usuario(
             rs.getInt("id_usuario"),

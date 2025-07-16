@@ -44,4 +44,10 @@ public class UsuarioService {
     public void deleteUser(int idUser) throws SQLException {
         userRepo.deleteUser(idUser);
     }
+
+    public Usuario login(String correo, String contrasena, String rol) throws SQLException {
+        return userRepo.findByCorreoAndContrasenaAndRol(correo, contrasena, rol);
+    }
+
+
 }
