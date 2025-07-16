@@ -103,8 +103,7 @@ public class UsuarioRepository {
             }
             
             System.out.println("Eliminando usuario ID: " + idUser + ", Tipo: " + tipoUsuario);
-            
-            // Eliminar de tablas hijas primero según el tipo
+
             if ("administrador".equals(tipoUsuario)) {
                 String queryAdmin = "DELETE FROM administrador WHERE codigo_usuario = ?";
                 PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
@@ -118,8 +117,7 @@ public class UsuarioRepository {
                 int restRows = stmtRest.executeUpdate();
                 System.out.println("Filas eliminadas de restaurantero: " + restRows);
             }
-            
-            // Finalmente eliminar de la tabla usuario
+
             String queryUsuario = "DELETE FROM usuario WHERE id_usuario = ?";
             PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario);
             stmtUsuario.setInt(1, idUser);
