@@ -7,6 +7,13 @@ public class Restaurantero extends Usuario{
     // Constructor vacío requerido por Jackson
     public Restaurantero() {
         super();
+        this.status = 1; // Status por defecto
+    }
+
+    // Constructor sin status (usa 1 por defecto)
+    public Restaurantero(String nombre, String correo, String contrasena) {
+        super(nombre, correo, contrasena, "restaurantero");
+        this.status = 1; // Status por defecto
     }
 
     public Restaurantero(int id_usuario, String nombre, String correo, String contrasena, String tipo, int codigo_usuario, int status){

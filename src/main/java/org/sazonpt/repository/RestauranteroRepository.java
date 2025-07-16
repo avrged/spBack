@@ -107,14 +107,46 @@ public class RestauranteroRepository {
     }
 
     public void DeleteUser(int idReo) throws SQLException{
-        String query = "UPDATE usuario SET status = 0 WHERE id_usuario = ?";
-
-        try(Connection conn = DBConfig.getDataSource().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setInt(1, idReo);
-            stmt.executeUpdate();
+        Connection conn = null;
+        try {
+            conn = DBConfig.getDataSource().getConnection();
+            conn.setAutoCommit(false); // Usar transacción para múltiples DELETE
+            
+            // Primero eliminar de la tabla restaurantero
+            String queryRestaurantero = "DELETE FROM restaurantero WHERE codigo_usuario = ?";
+            PreparedStatement stmtRestaurantero = conn.prepareStatement(queryRestaurantero);
+            stmtRestaurantero.setInt(1, idReo);
+            int rowsAffectedRestaurantero = stmtRestaurantero.executeUpdate();
+            
+            System.out.println("Query executed: " + queryRestaurantero);
+            System.out.println("Restaurantero rows affected: " + rowsAffectedRestaurantero);
+            
+            // Luego eliminar de la tabla usuario
+            String queryUsuario = "DELETE FROM usuario WHERE id_usuario = ?";
+            PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario);
+            stmtUsuario.setInt(1, idReo);
+            int rowsAffectedUsuario = stmtUsuario.executeUpdate();
+            
+            System.out.println("Query executed: " + queryUsuario);
+            System.out.println("Restaurantero ID: " + idReo);
+            System.out.println("Usuario rows affected: " + rowsAffectedUsuario);
+            
+            if (rowsAffectedUsuario == 0) {
+                throw new SQLException("No se encontró el restaurantero con ID: " + idReo);
+            }
+            
+            conn.commit();
+            
         } catch(SQLException e){
+            if (conn != null) {
+                conn.rollback();
+            }
             throw new SQLException("Error al intentar eliminar al restaurantero: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
         }
     }
 

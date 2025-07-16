@@ -77,13 +77,17 @@ public class RestauranteroController {
     public void delete(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("id"));
+            System.out.println("Attempting to delete restaurantero with ID: " + idRestaurantero);
             restauranteroService.deleteRestaurantero(idRestaurantero);
             ctx.status(200).result("Restaurantero eliminado exitosamente");
         } catch (NumberFormatException e) {
+            System.out.println("Invalid restaurantero ID format: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de restaurantero inválido");
         } catch (SQLException e) {
+            System.out.println("SQL Error deleting restaurantero: " + e.getMessage());
             ctx.status(500).result("Error al eliminar restaurantero: " + e.getMessage());
         } catch (Exception e) {
+            System.out.println("Unexpected error deleting restaurantero: " + e.getMessage());
             ctx.status(400).result("Error al procesar la solicitud: " + e.getMessage());
         }
     }

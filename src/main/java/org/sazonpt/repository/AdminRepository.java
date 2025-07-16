@@ -118,15 +118,46 @@ public class AdminRepository {
     }
 
     public void deleteAdmin(int idAdmin) throws SQLException {
-        String query = "UPDATE usuario SET status = 0 WHERE id_usuario = ?";
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        Connection conn = null;
+        try {
+            conn = DBConfig.getDataSource().getConnection();
+            conn.setAutoCommit(false); // Usar transacción para múltiples DELETE
             
-            stmt.setInt(1, idAdmin);
-            stmt.executeUpdate();
+            // Primero eliminar de la tabla administrador
+            String queryAdmin = "DELETE FROM administrador WHERE codigo_usuario = ?";
+            PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
+            stmtAdmin.setInt(1, idAdmin);
+            int rowsAffectedAdmin = stmtAdmin.executeUpdate();
+            
+            System.out.println("Query executed: " + queryAdmin);
+            System.out.println("Admin rows affected: " + rowsAffectedAdmin);
+            
+            // Luego eliminar de la tabla usuario
+            String queryUsuario = "DELETE FROM usuario WHERE id_usuario = ?";
+            PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario);
+            stmtUsuario.setInt(1, idAdmin);
+            int rowsAffectedUsuario = stmtUsuario.executeUpdate();
+            
+            System.out.println("Query executed: " + queryUsuario);
+            System.out.println("Admin ID: " + idAdmin);
+            System.out.println("Usuario rows affected: " + rowsAffectedUsuario);
+            
+            if (rowsAffectedUsuario == 0) {
+                throw new SQLException("No se encontró el administrador con ID: " + idAdmin);
+            }
+            
+            conn.commit();
+            
         } catch (SQLException e) {
+            if (conn != null) {
+                conn.rollback();
+            }
             throw new SQLException("Error al eliminar el administrador: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
         }
     }
 

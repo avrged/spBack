@@ -6,6 +6,12 @@ public class Administrador extends Usuario{
 
     public Administrador(){
         super();
+        this.status = 1; // Status por defecto
+    }
+
+    public Administrador(String nombre, String correo, String contrasena) {
+        super(nombre, correo, contrasena, "administrador");
+        this.status = 1; // Status por defecto
     }
 
     public Administrador(int id_usuario, String nombre, String correo, String contrasena, String tipo, int codigo_usuario, int status){
