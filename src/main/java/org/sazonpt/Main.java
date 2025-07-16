@@ -8,22 +8,18 @@ public class Main {
     public static void main(String[] args) {
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
-                cors.addRule(CorsPluginConfig.CorsRule::anyHost);
+                cors.addRule(it -> {
+                    it.allowHost("http://localhost:5501", "http://localhost:63342", "http://localhost:5500");
+                    it.allowCredentials = true;
+                });
             });
         }).start(7070);
 
         app.get("/", ctx -> ctx.result("API - Catalogo de Restaurantes"));
-        
+
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
         AppModule.initRestaurantero().registerRoutes(app);
-
-        app.before(ctx -> {
-            ctx.header("Access-Control-Allow-Origin", "http://127.0.0.1:5501");
-            ctx.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-            ctx.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
-            ctx.header("Access-Control-Allow-Credentials", "true");
-        });
 
         app.options("/*", ctx -> {
             ctx.status(200);
