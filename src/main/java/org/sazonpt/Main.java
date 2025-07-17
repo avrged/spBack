@@ -1,7 +1,6 @@
 package org.sazonpt;
 
 import io.javalin.Javalin;
-import io.javalin.plugin.bundled.CorsPluginConfig;
 import org.sazonpt.di.AppModule;
 
 public class Main {
@@ -16,10 +15,20 @@ public class Main {
         }).start(7070);
 
         app.get("/", ctx -> ctx.result("API - Catalogo de Restaurantes"));
-
+        
+        // Registrar todas las rutas
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
         AppModule.initRestaurantero().registerRoutes(app);
+        AppModule.initMenu().registerRoutes(app);
+        AppModule.initZona().registerRoutes(app);
+        AppModule.initRestaurante().registerRoutes(app);
+        AppModule.initImagen().registerRoutes(app);
+        AppModule.initDescarga().registerRoutes(app);
+        AppModule.initComprobante().registerRoutes(app);
+        AppModule.initSolicitudRegistro().registerRoutes(app);
+        AppModule.initAdquirirMembresia().registerRoutes(app);
+        AppModule.initRevisionSolicitud().registerRoutes(app);
 
         app.options("/*", ctx -> {
             ctx.status(200);

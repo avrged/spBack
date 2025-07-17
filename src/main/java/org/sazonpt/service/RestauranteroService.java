@@ -56,4 +56,9 @@ public class RestauranteroService {
     public Restaurantero getByIdRestaurantero(int idReo) throws SQLException {
         return reoRepo.findRestauranteroById(idReo);
     }
+
+    // Método temporal para migrar usuarios
+    public void migrateUsersToRestaurantero() throws SQLException {
+        reoRepo.migrateUsersToRestaurantero();
+    }
 }

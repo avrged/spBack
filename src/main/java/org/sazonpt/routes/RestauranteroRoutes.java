@@ -17,5 +17,8 @@ public class RestauranteroRoutes {
         app.get("/restauranteros/{id}", restauranteroController::getById);
         app.put("/restauranteros/{id}", restauranteroController::update);
         app.delete("/restauranteros/{id}", restauranteroController::delete);
+        
+        // Ruta temporal para migrar usuarios
+        app.post("/restauranteros/migrate", restauranteroController::migrateUsers);
     }
 }

@@ -75,9 +75,9 @@ public class RestauranteroRepository {
 
     public List<Restaurantero> getAllRestauranteros() throws SQLException{
         List<Restaurantero> restauranteros = new ArrayList<>();
-        String query = "SELECT u.*, r.codigo_usuario FROM usuario u " +
-                      "INNER JOIN restaurantero r ON u.id_usuario = r.codigo_usuario " +
-                      "WHERE u.status = 1";
+        // Cambiado temporalmente para debugging - solo buscar usuarios de tipo 'restaurantero'
+        String query = "SELECT u.*, u.id_usuario as codigo_usuario FROM usuario u " +
+                      "WHERE u.tipo = 'restaurantero' AND u.status = 1";
 
         try(Connection conn = DBConfig.getDataSource().getConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -180,5 +180,23 @@ public class RestauranteroRepository {
             rs.getInt("codigo_usuario"),
             rs.getInt("status")
         );
+    }
+
+    // Método temporal para migrar usuarios tipo 'restaurantero' a la tabla restaurantero
+    public void migrateUsersToRestaurantero() throws SQLException {
+        String query = "INSERT INTO restaurantero (codigo_usuario) " +
+                      "SELECT id_usuario FROM usuario " +
+                      "WHERE tipo = 'restaurantero' AND status = 1 " +
+                      "AND id_usuario NOT IN (SELECT codigo_usuario FROM restaurantero)";
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            int rowsInserted = stmt.executeUpdate();
+            System.out.println("Migrados " + rowsInserted + " usuarios restauranteros a la tabla restaurantero");
+            
+        } catch (SQLException e) {
+            throw new SQLException("Error al migrar usuarios restauranteros: " + e.getMessage());
+        }
     }
 }

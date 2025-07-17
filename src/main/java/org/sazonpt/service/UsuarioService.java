@@ -49,5 +49,4 @@ public class UsuarioService {
         return userRepo.findByCorreoAndContrasenaAndRol(correo, contrasena, rol);
     }
 
-
 }

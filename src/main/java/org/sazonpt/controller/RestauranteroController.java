@@ -91,4 +91,20 @@ public class RestauranteroController {
             ctx.status(400).result("Error al procesar la solicitud: " + e.getMessage());
         }
     }
+
+    // Endpoint temporal para migrar usuarios a restauranteros
+    public void migrateUsers(Context ctx) {
+        try {
+            restauranteroService.migrateUsersToRestaurantero();
+            ctx.status(200).json(java.util.Map.of(
+                    "success", true,
+                    "message", "Usuarios migrados exitosamente a la tabla restaurantero"
+            ));
+        } catch (SQLException e) {
+            ctx.status(500).json(java.util.Map.of(
+                    "success", false,
+                    "message", "Error al migrar usuarios: " + e.getMessage()
+            ));
+        }
+    }
 }
