@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.sazonpt.model.Restaurante;
+import org.sazonpt.model.Restaurantero;
+import org.sazonpt.repository.RestauranteRepository;
 import org.sazonpt.service.RestauranteService;
 
 import io.javalin.http.Context;
@@ -63,8 +65,8 @@ public class RestauranteController {
             // Asegurarse de que el ID del restaurante coincida con el parámetro de la URL
             Restaurante updatedRestaurante = new Restaurante(
                 idRestaurante, 
-                restaurante.getSolicitud_aprobada(),
-                restaurante.getCodigo_zona(),
+                restaurante.getId_solicitud_aprobada(),
+                restaurante.getId_zona(),
                 restaurante.getNombre(),
                 restaurante.getDireccion(),
                 restaurante.getHorario(),
@@ -92,6 +94,64 @@ public class RestauranteController {
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Unexpected error deleting restaurante: " + e.getMessage());
+            ctx.status(500).result("Error inesperado: " + e.getMessage());
+        }
+    }
+
+    // Método para obtener el dueño de un restaurante
+    public void getDueno(Context ctx) {
+        try {
+            int idRestaurante = Integer.parseInt(ctx.pathParam("id"));
+            Restaurantero dueno = restauranteService.getDuenoRestaurante(idRestaurante);
+            
+            if (dueno != null) {
+                ctx.json(dueno);
+            } else {
+                ctx.status(HttpStatus.NOT_FOUND).result("Dueño no encontrado para este restaurante");
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("ID de restaurante inválido");
+        } catch (SQLException e) {
+            ctx.status(500).result("Error en base de datos: " + e.getMessage());
+        } catch (Exception e) {
+            ctx.status(500).result("Error inesperado: " + e.getMessage());
+        }
+    }
+
+    // Método para obtener todos los restaurantes de un restaurantero
+    public void getRestaurantesByDueno(Context ctx) {
+        try {
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            List<Restaurante> restaurantes = restauranteService.getRestaurantesByDueno(idRestaurantero);
+            ctx.json(restaurantes);
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("ID de restaurantero inválido");
+        } catch (SQLException e) {
+            ctx.status(500).result("Error en base de datos: " + e.getMessage());
+        } catch (Exception e) {
+            ctx.status(500).result("Error inesperado: " + e.getMessage());
+        }
+    }
+
+    // Método para obtener restaurante con información completa del dueño
+    public void getRestauranteConDueno(Context ctx) {
+        try {
+            int idRestaurante = Integer.parseInt(ctx.pathParam("id"));
+            RestauranteRepository.RestauranteConDueno resultado = restauranteService.getRestauranteConDueno(idRestaurante);
+            
+            if (resultado != null) {
+                ctx.json(java.util.Map.of(
+                    "restaurante", resultado.getRestaurante(),
+                    "dueno", resultado.getDueno()
+                ));
+            } else {
+                ctx.status(HttpStatus.NOT_FOUND).result("Restaurante no encontrado");
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("ID de restaurante inválido");
+        } catch (SQLException e) {
+            ctx.status(500).result("Error en base de datos: " + e.getMessage());
+        } catch (Exception e) {
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }

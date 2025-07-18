@@ -39,20 +39,22 @@ public class Solicitud_registroService {
             throw new IllegalArgumentException("La dirección propuesta es obligatoria");
         }
 
-        if (solicitud.getCodigoRestaurantero() <= 0) {
-            throw new IllegalArgumentException("Código de restaurantero inválido");
+        if (solicitud.getId_restaurantero() <= 0) {
+            throw new IllegalArgumentException("ID de restaurantero inválido");
         }
 
         // Si no se especifica fecha, usar la fecha actual
         if (solicitud.getFecha() == null) {
             solicitud = new Solicitud_registro(
-                solicitud.getSolicitudR(),
-                solicitud.getCodigoRestaurantero(),
+                solicitud.getId_solicitud(),
+                solicitud.getId_restaurantero(),
                 LocalDate.now(),
                 solicitud.getEstado(),
                 solicitud.getNombrePropuesto(),
                 solicitud.getCorreo(),
-                solicitud.getDireccionPropuesta()
+                solicitud.getDireccionPropuesta(),
+                solicitud.getRuta_imagen(),
+                solicitud.getRuta_comprobante()
             );
         }
 
@@ -60,7 +62,7 @@ public class Solicitud_registroService {
     }
 
     public void updateSolicitud(Solicitud_registro solicitud) throws SQLException {
-        if (solicitudRepo.FindSolicitudR(solicitud.getSolicitudR()) == null) {
+        if (solicitudRepo.FindSolicitudR(solicitud.getId_solicitud()) == null) {
             throw new IllegalArgumentException("No existe una solicitud con este ID");
         }
 

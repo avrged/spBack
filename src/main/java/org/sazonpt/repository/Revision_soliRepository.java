@@ -15,17 +15,19 @@ import org.sazonpt.model.Solicitud_registro;
 public class Revision_soliRepository {
     
     public void AddSoli(Solicitud_registro soli) throws SQLException {
-        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta) VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setInt(1, soli.getId_restaurantero());
             stmt.setDate(2, Date.valueOf(soli.getFecha()));
-            stmt.setBoolean(3, soli.getEstado());
+            stmt.setString(3, soli.getEstado());
             stmt.setString(4, soli.getNombrePropuesto());
             stmt.setString(5, soli.getCorreo());
             stmt.setString(6, soli.getDireccionPropuesta());
+            stmt.setString(7, soli.getRuta_imagen());
+            stmt.setString(8, soli.getRuta_comprobante());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -71,7 +73,7 @@ public class Revision_soliRepository {
     }
 
     public Revision_solicitud UpdateRevision(Revision_solicitud revision) throws SQLException {
-        String query = "UPDATE revision_solicitud SET id_solicitud = ?, id_admin = ?, fecha = ? WHERE id_revision = ?";
+        String query = "UPDATE revision_solicitud SET id_solicitud = ?, id_admin = ?, fecha = ?, status = ? WHERE id_revision = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -79,7 +81,8 @@ public class Revision_soliRepository {
             stmt.setInt(1, revision.getId_solicitud());
             stmt.setInt(2, revision.getId_admin());
             stmt.setDate(3, Date.valueOf(revision.getFecha()));
-            stmt.setInt(4, revision.getId_revision());
+            stmt.setString(4, revision.getStatus());
+            stmt.setInt(5, revision.getId_revision());
             
             int rowsAffected = stmt.executeUpdate();
             
@@ -108,7 +111,7 @@ public class Revision_soliRepository {
             throw new SQLException("Error: No existe un administrador con id: " + revision.getId_admin());
         }
         
-        String query = "INSERT INTO revision_solicitud(id_solicitud, id_admin, fecha) VALUES(?, ?, ?)";
+        String query = "INSERT INTO revision_solicitud(id_solicitud, id_admin, fecha, status) VALUES(?, ?, ?, ?)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -116,6 +119,7 @@ public class Revision_soliRepository {
             stmt.setInt(1, revision.getId_solicitud());
             stmt.setInt(2, revision.getId_admin());
             stmt.setDate(3, Date.valueOf(revision.getFecha()));
+            stmt.setString(4, revision.getStatus());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -219,19 +223,22 @@ public class Revision_soliRepository {
             rs.getInt("id_solicitud"),
             rs.getInt("id_restaurantero"),
             rs.getDate("fecha").toLocalDate(),
-            rs.getBoolean("estado"),
+            rs.getString("estado"),
             rs.getString("nombre_propuesto_restaurante"),
             rs.getString("correo"),
-            rs.getString("direccion_propuesta")
+            rs.getString("direccion_propuesta"),
+            rs.getString("ruta_imagen"),
+            rs.getString("ruta_comprobante")
         );
     }
 
     private Revision_solicitud mapResultSetToRevision(ResultSet rs) throws SQLException {
         return new Revision_solicitud(
             rs.getInt("id_revision"),
-            rs.getInt("codigo_solicitud"),
-            rs.getInt("codigo_admin"),
-            rs.getDate("fecha").toLocalDate()
+            rs.getInt("id_solicitud"),
+            rs.getInt("id_admin"),
+            rs.getDate("fecha").toLocalDate(),
+            rs.getString("status")
         );
     }
 }

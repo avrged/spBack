@@ -25,7 +25,7 @@ public class AdminRepository {
             stmtUsuario.setString(2, admin.getCorreo());
             stmtUsuario.setString(3, admin.getContrasena());
             stmtUsuario.setString(4, "administrador");
-            stmtUsuario.setInt(5, 1);
+            stmtUsuario.setString(5, admin.getStatus());
             stmtUsuario.executeUpdate();
             
             // Obtener el ID generado
@@ -36,7 +36,7 @@ public class AdminRepository {
             }
             
             // Luego insertar en tabla administrador
-            String queryAdmin = "INSERT INTO administrador(codigo_usuario) VALUES(?)";
+            String queryAdmin = "INSERT INTO administrador(id_usuario) VALUES(?)";
             PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
             stmtAdmin.setInt(1, idUsuario);
             stmtAdmin.executeUpdate();
@@ -57,9 +57,9 @@ public class AdminRepository {
     }
 
     public Administrador findAdminById(int idAdmin) throws SQLException {
-        String query = "SELECT u.*, a.codigo_usuario FROM usuario u " +
-                      "INNER JOIN administrador a ON u.id_usuario = a.codigo_usuario " +
-                      "WHERE u.id_usuario = ? AND u.status = 1";
+        String query = "SELECT u.*, a.id_usuario as admin_id_usuario FROM usuario u " +
+                      "INNER JOIN administrador a ON u.id_usuario = a.id_usuario " +
+                      "WHERE u.id_usuario = ? AND u.status = 'activo'";
         Administrador admin = null;
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -81,9 +81,9 @@ public class AdminRepository {
 
     public List<Administrador> getAllAdmins() throws SQLException {
         List<Administrador> admins = new ArrayList<>();
-        String query = "SELECT u.*, a.codigo_usuario FROM usuario u " +
-                      "INNER JOIN administrador a ON u.id_usuario = a.codigo_usuario " +
-                      "WHERE u.status = 1";
+        String query = "SELECT u.*, a.id_usuario as admin_id_usuario FROM usuario u " +
+                      "INNER JOIN administrador a ON u.id_usuario = a.id_usuario " +
+                      "WHERE u.status = 'activo'";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -108,7 +108,7 @@ public class AdminRepository {
             stmt.setString(1, admin.getNombreU());
             stmt.setString(2, admin.getCorreo());
             stmt.setString(3, admin.getContrasena());
-            stmt.setInt(4, admin.getStatus());
+            stmt.setString(4, admin.getStatus());
             stmt.setInt(5, admin.getId_usuario());
             
             stmt.executeUpdate();
@@ -124,7 +124,7 @@ public class AdminRepository {
             conn.setAutoCommit(false); // Usar transacción para múltiples DELETE
             
             // Primero eliminar de la tabla administrador
-            String queryAdmin = "DELETE FROM administrador WHERE codigo_usuario = ?";
+            String queryAdmin = "DELETE FROM administrador WHERE id_usuario = ?";
             PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
             stmtAdmin.setInt(1, idAdmin);
             int rowsAffectedAdmin = stmtAdmin.executeUpdate();
@@ -168,8 +168,8 @@ public class AdminRepository {
             rs.getString("correo"),
             rs.getString("contrasena"),
             rs.getString("tipo"),
-            rs.getInt("codigo_usuario"),
-            rs.getInt("status")
+            rs.getInt("admin_id_usuario"),
+            rs.getString("status")
         );
     }
 }

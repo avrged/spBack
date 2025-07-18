@@ -26,8 +26,8 @@ public class DebugService {
         String orphanedUsersQuery = """
             SELECT u.id_usuario, u.nombre, u.correo 
             FROM usuario u 
-            LEFT JOIN restaurantero r ON u.id_usuario = r.codigo_usuario 
-            WHERE u.tipo = 'restaurantero' AND r.codigo_usuario IS NULL
+            LEFT JOIN restaurantero r ON u.id_usuario = r.id_usuario 
+            WHERE u.tipo = 'restaurantero' AND r.id_usuario IS NULL
         """;
         
         result.append("- Usuarios restaurantero sin registro: ").append(getOrphanedUsers(orphanedUsersQuery));

@@ -25,7 +25,7 @@ public class RestauranteroRepository {
             stmtUsuario.setString(2, reo.getCorreo());
             stmtUsuario.setString(3, reo.getContrasena());
             stmtUsuario.setString(4, "restaurantero");
-            stmtUsuario.setInt(5, 1);
+            stmtUsuario.setString(5, reo.getStatus());
             stmtUsuario.executeUpdate();
             
             // Obtener el ID generado
@@ -36,7 +36,7 @@ public class RestauranteroRepository {
             }
             
             // Luego insertar en tabla restaurantero
-            String queryRestaurantero = "INSERT INTO restaurantero(codigo_usuario) VALUES(?)";
+            String queryRestaurantero = "INSERT INTO restaurantero(id_usuario) VALUES(?)";
             PreparedStatement stmtRestaurantero = conn.prepareStatement(queryRestaurantero);
             stmtRestaurantero.setInt(1, idUsuario);
             stmtRestaurantero.executeUpdate();
@@ -58,8 +58,8 @@ public class RestauranteroRepository {
 
     public List<Restaurantero> findAllRestauranteros() throws SQLException{
         List<Restaurantero> restauranteros = new ArrayList<>();
-        String query = "SELECT u.*, r.codigo_usuario FROM usuario u " +
-                      "INNER JOIN restaurantero r ON u.id_usuario = r.codigo_usuario";
+        String query = "SELECT u.*, r.id_usuario FROM usuario u " +
+                      "INNER JOIN restaurantero r ON u.id_usuario = r.id_usuario";
 
         try(Connection conn = DBConfig.getDataSource().getConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -76,8 +76,8 @@ public class RestauranteroRepository {
     public List<Restaurantero> getAllRestauranteros() throws SQLException{
         List<Restaurantero> restauranteros = new ArrayList<>();
         // Cambiado temporalmente para debugging - solo buscar usuarios de tipo 'restaurantero'
-        String query = "SELECT u.*, u.id_usuario as codigo_usuario FROM usuario u " +
-                      "WHERE u.tipo = 'restaurantero' AND u.status = 1";
+        String query = "SELECT u.*, u.id_usuario as id_usuario FROM usuario u " +
+                      "WHERE u.tipo = 'restaurantero' AND u.status = 'activo'";
 
         try(Connection conn = DBConfig.getDataSource().getConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -98,7 +98,7 @@ public class RestauranteroRepository {
             stmt.setString(1, reo.getNombreU());
             stmt.setString(2, reo.getCorreo());
             stmt.setString(3, reo.getContrasena());
-            stmt.setInt(4, reo.getStatus());
+            stmt.setString(4, reo.getStatus());
             stmt.setInt(5, reo.getId_usuario());
             stmt.executeUpdate();
         } catch(SQLException e){
@@ -113,7 +113,7 @@ public class RestauranteroRepository {
             conn.setAutoCommit(false); // Usar transacción para múltiples DELETE
             
             // Primero eliminar de la tabla restaurantero
-            String queryRestaurantero = "DELETE FROM restaurantero WHERE codigo_usuario = ?";
+            String queryRestaurantero = "DELETE FROM restaurantero WHERE id_usuario = ?";
             PreparedStatement stmtRestaurantero = conn.prepareStatement(queryRestaurantero);
             stmtRestaurantero.setInt(1, idReo);
             int rowsAffectedRestaurantero = stmtRestaurantero.executeUpdate();
@@ -151,9 +151,9 @@ public class RestauranteroRepository {
     }
 
     public Restaurantero findRestauranteroById(int idReo) throws SQLException{
-        String query = "SELECT u.*, r.codigo_usuario FROM usuario u " +
-                      "INNER JOIN restaurantero r ON u.id_usuario = r.codigo_usuario " +
-                      "WHERE u.id_usuario = ? AND u.status = 1";
+        String query = "SELECT u.*, r.id_usuario FROM usuario u " +
+                      "INNER JOIN restaurantero r ON u.id_usuario = r.id_usuario " +
+                      "WHERE u.id_usuario = ? AND u.status = 'activo'";
         
         try(Connection conn = DBConfig.getDataSource().getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
@@ -177,17 +177,17 @@ public class RestauranteroRepository {
             rs.getString("correo"),
             rs.getString("contrasena"),
             rs.getString("tipo"),
-            rs.getInt("codigo_usuario"),
-            rs.getInt("status")
+            rs.getInt("id_usuario"),
+            rs.getString("status")
         );
     }
 
     // Método temporal para migrar usuarios tipo 'restaurantero' a la tabla restaurantero
     public void migrateUsersToRestaurantero() throws SQLException {
-        String query = "INSERT INTO restaurantero (codigo_usuario) " +
+        String query = "INSERT INTO restaurantero (id_usuario) " +
                       "SELECT id_usuario FROM usuario " +
-                      "WHERE tipo = 'restaurantero' AND status = 1 " +
-                      "AND id_usuario NOT IN (SELECT codigo_usuario FROM restaurantero)";
+                      "WHERE tipo = 'restaurantero' AND status = 'activo' " +
+                      "AND id_usuario NOT IN (SELECT id_usuario FROM restaurantero)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {

@@ -1,27 +1,30 @@
 package org.sazonpt.model;
 
 public class Administrador extends Usuario{
-    private int codigo_usuario;
-    private int status;
+    private int id_usuario;
+    private String status;
 
     public Administrador(){
         super();
-        this.status = 1; // Status por defecto
+        this.status = "activo"; // Status por defecto
     }
 
     public Administrador(String nombre, String correo, String contrasena) {
         super(nombre, correo, contrasena, "administrador");
-        this.status = 1; // Status por defecto
+        this.status = "activo"; // Status por defecto
     }
 
-    public Administrador(int id_usuario, String nombre, String correo, String contrasena, String tipo, int codigo_usuario, int status){
+    public Administrador(int id_usuario, String nombre, String correo, String contrasena, String tipo, int id_usuario_fk, String status){
         super(id_usuario, nombre, correo, contrasena, tipo, status);
-        this.codigo_usuario = codigo_usuario;
+        this.id_usuario = id_usuario_fk;
         this.status = status;
     }
 
-    public void setCodigoUsuario(int codigo_usuario) {this.codigo_usuario = codigo_usuario;}
-    public int getCodigo_admin() {return codigo_usuario;}
-    public void setStatus(int status){this.status = status;}
-    public int getStatus(){return status;}
+    public void setId_usuario(int id_usuario) {this.id_usuario = id_usuario;}
+    public int getId_usuario() {return id_usuario;}
+    public void setStatus(String status){this.status = status;}
+    public String getStatus(){return status;}
+    
+    // Métodos de compatibilidad (mantener nombres antiguos)
+    public void setCodigoUsuario(int codigo_usuario) {this.id_usuario = codigo_usuario;}
 }

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.sazonpt.model.Restaurante;
+import org.sazonpt.model.Restaurantero;
 import org.sazonpt.repository.RestauranteRepository;
 
 public class RestauranteService {
@@ -34,7 +35,7 @@ public class RestauranteService {
             throw new IllegalArgumentException("El teléfono del restaurante es obligatorio");
         }
 
-        if (restaurante.getCodigo_zona() <= 0) {
+        if (restaurante.getId_zona() <= 0) {
             throw new IllegalArgumentException("Código de zona inválido");
         }
 
@@ -70,5 +71,20 @@ public class RestauranteService {
         if (!deleted) {
             throw new SQLException("No se pudo eliminar el restaurante");
         }
+    }
+
+    // Método para obtener el dueño de un restaurante
+    public Restaurantero getDuenoRestaurante(int idRestaurante) throws SQLException {
+        return restauranteRepo.findDuenoByRestauranteId(idRestaurante);
+    }
+
+    // Método para obtener todos los restaurantes de un restaurantero
+    public List<Restaurante> getRestaurantesByDueno(int idRestaurantero) throws SQLException {
+        return restauranteRepo.findRestaurantesByDueno(idRestaurantero);
+    }
+
+    // Método para obtener restaurante con información del dueño
+    public RestauranteRepository.RestauranteConDueno getRestauranteConDueno(int idRestaurante) throws SQLException {
+        return restauranteRepo.findRestauranteConDueno(idRestaurante);
     }
 }

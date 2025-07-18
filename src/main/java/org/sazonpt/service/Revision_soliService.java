@@ -47,7 +47,7 @@ public class Revision_soliService {
             throw new IllegalArgumentException("La dirección propuesta es obligatoria");
         }
 
-        if (solicitud.getCodigoRestaurantero() <= 0) {
+        if (solicitud.getId_restaurantero() <= 0) {
             throw new IllegalArgumentException("Código de restaurantero inválido");
         }
 
@@ -76,11 +76,11 @@ public class Revision_soliService {
             throw new IllegalArgumentException("No existe una revisión con este ID");
         }
 
-        if (revision.getCodigo_solicitud() <= 0) {
+        if (revision.getId_solicitud() <= 0) {
             throw new IllegalArgumentException("Código de solicitud inválido");
         }
 
-        if (revision.getCodigo_admin() <= 0) {
+        if (revision.getId_admin() <= 0) {
             throw new IllegalArgumentException("Código de administrador inválido");
         }
 

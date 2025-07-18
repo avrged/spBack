@@ -50,25 +50,11 @@ public class AppModule {
         return new RestauranteRoutes(restauranteController);
     }
 
-    public static ImagenRoutes initImagen() {
-        ImagenRepository imagenRepo = new ImagenRepository();
-        ImagenService imagenService = new ImagenService(imagenRepo);
-        ImagenController imagenController = new ImagenController(imagenService);
-        return new ImagenRoutes(imagenController);
-    }
-
     public static DescargaRoutes initDescarga() {
         DescargaRepository descargaRepo = new DescargaRepository();
         DescargaService descargaService = new DescargaService(descargaRepo);
         DescargaController descargaController = new DescargaController(descargaService);
         return new DescargaRoutes(descargaController);
-    }
-
-    public static ComprobanteRoutes initComprobante() {
-        ComprobanteRepository comprobanteRepo = new ComprobanteRepository();
-        ComprobanteService comprobanteService = new ComprobanteService(comprobanteRepo);
-        ComprobanteController comprobanteController = new ComprobanteController(comprobanteService);
-        return new ComprobanteRoutes(comprobanteController);
     }
 
     public static Solicitud_registroRoutes initSolicitudRegistro() {

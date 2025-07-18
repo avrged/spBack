@@ -60,12 +60,14 @@ public class Solicitud_registroController {
             // Asegurarse de que el ID de la solicitud coincida con el parámetro de la URL
             Solicitud_registro updatedSolicitud = new Solicitud_registro(
                 idSolicitud,
-                solicitud.getCodigoRestaurantero(),
+                solicitud.getId_restaurantero(),
                 solicitud.getFecha(),
                 solicitud.getEstado(),
                 solicitud.getNombrePropuesto(),
                 solicitud.getCorreo(),
-                solicitud.getDireccionPropuesta()
+                solicitud.getDireccionPropuesta(),
+                solicitud.getRuta_imagen(),
+                solicitud.getRuta_comprobante()
             );
             solicitudService.updateSolicitud(updatedSolicitud);
             ctx.status(200).result("Solicitud actualizada");

@@ -26,7 +26,7 @@ public class RestauranteroService {
             throw new IllegalArgumentException("Nombre, correo y contraseña son obligatorios");
         }
 
-        if (reoRepo.findRestauranteroById(reo.getCodigorestaurantero()) != null) {
+        if (reoRepo.findRestauranteroById(reo.getId_usuario()) != null) {
             throw new IllegalArgumentException("Ya existe un restaurantero con este código");
         }
 

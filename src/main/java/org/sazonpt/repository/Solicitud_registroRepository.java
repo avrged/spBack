@@ -20,17 +20,19 @@ public class Solicitud_registroRepository {
                                  ". Debe ejecutar la migración primero o verificar que el restaurantero exista.");
         }
         
-        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta) VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setInt(1, soliR.getId_restaurantero());
             stmt.setDate(2, Date.valueOf(soliR.getFecha()));
-            stmt.setBoolean(3, soliR.getEstado());
+            stmt.setString(3, soliR.getEstado());
             stmt.setString(4, soliR.getNombrePropuesto());
             stmt.setString(5, soliR.getCorreo());
             stmt.setString(6, soliR.getDireccionPropuesta());
+            stmt.setString(7, soliR.getRuta_imagen());
+            stmt.setString(8, soliR.getRuta_comprobante());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -39,7 +41,7 @@ public class Solicitud_registroRepository {
     }
     
     private boolean existeRestaurantero(int idRestaurantero) throws SQLException {
-        String query = "SELECT COUNT(*) FROM restaurantero WHERE codigo_usuario = ?";
+        String query = "SELECT COUNT(*) FROM restaurantero WHERE id_usuario = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -93,25 +95,27 @@ public class Solicitud_registroRepository {
     }
 
     public Solicitud_registro UpdateSolicitud(Solicitud_registro soliR) throws SQLException {
-        String query = "UPDATE solicitud_registro SET id_restaurantero = ?, fecha = ?, estado = ?, nombre_propuesto_restaurante = ?, correo = ?, direccion_propuesta = ? WHERE id_solicitud = ?";
+        String query = "UPDATE solicitud_registro SET id_restaurantero = ?, fecha = ?, estado = ?, nombre_propuesto_restaurante = ?, correo = ?, direccion_propuesta = ?, ruta_imagen = ?, ruta_comprobante = ? WHERE id_solicitud = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setInt(1, soliR.getId_restaurantero());
             stmt.setDate(2, Date.valueOf(soliR.getFecha()));
-            stmt.setBoolean(3, soliR.getEstado());
+            stmt.setString(3, soliR.getEstado());
             stmt.setString(4, soliR.getNombrePropuesto());
             stmt.setString(5, soliR.getCorreo());
             stmt.setString(6, soliR.getDireccionPropuesta());
-            stmt.setInt(7, soliR.getSolicitudR());
+            stmt.setString(7, soliR.getRuta_imagen());
+            stmt.setString(8, soliR.getRuta_comprobante());
+            stmt.setInt(9, soliR.getId_solicitud());
             
             int rowsAffected = stmt.executeUpdate();
             
             if (rowsAffected > 0) {
-                return FindSolicitudR(soliR.getSolicitudR());
+                return FindSolicitudR(soliR.getId_solicitud());
             } else {
-                throw new SQLException("No se encontró la solicitud de registro con ID: " + soliR.getSolicitudR());
+                throw new SQLException("No se encontró la solicitud de registro con ID: " + soliR.getId_solicitud());
             }
             
         } catch (SQLException e) {
@@ -142,10 +146,12 @@ public class Solicitud_registroRepository {
             rs.getInt("id_solicitud"),
             rs.getInt("id_restaurantero"),
             rs.getDate("fecha").toLocalDate(),
-            rs.getBoolean("estado"),
+            rs.getString("estado"),
             rs.getString("nombre_propuesto_restaurante"),
             rs.getString("correo"),
-            rs.getString("direccion_propuesta")
+            rs.getString("direccion_propuesta"),
+            rs.getString("ruta_imagen"),
+            rs.getString("ruta_comprobante")
         );
     }
 }

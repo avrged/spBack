@@ -62,9 +62,10 @@ public class Revision_solicitudController {
             // Asegurarse de que el ID de la revisión coincida con el parámetro de la URL
             Revision_solicitud updatedRevision = new Revision_solicitud(
                 idRevision,
-                revision.getCodigo_solicitud(),
-                revision.getCodigo_admin(),
-                revision.getFecha()
+                revision.getId_solicitud(),
+                revision.getId_admin(),
+                revision.getFecha(),
+                revision.getStatus()
             );
             revisionService.updateRevision(updatedRevision);
             ctx.status(200).result("Revisión actualizada");

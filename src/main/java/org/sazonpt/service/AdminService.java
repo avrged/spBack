@@ -26,7 +26,7 @@ public class AdminService {
             throw new IllegalArgumentException("Nombre, correo y contraseña son obligatorios");
         }
 
-        if(adminRepo.findAdminById(admin.getCodigo_admin()) != null){
+        if(adminRepo.findAdminById(admin.getId_usuario()) != null){
             throw new IllegalArgumentException("Ya existe un administrador con este ID");
         }
 

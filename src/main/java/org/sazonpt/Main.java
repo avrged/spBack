@@ -23,9 +23,7 @@ public class Main {
         AppModule.initMenu().registerRoutes(app);
         AppModule.initZona().registerRoutes(app);
         AppModule.initRestaurante().registerRoutes(app);
-        AppModule.initImagen().registerRoutes(app);
         AppModule.initDescarga().registerRoutes(app);
-        AppModule.initComprobante().registerRoutes(app);
         AppModule.initSolicitudRegistro().registerRoutes(app);
         AppModule.initAdquirirMembresia().registerRoutes(app);
         AppModule.initRevisionSolicitud().registerRoutes(app);

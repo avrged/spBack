@@ -21,7 +21,7 @@ public class UsuarioRepository {
             stmt.setString(2, user.getCorreo());
             stmt.setString(3, user.getContrasena());
             stmt.setString(4, user.getTipo());
-            stmt.setInt(5, 1);
+            stmt.setString(5, user.getStatus());
             stmt.executeUpdate();
         } catch(SQLException e){
             throw new SQLException("Error al crear el usuario: "+e.getMessage());
@@ -74,7 +74,7 @@ public class UsuarioRepository {
             stmt.setString(2, user.getCorreo());
             stmt.setString(3, user.getContrasena());
             stmt.setString(4, user.getTipo());
-            stmt.setInt(5, user.getStatus());
+            stmt.setString(5, user.getStatus());
             stmt.setInt(6, user.getId_usuario());
 
             stmt.executeUpdate();
@@ -105,13 +105,13 @@ public class UsuarioRepository {
             System.out.println("Eliminando usuario ID: " + idUser + ", Tipo: " + tipoUsuario);
 
             if ("administrador".equals(tipoUsuario)) {
-                String queryAdmin = "DELETE FROM administrador WHERE codigo_usuario = ?";
+                String queryAdmin = "DELETE FROM administrador WHERE id_usuario = ?";
                 PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
                 stmtAdmin.setInt(1, idUser);
                 int adminRows = stmtAdmin.executeUpdate();
                 System.out.println("Filas eliminadas de administrador: " + adminRows);
             } else if ("restaurantero".equals(tipoUsuario)) {
-                String queryRest = "DELETE FROM restaurantero WHERE codigo_usuario = ?";
+                String queryRest = "DELETE FROM restaurantero WHERE id_usuario = ?";
                 PreparedStatement stmtRest = conn.prepareStatement(queryRest);
                 stmtRest.setInt(1, idUser);
                 int restRows = stmtRest.executeUpdate();
@@ -172,7 +172,7 @@ public class UsuarioRepository {
             rs.getString("correo"),
             rs.getString("contrasena"),
             rs.getString("tipo"),
-            rs.getInt("status")
+            rs.getString("status")
         );
     }
 }
