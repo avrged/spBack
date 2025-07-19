@@ -16,14 +16,13 @@ public class Solicitud_registro {
 
     // Constructor por defecto (necesario para Jackson)
     public Solicitud_registro() {
-        this.estado = "pendiente"; // Estado por defecto
+        this.estado = "pendiente";
     }
 
-    // Constructor sin estado (usa "pendiente" por defecto)
     public Solicitud_registro(int id_restaurantero, LocalDate fecha, String nombre_propuesto_restaurante, String correo, String direccion_propuesta, String ruta_imagen, String ruta_comprobante) {
         this.id_restaurantero = id_restaurantero;
         this.fecha = fecha;
-        this.estado = "pendiente"; // Estado por defecto
+        this.estado = "pendiente";
         this.nombre_propuesto_restaurante = nombre_propuesto_restaurante;
         this.correo = correo;
         this.direccion_propuesta = direccion_propuesta;
