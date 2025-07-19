@@ -20,8 +20,8 @@ public class Solicitud_registroRepository {
                                  ". Debe ejecutar la migración primero o verificar que el restaurantero exista.");
         }
         
-        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-        
+        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_imagen2, ruta_imagen3, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
@@ -32,7 +32,9 @@ public class Solicitud_registroRepository {
             stmt.setString(5, soliR.getCorreo());
             stmt.setString(6, soliR.getDireccionPropuesta());
             stmt.setString(7, soliR.getRuta_imagen());
-            stmt.setString(8, soliR.getRuta_comprobante());
+            stmt.setString(8, soliR.getRuta_imagen2());
+            stmt.setString(9, soliR.getRuta_imagen3());
+            stmt.setString(10, soliR.getRuta_comprobante());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -95,8 +97,8 @@ public class Solicitud_registroRepository {
     }
 
     public Solicitud_registro UpdateSolicitud(Solicitud_registro soliR) throws SQLException {
-        String query = "UPDATE solicitud_registro SET id_restaurantero = ?, fecha = ?, estado = ?, nombre_propuesto_restaurante = ?, correo = ?, direccion_propuesta = ?, ruta_imagen = ?, ruta_comprobante = ? WHERE id_solicitud = ?";
-        
+        String query = "UPDATE solicitud_registro SET id_restaurantero = ?, fecha = ?, estado = ?, nombre_propuesto_restaurante = ?, correo = ?, direccion_propuesta = ?, ruta_imagen = ?, ruta_imagen2 = ?, ruta_imagen3 = ?, ruta_comprobante = ? WHERE id_solicitud = ?";
+
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
@@ -107,15 +109,17 @@ public class Solicitud_registroRepository {
             stmt.setString(5, soliR.getCorreo());
             stmt.setString(6, soliR.getDireccionPropuesta());
             stmt.setString(7, soliR.getRuta_imagen());
-            stmt.setString(8, soliR.getRuta_comprobante());
-            stmt.setInt(9, soliR.getId_solicitud());
-            
+            stmt.setString(8, soliR.getRuta_imagen2());
+            stmt.setString(9, soliR.getRuta_imagen3());
+            stmt.setString(10, soliR.getRuta_comprobante());
+            stmt.setInt(11, soliR.getId_solicitud());
+
             int rowsAffected = stmt.executeUpdate();
             
             if (rowsAffected > 0) {
                 return FindSolicitudR(soliR.getId_solicitud());
             } else {
-                throw new SQLException("No se encontró la solicitud de registro con ID: " + soliR.getId_solicitud());
+                throw new SQLException("No se encontró la solicitud con ID: " + soliR.getId_solicitud());
             }
             
         } catch (SQLException e) {
@@ -151,6 +155,8 @@ public class Solicitud_registroRepository {
             rs.getString("correo"),
             rs.getString("direccion_propuesta"),
             rs.getString("ruta_imagen"),
+            rs.getString("ruta_imagen2"),
+            rs.getString("ruta_imagen3"),
             rs.getString("ruta_comprobante")
         );
     }

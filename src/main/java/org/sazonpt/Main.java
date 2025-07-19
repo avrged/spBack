@@ -1,6 +1,7 @@
 package org.sazonpt;
 
 import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
 import org.sazonpt.di.AppModule;
 
 public class Main {
@@ -12,6 +13,8 @@ public class Main {
                     it.allowCredentials = true;
                 });
             });
+            // Configurar archivos estáticos para servir uploads
+            config.staticFiles.add("uploads", Location.EXTERNAL);
         }).start(7070);
 
         app.get("/", ctx -> ctx.result("API - Catalogo de Restaurantes"));

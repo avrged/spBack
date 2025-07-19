@@ -1,6 +1,11 @@
 package org.sazonpt.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.sazonpt.model.Solicitud_registro;
@@ -8,6 +13,7 @@ import org.sazonpt.service.Solicitud_registroService;
 
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import io.javalin.http.UploadedFile;
 
 public class Solicitud_registroController {
     private final Solicitud_registroService solicitudService;
@@ -53,23 +59,135 @@ public class Solicitud_registroController {
         }
     }
 
+    public void createWithFiles(Context ctx) {
+        try {
+            // Obtener datos del formulario
+            var nombrePropuesto = ctx.formParam("nombrePropuesto");
+            var correo = ctx.formParam("correo");
+            var direccionPropuesta = ctx.formParam("direccionPropuesta");
+            var codigoRestaurantero = ctx.formParam("codigoRestaurantero");
+            var estado = ctx.formParam("estado");
+
+            // Obtener archivos
+            var imagen1 = ctx.uploadedFile("imagen1");
+            var imagen2 = ctx.uploadedFile("imagen2");
+            var imagen3 = ctx.uploadedFile("imagen3");
+            var comprobanteDomicilio = ctx.uploadedFile("comprobanteDomicilio");
+
+            // Validar campos obligatorios
+            if (nombrePropuesto == null || correo == null || direccionPropuesta == null || codigoRestaurantero == null) {
+                ctx.status(400).json(java.util.Map.of(
+                    "success", false,
+                    "message", "Los campos nombrePropuesto, correo, direccionPropuesta y codigoRestaurantero son obligatorios"
+                ));
+                return;
+            }
+
+            // Guardar archivos y obtener URLs
+            String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : null;
+            String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : null;
+            String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : null;
+            String urlComprobante = comprobanteDomicilio != null ? saveDocumentFile(comprobanteDomicilio) : null;
+
+            // Crear objeto solicitud
+            Solicitud_registro solicitud = new Solicitud_registro();
+            solicitud.setNombre_propuesto_restaurante(nombrePropuesto);
+            solicitud.setCorreo(correo);
+            solicitud.setDireccion_propuesta(direccionPropuesta);
+            solicitud.setId_restaurantero(Integer.parseInt(codigoRestaurantero));
+            solicitud.setEstado(estado != null ? estado : "pendiente");
+            solicitud.setFecha(LocalDate.now());
+            solicitud.setRuta_imagen(urlImagen1);
+            solicitud.setRuta_imagen2(urlImagen2);
+            solicitud.setRuta_imagen3(urlImagen3);
+            solicitud.setRuta_comprobante(urlComprobante);
+
+            // Guardar en base de datos
+            solicitudService.createSolicitud(solicitud);
+
+            ctx.status(201).json(java.util.Map.of(
+                "success", true,
+                "message", "Solicitud creada correctamente con archivos",
+                "data", java.util.Map.of(
+                    "imagen1", urlImagen1,
+                    "imagen2", urlImagen2,
+                    "imagen3", urlImagen3,
+                    "comprobante", urlComprobante
+                )
+            ));
+        } catch (Exception e) {
+            System.out.println("Error al crear solicitud con archivos: " + e.getMessage());
+            e.printStackTrace();
+            ctx.status(400).json(java.util.Map.of(
+                "success", false,
+                "message", "Error al crear solicitud: " + e.getMessage()
+            ));
+        }
+    }
+
+    private String saveImageFile(UploadedFile file) throws IOException {
+        // Validar que sea una imagen
+        String contentType = file.contentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("El archivo debe ser una imagen");
+        }
+
+        // Ruta de guardado para imágenes
+        String staticPath = "uploads/images";
+        File uploadDir = new File(staticPath);
+        if (!uploadDir.exists()) uploadDir.mkdirs();
+
+        // Nombre único del archivo
+        String fileName = System.currentTimeMillis() + "_" + file.filename();
+        File destino = new File(uploadDir, fileName);
+
+        // Guardar el archivo
+        try (InputStream is = file.content();
+             FileOutputStream os = new FileOutputStream(destino)) {
+            is.transferTo(os);
+        }
+
+        // Construcción de la URL completa
+        String host = "localhost"; // Puedes configurar esto como variable de entorno
+        String fileUrl = String.format("http://%s:7070/uploads/images/%s", host, fileName);
+        return fileUrl;
+    }
+
+    private String saveDocumentFile(UploadedFile file) throws IOException {
+        // Validar que sea un PDF
+        String contentType = file.contentType();
+        if (contentType == null || !contentType.equals("application/pdf")) {
+            throw new IllegalArgumentException("El comprobante debe ser un archivo PDF");
+        }
+
+        // Ruta de guardado para documentos
+        String staticPath = "uploads/documents";
+        File uploadDir = new File(staticPath);
+        if (!uploadDir.exists()) uploadDir.mkdirs();
+
+        // Nombre único del archivo
+        String fileName = System.currentTimeMillis() + "_" + file.filename();
+        File destino = new File(uploadDir, fileName);
+
+        // Guardar el archivo
+        try (InputStream is = file.content();
+             FileOutputStream os = new FileOutputStream(destino)) {
+            is.transferTo(os);
+        }
+
+        // Construcción de la URL completa
+        String host = "localhost"; // Puedes configurar esto como variable de entorno
+        String fileUrl = String.format("http://%s:7070/uploads/documents/%s", host, fileName);
+        return fileUrl;
+    }
+
     public void update(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
             Solicitud_registro solicitud = ctx.bodyAsClass(Solicitud_registro.class);
             // Asegurarse de que el ID de la solicitud coincida con el parámetro de la URL
-            Solicitud_registro updatedSolicitud = new Solicitud_registro(
-                idSolicitud,
-                solicitud.getId_restaurantero(),
-                solicitud.getFecha(),
-                solicitud.getEstado(),
-                solicitud.getNombrePropuesto(),
-                solicitud.getCorreo(),
-                solicitud.getDireccionPropuesta(),
-                solicitud.getRuta_imagen(),
-                solicitud.getRuta_comprobante()
-            );
-            solicitudService.updateSolicitud(updatedSolicitud);
+            solicitud.setId_solicitud(idSolicitud);
+            solicitudService.updateSolicitud(solicitud);
             ctx.status(200).result("Solicitud actualizada");
         } catch (Exception e) {
             ctx.status(400).result("Error al actualizar solicitud: " + e.getMessage());

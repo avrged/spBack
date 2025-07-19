@@ -1,4 +1,3 @@
-
 package org.sazonpt.model;
 import java.time.LocalDate;
 
@@ -11,6 +10,8 @@ public class Solicitud_registro {
     private String correo;
     private String direccion_propuesta;
     private String ruta_imagen;
+    private String ruta_imagen2;
+    private String ruta_imagen3;
     private String ruta_comprobante;
 
     // Constructor por defecto (necesario para Jackson)
@@ -30,8 +31,8 @@ public class Solicitud_registro {
         this.ruta_comprobante = ruta_comprobante;
     }
 
-    // Constructor con parámetros
-    public Solicitud_registro(int id_solicitud, int id_restaurantero, LocalDate fecha, String estado, String nombre_propuesto_restaurante, String correo, String direccion_propuesta, String ruta_imagen, String ruta_comprobante){
+    // Constructor con parámetros completo
+    public Solicitud_registro(int id_solicitud, int id_restaurantero, LocalDate fecha, String estado, String nombre_propuesto_restaurante, String correo, String direccion_propuesta, String ruta_imagen, String ruta_imagen2, String ruta_imagen3, String ruta_comprobante){
         this.id_solicitud = id_solicitud;
         this.id_restaurantero = id_restaurantero;
         this.fecha = fecha;
@@ -40,6 +41,8 @@ public class Solicitud_registro {
         this.correo = correo;
         this.direccion_propuesta = direccion_propuesta;
         this.ruta_imagen = ruta_imagen;
+        this.ruta_imagen2 = ruta_imagen2;
+        this.ruta_imagen3 = ruta_imagen3;
         this.ruta_comprobante = ruta_comprobante;
     }
 
@@ -52,6 +55,8 @@ public class Solicitud_registro {
     public String getCorreo(){return correo;}
     public String getDireccionPropuesta(){return direccion_propuesta;}
     public String getRuta_imagen(){return ruta_imagen;}
+    public String getRuta_imagen2(){return ruta_imagen2;}
+    public String getRuta_imagen3(){return ruta_imagen3;}
     public String getRuta_comprobante(){return ruta_comprobante;}
 
     // Setters (necesarios para Jackson)
@@ -85,6 +90,14 @@ public class Solicitud_registro {
 
     public void setRuta_imagen(String ruta_imagen) {
         this.ruta_imagen = ruta_imagen;
+    }
+
+    public void setRuta_imagen2(String ruta_imagen2) {
+        this.ruta_imagen2 = ruta_imagen2;
+    }
+
+    public void setRuta_imagen3(String ruta_imagen3) {
+        this.ruta_imagen3 = ruta_imagen3;
     }
 
     public void setRuta_comprobante(String ruta_comprobante) {

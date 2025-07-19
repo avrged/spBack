@@ -14,6 +14,7 @@ public class Solicitud_registroRoutes {
     public void registerRoutes(Javalin app) {
         app.get("/solicitudes", solicitudController::getAll);
         app.post("/solicitudes", solicitudController::create);
+        app.post("/solicitudes/with-files", solicitudController::createWithFiles);
         app.get("/solicitudes/{id}", solicitudController::getById);
         app.put("/solicitudes/{id}", solicitudController::update);
         app.delete("/solicitudes/{id}", solicitudController::delete);
