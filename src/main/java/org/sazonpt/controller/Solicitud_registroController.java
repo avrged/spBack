@@ -109,10 +109,10 @@ public class Solicitud_registroController {
                 "success", true,
                 "message", "Solicitud creada correctamente con archivos",
                 "data", java.util.Map.of(
-                    "imagen1", urlImagen1,
-                    "imagen2", urlImagen2,
-                    "imagen3", urlImagen3,
-                    "comprobante", urlComprobante
+                    "imagen1", urlImagen1 != null ? urlImagen1 : "No se subió imagen",
+                    "imagen2", urlImagen2 != null ? urlImagen2 : "No se subió imagen",
+                    "imagen3", urlImagen3 != null ? urlImagen3 : "No se subió imagen",
+                    "comprobante", urlComprobante != null ? urlComprobante : "No se subió comprobante"
                 )
             ));
         } catch (Exception e) {
@@ -135,7 +135,12 @@ public class Solicitud_registroController {
         // Ruta de guardado para imágenes
         String staticPath = "uploads/images";
         File uploadDir = new File(staticPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+        if (!uploadDir.exists()) {
+            boolean created = uploadDir.mkdirs();
+            if (!created) {
+                throw new IOException("No se pudo crear el directorio de imágenes");
+            }
+        }
 
         // Nombre único del archivo
         String fileName = System.currentTimeMillis() + "_" + file.filename();
@@ -149,8 +154,7 @@ public class Solicitud_registroController {
 
         // Construcción de la URL completa
         String host = "localhost"; // Puedes configurar esto como variable de entorno
-        String fileUrl = String.format("http://%s:7070/uploads/images/%s", host, fileName);
-        return fileUrl;
+        return String.format("http://%s:7070/uploads/images/%s", host, fileName);
     }
 
     private String saveDocumentFile(UploadedFile file) throws IOException {
@@ -163,7 +167,12 @@ public class Solicitud_registroController {
         // Ruta de guardado para documentos
         String staticPath = "uploads/documents";
         File uploadDir = new File(staticPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+        if (!uploadDir.exists()) {
+            boolean created = uploadDir.mkdirs();
+            if (!created) {
+                throw new IOException("No se pudo crear el directorio de documentos");
+            }
+        }
 
         // Nombre único del archivo
         String fileName = System.currentTimeMillis() + "_" + file.filename();
@@ -177,8 +186,7 @@ public class Solicitud_registroController {
 
         // Construcción de la URL completa
         String host = "localhost"; // Puedes configurar esto como variable de entorno
-        String fileUrl = String.format("http://%s:7070/uploads/documents/%s", host, fileName);
-        return fileUrl;
+        return String.format("http://%s:7070/uploads/documents/%s", host, fileName);
     }
 
     public void update(Context ctx) {

@@ -15,8 +15,8 @@ import org.sazonpt.model.Solicitud_registro;
 public class Revision_soliRepository {
     
     public void AddSoli(Solicitud_registro soli) throws SQLException {
-        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-        
+        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_imagen2, ruta_imagen3, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
@@ -27,7 +27,9 @@ public class Revision_soliRepository {
             stmt.setString(5, soli.getCorreo());
             stmt.setString(6, soli.getDireccionPropuesta());
             stmt.setString(7, soli.getRuta_imagen());
-            stmt.setString(8, soli.getRuta_comprobante());
+            stmt.setString(8, soli.getRuta_imagen2());
+            stmt.setString(9, soli.getRuta_imagen3());
+            stmt.setString(10, soli.getRuta_comprobante());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -228,6 +230,8 @@ public class Revision_soliRepository {
             rs.getString("correo"),
             rs.getString("direccion_propuesta"),
             rs.getString("ruta_imagen"),
+            rs.getString("ruta_imagen2"),
+            rs.getString("ruta_imagen3"),
             rs.getString("ruta_comprobante")
         );
     }

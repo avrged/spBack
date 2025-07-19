@@ -54,6 +54,8 @@ public class Solicitud_registroService {
                 solicitud.getCorreo(),
                 solicitud.getDireccionPropuesta(),
                 solicitud.getRuta_imagen(),
+                solicitud.getRuta_imagen2(),
+                solicitud.getRuta_imagen3(),
                 solicitud.getRuta_comprobante()
             );
         }
