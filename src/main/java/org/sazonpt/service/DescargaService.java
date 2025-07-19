@@ -30,7 +30,7 @@ public class DescargaService {
             throw new IllegalArgumentException("La cantidad de descargas no puede ser negativa");
         }
 
-        if (descarga.getCodigo_adquisicion() <= 0) {
+        if (descarga.getId_adquisicion() <= 0) {
             throw new IllegalArgumentException("Código de adquisición inválido");
         }
 

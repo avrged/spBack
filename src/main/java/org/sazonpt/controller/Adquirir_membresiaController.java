@@ -73,8 +73,8 @@ public class Adquirir_membresiaController {
             // Asegurarse de que el ID de la membresía coincida con el parámetro de la URL
             Adquirir_membresia updatedMembresia = new Adquirir_membresia(
                 idAdquisicion,
-                membresia.getCodigoRestaurantero(),
-                membresia.getFechaAdquisicion(),
+                membresia.getId_restaurantero(),
+                membresia.getFecha_adquisicion(),
                 membresia.getCosto(),
                 membresia.getEstado()
             );

@@ -20,9 +20,9 @@ public class Adquirir_membresiaRepository {
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, membresia.getId_restaurantero());
-            stmt.setDate(2, Date.valueOf(membresia.getFechaAdquisicion()));
+            stmt.setDate(2, Date.valueOf(membresia.getFecha_adquisicion()));
             stmt.setDouble(3, membresia.getCosto());
-            stmt.setBoolean(4, membresia.getEstado());
+            stmt.setString(4, membresia.getEstado());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException("Error al crear la membresía: " + e.getMessage());
@@ -96,10 +96,10 @@ public class Adquirir_membresiaRepository {
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, membresia.getId_restaurantero());
-            stmt.setDate(2, Date.valueOf(membresia.getFechaAdquisicion()));
+            stmt.setDate(2, Date.valueOf(membresia.getFecha_adquisicion()));
             stmt.setDouble(3, membresia.getCosto());
-            stmt.setBoolean(4, membresia.getEstado());
-            stmt.setInt(5, membresia.getIdAdquisicion());
+            stmt.setString(4, membresia.getEstado());
+            stmt.setInt(5, membresia.getId_adquisicion());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -135,7 +135,7 @@ public class Adquirir_membresiaRepository {
             rs.getInt("id_restaurantero"),
             rs.getDate("fecha_adquisicion").toLocalDate(),
             rs.getDouble("costo"),
-            rs.getBoolean("estado")
+            rs.getString("estado")
         );
     }
 }

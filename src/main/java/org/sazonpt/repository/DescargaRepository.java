@@ -13,13 +13,13 @@ import org.sazonpt.model.Descarga;
 public class DescargaRepository {
     
     public void AddDescarga(Descarga d) throws SQLException {
-        String query = "INSERT INTO descarga(cantidad_descargas, codigo_adquisicion, lugar_origen, opiniones) VALUES(?, ?, ?, ?)";
+        String query = "INSERT INTO descarga(cantidad_descargas, id_adquisicion, lugar_origen, opiniones) VALUES(?, ?, ?, ?)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setInt(1, d.getCantidad_descargas());
-            stmt.setInt(2, d.getCodigo_adquisicion());
+            stmt.setInt(2, d.getId_adquisicion());
             stmt.setString(3, d.getLugar_origen());
             stmt.setString(4, d.getOpiniones());
             stmt.executeUpdate();
@@ -67,13 +67,13 @@ public class DescargaRepository {
     }
 
     public Descarga UpdateDescarga(Descarga d) throws SQLException {
-        String query = "UPDATE descarga SET cantidad_descargas = ?, codigo_adquisicion = ?, lugar_origen = ?, opiniones = ? WHERE id_descarga = ?";
+        String query = "UPDATE descarga SET cantidad_descargas = ?, id_adquisicion = ?, lugar_origen = ?, opiniones = ? WHERE id_descarga = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setInt(1, d.getCantidad_descargas());
-            stmt.setInt(2, d.getCodigo_adquisicion());
+            stmt.setInt(2, d.getId_adquisicion());
             stmt.setString(3, d.getLugar_origen());
             stmt.setString(4, d.getOpiniones());
             stmt.setInt(5, d.getId_descarga());
@@ -113,7 +113,7 @@ public class DescargaRepository {
         return new Descarga(
             rs.getInt("id_descarga"),
             rs.getInt("cantidad_descargas"),
-            rs.getInt("codigo_adquisicion"),
+            rs.getInt("id_adquisicion"),
             rs.getString("lugar_origen"),
             rs.getString("opiniones")
         );

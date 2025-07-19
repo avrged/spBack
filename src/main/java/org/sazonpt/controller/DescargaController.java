@@ -64,7 +64,7 @@ public class DescargaController {
             Descarga updatedDescarga = new Descarga(
                 idDescarga,
                 descarga.getCantidad_descargas(),
-                descarga.getCodigo_adquisicion(),
+                descarga.getId_adquisicion(),
                 descarga.getLugar_origen(),
                 descarga.getOpiniones()
             );

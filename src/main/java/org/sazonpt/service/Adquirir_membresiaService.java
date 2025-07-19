@@ -27,8 +27,8 @@ public class Adquirir_membresiaService {
     }
 
     public void createMembresia(Adquirir_membresia membresia) throws SQLException {
-        if (membresia.getCodigoRestaurantero() <= 0) {
-            throw new IllegalArgumentException("Código de restaurantero inválido");
+        if (membresia.getId_restaurantero() <= 0) {
+            throw new IllegalArgumentException("id de restaurantero inválido");
         }
 
         if (membresia.getCosto() < 0) {
@@ -36,10 +36,10 @@ public class Adquirir_membresiaService {
         }
 
         // Si no se especifica fecha, usar la fecha actual
-        if (membresia.getFechaAdquisicion() == null) {
+        if (membresia.getFecha_adquisicion() == null) {
             membresia = new Adquirir_membresia(
-                membresia.getIdAdquisicion(),
-                membresia.getCodigoRestaurantero(),
+                membresia.getId_adquisicion(),
+                membresia.getId_restaurantero(),
                 LocalDate.now(),
                 membresia.getCosto(),
                 membresia.getEstado()
@@ -50,7 +50,7 @@ public class Adquirir_membresiaService {
     }
 
     public void updateMembresia(Adquirir_membresia membresia) throws SQLException {
-        if (membresiaRepo.findById(membresia.getIdAdquisicion()) == null) {
+        if (membresiaRepo.findById(membresia.getId_adquisicion()) == null) {
             throw new IllegalArgumentException("No existe una membresía con este ID");
         }
 

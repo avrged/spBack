@@ -50,7 +50,4 @@ public class Restaurante {
     public void setEtiquetas(String etiquetas){this.etiquetas = etiquetas;}
     public String getEtiquetas(){return etiquetas;}
 
-    // Métodos de compatibilidad (mantener nombres antiguos)
-    public int getSolicitud_aprobada(){return id_solicitud_aprobada;}
-    public int getCodigo_zona(){return id_zona;}
 }
