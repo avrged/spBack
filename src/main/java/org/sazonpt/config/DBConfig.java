@@ -28,7 +28,7 @@ public class DBConfig {
                 config.setConnectionTimeout(30000);
                 
                 dataSource = new HikariDataSource(config);
-                System.out.println("Conexión a BD establecida correctamente");
+                System.out.println("Conexión a la BD establecida correctamente");
             } catch (Exception e) {
                 System.err.println("Error al conectar con la BD: " + e.getMessage());
                 e.printStackTrace();

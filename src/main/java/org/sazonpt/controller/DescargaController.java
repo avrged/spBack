@@ -78,17 +78,17 @@ public class DescargaController {
     public void delete(Context ctx) {
         try {
             int idDescarga = Integer.parseInt(ctx.pathParam("id"));
-            System.out.println("Attempting to delete descarga with ID: " + idDescarga);
+            System.out.println("Intentando eliminar la descarga con id: " + idDescarga);
             descargaService.deleteDescarga(idDescarga);
             ctx.status(200).result("Descarga eliminada exitosamente");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid descarga ID format: " + ctx.pathParam("id"));
+            System.out.println("Formato invalido de id: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de descarga inválido");
         } catch (SQLException e) {
-            System.out.println("SQL Error deleting descarga: " + e.getMessage());
+            System.out.println("Error sql al borrar la descarga: " + e.getMessage());
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unexpected error deleting descarga: " + e.getMessage());
+            System.out.println("Error inesperado al intentar borrar la descarga: " + e.getMessage());
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }

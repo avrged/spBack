@@ -71,17 +71,17 @@ public class UsuarioController {
     public void delete(Context ctx) {
         try {
             int idUser = Integer.parseInt(ctx.pathParam("id"));
-            System.out.println("Attempting to delete user with ID: " + idUser);
+            System.out.println("Intentando borrar el usuario con id: " + idUser);
             userService.deleteUser(idUser);
             ctx.status(200).result("Usuario eliminado exitosamente");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid user ID format: " + ctx.pathParam("id"));
+            System.out.println("Formato invalido de id: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de usuario inválido");
         } catch (SQLException e) {
-            System.out.println("SQL Error deleting user: " + e.getMessage());
+            System.out.println("Error sql al borrar el usuario: " + e.getMessage());
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unexpected error deleting user: " + e.getMessage());
+            System.out.println("Error inesperado al borrar el usuario: " + e.getMessage());
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }

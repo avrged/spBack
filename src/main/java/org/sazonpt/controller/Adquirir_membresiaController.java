@@ -88,17 +88,17 @@ public class Adquirir_membresiaController {
     public void delete(Context ctx) {
         try {
             int idAdquisicion = Integer.parseInt(ctx.pathParam("id"));
-            System.out.println("Attempting to delete membresia with ID: " + idAdquisicion);
+            System.out.println("Intentando eliminar la membresia con id: " + idAdquisicion);
             membresiaService.deleteMembresia(idAdquisicion);
             ctx.status(200).result("Membresía eliminada exitosamente");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid membresia ID format: " + ctx.pathParam("id"));
+            System.out.println("Formato invalido de id para la membresia: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de membresía inválido");
         } catch (SQLException e) {
             System.out.println("SQL Error deleting membresia: " + e.getMessage());
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unexpected error deleting membresia: " + e.getMessage());
+            System.out.println("Error inesperado al borrar la membresia: " + e.getMessage());
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }

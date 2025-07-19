@@ -118,17 +118,17 @@ public class Revision_solicitudController {
     public void deleteSolicitud(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
-            System.out.println("Attempting to delete solicitud with ID: " + idSolicitud);
+            System.out.println("Intentando borrar la solicitud con id: " + idSolicitud);
             revisionService.deleteSolicitud(idSolicitud);
             ctx.status(200).result("Solicitud eliminada exitosamente");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid solicitud ID format: " + ctx.pathParam("id"));
+            System.out.println("formato invalido de id: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de solicitud inválido");
         } catch (SQLException e) {
-            System.out.println("SQL Error deleting solicitud: " + e.getMessage());
+            System.out.println("Error SQL al borrar la solicitud: " + e.getMessage());
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unexpected error deleting solicitud: " + e.getMessage());
+            System.out.println("Error inesperado al borrar la solicitud: " + e.getMessage());
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }

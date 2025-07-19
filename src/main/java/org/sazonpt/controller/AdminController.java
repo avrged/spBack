@@ -63,17 +63,17 @@ public class AdminController {
     public void delete(Context ctx) {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            System.out.println("Attempting to delete admin with ID: " + id);
+            System.out.println("Intentando eliminar el administrador con Id: " + id);
             adminService.deleteAdmin(id);
             ctx.status(200).result("Administrador eliminado exitosamente");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid admin ID format: " + ctx.pathParam("id"));
+            System.out.println("formato de Id invalido: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de administrador inválido");
         } catch (SQLException e) {
-            System.out.println("SQL Error deleting admin: " + e.getMessage());
+            System.out.println("Error de SQL al eliminar el Id: " + e.getMessage());
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unexpected error deleting admin: " + e.getMessage());
+            System.out.println("Error inesperado al borrar el administrador: " + e.getMessage());
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }

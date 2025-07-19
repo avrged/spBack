@@ -82,17 +82,17 @@ public class MenuController {
     public void delete(Context ctx) {
         try {
             int idMenu = Integer.parseInt(ctx.pathParam("id"));
-            System.out.println("Attempting to delete menu with ID: " + idMenu);
+            System.out.println("Intentando eliminar el menu con id: " + idMenu);
             menuService.deleteMenu(idMenu);
             ctx.status(200).result("Menú eliminado exitosamente");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid menu ID format: " + ctx.pathParam("id"));
+            System.out.println("formato invalido de id: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de menú inválido");
         } catch (SQLException e) {
-            System.out.println("SQL Error deleting menu: " + e.getMessage());
+            System.out.println("Error sql al borrar el menu: " + e.getMessage());
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unexpected error deleting menu: " + e.getMessage());
+            System.out.println("Error inesperado al intentar borrar el menu: " + e.getMessage());
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }

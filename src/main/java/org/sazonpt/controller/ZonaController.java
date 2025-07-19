@@ -72,17 +72,17 @@ public class ZonaController {
     public void delete(Context ctx) {
         try {
             int idZona = Integer.parseInt(ctx.pathParam("id"));
-            System.out.println("Attempting to delete zona with ID: " + idZona);
+            System.out.println("Intentando borrar la zona con id: " + idZona);
             zonaService.deleteZona(idZona);
             ctx.status(200).result("Zona eliminada exitosamente");
         } catch (NumberFormatException e) {
-            System.out.println("Invalid zona ID format: " + ctx.pathParam("id"));
+            System.out.println("formato invalido de id: " + ctx.pathParam("id"));
             ctx.status(400).result("ID de zona inválido");
         } catch (SQLException e) {
-            System.out.println("SQL Error deleting zona: " + e.getMessage());
+            System.out.println("Error SQL al borrar la zona: " + e.getMessage());
             ctx.status(500).result("Error en base de datos: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unexpected error deleting zona: " + e.getMessage());
+            System.out.println("Error inesperado al borrar la zona: " + e.getMessage());
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }
