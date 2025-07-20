@@ -11,21 +11,60 @@ import org.sazonpt.config.DBConfig;
 import org.sazonpt.model.Usuario;
 
 public class UsuarioRepository {
-    public void save(Usuario user) throws SQLException {
-        String query = "INSERT INTO usuario(nombre, correo, contrasena, tipo, status) VALUES (?, ?, ?, ?, ?);";
-
+    public Usuario findByCorreo(String correo) throws SQLException {
+        String query = "SELECT * FROM usuario WHERE correo = ?;";
+        Usuario user = null;
         try(Connection conn = DBConfig.getDataSource().getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setString(1, correo);
+            try(ResultSet rs = stmt.executeQuery()){
+                if(rs.next()){
+                    user = mapResulsetToUser(rs);
+                }
+            }
+        } catch(SQLException e){
+            throw new SQLException("Error al buscar usuario por correo: "+e.getMessage());
+        }
+        return user;
+    }
+    public int save(Usuario user) throws SQLException {
+        // Validar si el usuario ya existe por correo antes de insertar
+        if (findByCorreo(user.getCorreo()) != null) {
+            throw new SQLException("Ya existe un usuario con ese correo");
+        }
+        String query = "INSERT INTO usuario(nombre, correo, contrasena, tipo, status) VALUES (?, ?, ?, ?, ?);";
+        int id_usuario = -1;
+        System.out.println("[UsuarioRepository.save] Recibido:");
+        System.out.println("nombre: " + user.getNombre());
+        System.out.println("correo: " + user.getCorreo());
+        System.out.println("contrasena: " + user.getContrasena());
+        System.out.println("tipo: " + user.getTipo());
+        System.out.println("status: " + user.getStatus());
+        try(Connection conn = DBConfig.getDataSource().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS)){
 
-            stmt.setString(1, user.getNombreU());
+            stmt.setString(1, user.getNombre());
             stmt.setString(2, user.getCorreo());
             stmt.setString(3, user.getContrasena());
             stmt.setString(4, user.getTipo());
             stmt.setString(5, user.getStatus());
             stmt.executeUpdate();
+
+            try(ResultSet generatedKeys = stmt.getGeneratedKeys()){
+                if(generatedKeys.next()){
+                    id_usuario = generatedKeys.getInt(1);
+                }
+            } catch(SQLException e){
+                System.out.println("[UsuarioRepository.save] Error al obtener el ID generado: " + e.getMessage());
+                throw new SQLException("Error al crear el ID del usuario creado: " + e.getMessage());
+            }
+
         } catch(SQLException e){
+            System.out.println("[UsuarioRepository.save] Error SQL: " + e.getMessage());
             throw new SQLException("Error al crear el usuario: "+e.getMessage());
         }
+        System.out.println("[UsuarioRepository.save] id_usuario generado: " + id_usuario);
+        return id_usuario;
     }
 
     public Usuario findByIdUser(int idUser) throws SQLException {
@@ -70,7 +109,7 @@ public class UsuarioRepository {
         try(Connection conn = DBConfig.getDataSource().getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
 
-            stmt.setString(1, user.getNombreU());
+            stmt.setString(1, user.getNombre());
             stmt.setString(2, user.getCorreo());
             stmt.setString(3, user.getContrasena());
             stmt.setString(4, user.getTipo());

@@ -11,48 +11,14 @@ import org.sazonpt.config.DBConfig;
 import org.sazonpt.model.Administrador;
 
 public class AdminRepository {
-    
     public void createAdmin(Administrador admin) throws SQLException {
-        Connection conn = null;
-        try {
-            conn = DBConfig.getDataSource().getConnection();
-            conn.setAutoCommit(false);
-            
-            // Primero insertar en tabla usuario
-            String queryUsuario = "INSERT INTO usuario(nombre, correo, contrasena, tipo, status) VALUES(?, ?, ?, ?, ?)";
-            PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario, PreparedStatement.RETURN_GENERATED_KEYS);
-            stmtUsuario.setString(1, admin.getNombreU());
-            stmtUsuario.setString(2, admin.getCorreo());
-            stmtUsuario.setString(3, admin.getContrasena());
-            stmtUsuario.setString(4, "administrador");
-            stmtUsuario.setString(5, admin.getStatus());
-            stmtUsuario.executeUpdate();
-            
-            // Obtener el ID generado
-            ResultSet generatedKeys = stmtUsuario.getGeneratedKeys();
-            int idUsuario = 0;
-            if (generatedKeys.next()) {
-                idUsuario = generatedKeys.getInt(1);
-            }
-            
-            // Luego insertar en tabla administrador
-            String queryAdmin = "INSERT INTO administrador(id_usuario) VALUES(?)";
-            PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
-            stmtAdmin.setInt(1, idUsuario);
-            stmtAdmin.executeUpdate();
-            
-            conn.commit();
-            
+        String query = "INSERT INTO administrador(id_usuario) VALUES(?)";
+        try(Connection conn = DBConfig.getDataSource().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setInt(1, admin.getId_usuario());
+            stmt.executeUpdate();
         } catch(SQLException e){
-            if (conn != null) {
-                conn.rollback();
-            }
-            throw new SQLException("Error al crear el administrador: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                conn.setAutoCommit(true);
-                conn.close();
-            }
+            throw new SQLException("Error al crear el administrador: "+e.getMessage());
         }
     }
 
@@ -105,7 +71,7 @@ public class AdminRepository {
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
-            stmt.setString(1, admin.getNombreU());
+            stmt.setString(1, admin.getNombre());
             stmt.setString(2, admin.getCorreo());
             stmt.setString(3, admin.getContrasena());
             stmt.setString(4, admin.getStatus());

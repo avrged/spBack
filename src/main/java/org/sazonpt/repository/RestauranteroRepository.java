@@ -8,51 +8,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sazonpt.config.DBConfig;
+import org.sazonpt.model.Administrador;
 import org.sazonpt.model.Restaurantero;
 
 public class RestauranteroRepository {
     
     public void CreateRestaurantero(Restaurantero reo) throws SQLException{
-        Connection conn = null;
-        try {
-            conn = DBConfig.getDataSource().getConnection();
-            conn.setAutoCommit(false);
-            
-            // Primero insertar en tabla usuario
-            String queryUsuario = "INSERT INTO usuario(nombre, correo, contrasena, tipo, status) VALUES(?, ?, ?, ?, ?)";
-            PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario, PreparedStatement.RETURN_GENERATED_KEYS);
-            stmtUsuario.setString(1, reo.getNombreU());
-            stmtUsuario.setString(2, reo.getCorreo());
-            stmtUsuario.setString(3, reo.getContrasena());
-            stmtUsuario.setString(4, "restaurantero");
-            stmtUsuario.setString(5, reo.getStatus());
-            stmtUsuario.executeUpdate();
-            
-            // Obtener el ID generado
-            ResultSet generatedKeys = stmtUsuario.getGeneratedKeys();
-            int idUsuario = 0;
-            if (generatedKeys.next()) {
-                idUsuario = generatedKeys.getInt(1);
-            }
-            
-            // Luego insertar en tabla restaurantero
-            String queryRestaurantero = "INSERT INTO restaurantero(id_usuario) VALUES(?)";
-            PreparedStatement stmtRestaurantero = conn.prepareStatement(queryRestaurantero);
-            stmtRestaurantero.setInt(1, idUsuario);
-            stmtRestaurantero.executeUpdate();
-            
-            conn.commit();
-            
+       String query = "INSERT INTO restaurantero(id_usuario) VALUES(?)";
+       try(Connection conn = DBConfig.getDataSource().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setInt(1, reo.getId_usuario());
+            stmt.executeUpdate();
         } catch(SQLException e){
-            if (conn != null) {
-                conn.rollback();
-            }
-            throw new SQLException("Error al crear el restaurantero: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                conn.setAutoCommit(true);
-                conn.close();
-            }
+            throw new SQLException("Error al crear el restaurantero: "+e.getMessage());
+        }
+    }
+
+    public void CreateAdmin(Administrador admin) throws SQLException {
+        String query = "INSERT INTO administrador(id_usuario) VALUES(?)";
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setInt(1, admin.getId_usuario());
+            stmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            throw new SQLException("Error al crear el administrador: " + e.getMessage());
         }
     }
 
@@ -95,7 +77,7 @@ public class RestauranteroRepository {
         String query = "UPDATE usuario SET nombre = ?, correo = ?, contrasena = ?, status = ? WHERE id_usuario = ?";
         try(Connection conn = DBConfig.getDataSource().getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setString(1, reo.getNombreU());
+            stmt.setString(1, reo.getNombre());
             stmt.setString(2, reo.getCorreo());
             stmt.setString(3, reo.getContrasena());
             stmt.setString(4, reo.getStatus());

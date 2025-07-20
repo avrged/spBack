@@ -3,7 +3,11 @@ package org.sazonpt.service;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.sazonpt.model.Administrador;
+import org.sazonpt.model.Restaurantero;
 import org.sazonpt.model.Usuario;
+import org.sazonpt.repository.AdminRepository;
+import org.sazonpt.repository.RestauranteroRepository;
 import org.sazonpt.repository.UsuarioRepository;
 
 public class UsuarioService {
@@ -21,20 +25,34 @@ public class UsuarioService {
         return userRepo.findByIdUser(idUser);
     }
 
-    public void createUser(Usuario user) throws SQLException {
-        if (user.getNombreU() == null || user.getCorreo() == null || user.getContrasena() == null) {
+    public int createUser(Usuario user) throws SQLException {
+        // Validaciones antes de guardar
+        if (user.getNombre() == null || user.getCorreo() == null || user.getContrasena() == null) {
             throw new IllegalArgumentException("Nombre, correo y contraseña obligatorios");
         }
 
-        if (userRepo.findByIdUser(user.getId_usuario()) != null) {
-            throw new IllegalArgumentException("Ya existe un usuario con este id");
-        }
-
+        // Validación de correo
         if (!user.getCorreo().contains("@")) {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
-        
-        userRepo.save(user);
+
+        // Validación de usuario existente por correo
+        if (userRepo.findByCorreo(user.getCorreo()) != null) {
+            throw new IllegalArgumentException("Ya existe un usuario con este correo");
+        }
+
+        int id_usuario = userRepo.save(user);
+
+        if("restaurantero".equalsIgnoreCase(user.getTipo())){
+            RestauranteroRepository restRepo = new RestauranteroRepository();
+            restRepo.CreateRestaurantero(new Restaurantero(id_usuario));
+        }
+        else if("administrador".equalsIgnoreCase(user.getTipo())){
+            AdminRepository adminRepo = new AdminRepository();
+            adminRepo.createAdmin(new Administrador(id_usuario));
+        }
+
+        return id_usuario;
     }
 
     public void updateUser(Usuario user) throws SQLException {

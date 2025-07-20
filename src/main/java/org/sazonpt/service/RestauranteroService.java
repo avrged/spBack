@@ -22,23 +22,38 @@ public class RestauranteroService {
     }
 
     public void createRestaurantero(Restaurantero reo) throws SQLException {
-        if(reo.getNombreU() == null || reo.getCorreo() == null || reo.getContrasena() == null) {
-            throw new IllegalArgumentException("Nombre, correo y contraseña son obligatorios");
-        }
+        try {
+            System.out.println("[RestauranteroService.createRestaurantero] Recibido:");
+            System.out.println("nombre: " + reo.getNombre());
+            System.out.println("correo: " + reo.getCorreo());
+            System.out.println("contrasena: " + reo.getContrasena());
+            System.out.println("id_usuario: " + reo.getId_usuario());
+            System.out.println("tipo: " + reo.getTipo());
+            System.out.println("status: " + reo.getStatus());
 
-        if (reoRepo.findRestauranteroById(reo.getId_usuario()) != null) {
-            throw new IllegalArgumentException("Ya existe un restaurantero con este código");
-        }
+            if(reo.getNombre() == null || reo.getCorreo() == null || reo.getContrasena() == null) {
+                throw new IllegalArgumentException("Nombre, correo y contraseña son obligatorios");
+            }
 
-        if (!reo.getCorreo().contains("@")) {
-            throw new IllegalArgumentException("El correo debe contener un '@'");
-        }
+            if (reoRepo.findRestauranteroById(reo.getId_usuario()) != null) {
+                throw new IllegalArgumentException("Ya existe un restaurantero con este código");
+            }
 
-        reoRepo.CreateRestaurantero(reo);
+            if (!reo.getCorreo().contains("@")) {
+                throw new IllegalArgumentException("El correo debe contener un '@'");
+            }
+
+            reoRepo.CreateRestaurantero(reo);
+            System.out.println("[RestauranteroService.createRestaurantero] Restaurantero creado correctamente.");
+        } catch (Exception e) {
+            System.out.println("[RestauranteroService.createRestaurantero] Error: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public void updateRestaurantero(Restaurantero reo) throws SQLException {
-        if(reo.getNombreU() == null || reo.getCorreo() == null || reo.getContrasena() == null) {
+        if(reo.getNombre() == null || reo.getCorreo() == null || reo.getContrasena() == null) {
             throw new IllegalArgumentException("Nombre, correo y contraseña son obligatorios");
         }
 

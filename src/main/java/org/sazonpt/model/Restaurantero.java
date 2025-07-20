@@ -10,16 +10,14 @@ public class Restaurantero extends Usuario{
         this.status = "activo"; // Status por defecto
     }
 
-    // Constructor sin status (usa "activo" por defecto)
-    public Restaurantero(String nombre, String correo, String contrasena) {
-        super(nombre, correo, contrasena, "restaurantero");
-        this.status = "activo"; // Status por defecto
+    public Restaurantero(int id_usuario){
+        this.id_usuario = id_usuario;
     }
 
     public Restaurantero(int id_usuario, String nombre, String correo, String contrasena, String tipo, int id_usuario_fk, String status){
         super(id_usuario, nombre, correo, contrasena, tipo, status);
         this.id_usuario = id_usuario_fk;
-        this.status = status;
+        this.status = "activo";
     }
 
     // Getters y Setters

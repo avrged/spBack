@@ -17,6 +17,4 @@ public class AdminRoutes {
         app.put("/admins/{id}", adminController::update);
         app.delete("/admins/{id}", adminController::delete);
     }
-
-
 }

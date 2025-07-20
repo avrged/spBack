@@ -43,16 +43,34 @@ public class UsuarioController {
     public void create(Context ctx) {
         try {
             Usuario user = ctx.bodyAsClass(Usuario.class);
-            userService.createUser(user);
+            int id_usuario = userService.createUser(user); // Debe retornar el id generado
+
+            // Construir datos de respuesta
+            java.util.Map<String, Object> data = new java.util.HashMap<>();
+            data.put("id_usuario", id_usuario);
+            data.put("nombre", user.getNombre());
+            data.put("correo", user.getCorreo());
+            data.put("tipo", user.getTipo());
+            data.put("status", user.getStatus());
+
             ctx.status(201).json(java.util.Map.of(
-                    "success", true,
-                    "message", "Usuario creado correctamente"
+                "success", true,
+                "message", "Usuario creado correctamente",
+                "data", data
             ));
         } catch (Exception e) {
-            ctx.status(400).json(java.util.Map.of(
+            String msg = e.getMessage();
+            if (msg != null && (msg.contains("Duplicate entry") || msg.contains("UNIQUE") || msg.contains("duplicate key"))) {
+                ctx.status(409).json(java.util.Map.of(
                     "success", false,
-                    "message", "Error al crear usuario"
-            ));
+                    "message", "Ya existe un usuario con ese correo"
+                ));
+            } else {
+                ctx.status(400).json(java.util.Map.of(
+                    "success", false,
+                    "message", "Error al crear usuario: " + msg
+                ));
+            }
         }
     }
 

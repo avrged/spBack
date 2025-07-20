@@ -9,6 +9,10 @@ public class Administrador extends Usuario{
         this.status = "activo"; // Status por defecto
     }
 
+    public Administrador(int id_usuario) {
+        this.id_usuario = id_usuario;
+    }
+
     public Administrador(String nombre, String correo, String contrasena) {
         super(nombre, correo, contrasena, "administrador");
         this.status = "activo"; // Status por defecto

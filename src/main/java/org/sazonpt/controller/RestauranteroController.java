@@ -45,13 +45,32 @@ public class RestauranteroController {
         try {
             Restaurantero restaurantero = ctx.bodyAsClass(Restaurantero.class);
             restauranteroService.createRestaurantero(restaurantero);
-            ctx.status(201).result("Restaurantero creado exitosamente");
+            ctx.status(201).json(java.util.Map.of(
+                "success", true,
+                "message", "Restaurantero creado exitosamente",
+                "data", java.util.Map.of(
+                    "nombre", restaurantero.getNombre(),
+                    "correo", restaurantero.getCorreo(),
+                    "tipo", restaurantero.getTipo(),
+                    "status", restaurantero.getStatus(),
+                    "id_usuario", restaurantero.getId_usuario()
+                )
+            ));
         } catch (IllegalArgumentException e) {
-            ctx.status(400).result("Datos inválidos: " + e.getMessage());
+            ctx.status(400).json(java.util.Map.of(
+                "success", false,
+                "message", "Datos inválidos: " + e.getMessage()
+            ));
         } catch (SQLException e) {
-            ctx.status(500).result("Error al crear restaurantero: " + e.getMessage());
+            ctx.status(500).json(java.util.Map.of(
+                "success", false,
+                "message", "Error al crear restaurantero: " + e.getMessage()
+            ));
         } catch (Exception e) {
-            ctx.status(400).result("Error al procesar la solicitud: " + e.getMessage());
+            ctx.status(400).json(java.util.Map.of(
+                "success", false,
+                "message", "Error al procesar la solicitud: " + e.getMessage()
+            ));
         }
     }
 

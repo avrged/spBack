@@ -1,7 +1,9 @@
 package org.sazonpt.service;
 
 import org.sazonpt.model.Administrador;
+import org.sazonpt.model.Usuario;
 import org.sazonpt.repository.AdminRepository;
+import org.sazonpt.repository.UsuarioRepository;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -22,18 +24,26 @@ public class AdminService {
     }
     
     public void createAdmin(Administrador admin) throws SQLException {
-        if(admin.getNombreU() == null || admin.getCorreo() == null || admin.getContrasena() == null) {
+        if(admin.getNombre() == null || admin.getCorreo() == null || admin.getContrasena() == null) {
             throw new IllegalArgumentException("Nombre, correo y contraseña son obligatorios");
-        }
-
-        if(adminRepo.findAdminById(admin.getId_usuario()) != null){
-            throw new IllegalArgumentException("Ya existe un administrador con este ID");
         }
 
         if(!admin.getCorreo().contains("@")){
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
-        adminRepo.createAdmin(admin);
+        UsuarioRepository userRepo = new UsuarioRepository();
+        if(userRepo.findByCorreo(admin.getCorreo()) != null){
+            throw new IllegalArgumentException("Ya existe un usuario con este correo");
+        }
+
+        Usuario user = new Usuario(
+            admin.getNombre(),
+            admin.getCorreo(),
+            admin.getContrasena(),
+            "administrador"
+        );
+        int id_usuario = userRepo.save(user);
+        adminRepo.createAdmin(new Administrador(id_usuario));
     }
     
     public void updateAdmin(Administrador admin) throws SQLException {
