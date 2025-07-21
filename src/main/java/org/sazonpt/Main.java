@@ -14,13 +14,11 @@ public class Main {
                     it.allowCredentials = true;
                 });
             });
-            // Configurar archivos estáticos para servir uploads
-            config.staticFiles.add("spBack/uploads", Location.EXTERNAL);
+            config.staticFiles.add("./uploads", Location.EXTERNAL);
         }).start(7070);
 
         app.get("/", ctx -> ctx.result("API - Catalogo de Restaurantes"));
         
-        // Registrar todas las rutas
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
         AppModule.initRestaurantero().registerRoutes(app);
