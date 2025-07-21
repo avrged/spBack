@@ -11,7 +11,12 @@ public class Main {
             // Configurar límites para archivos (en bytes)
             config.http.maxRequestSize = 50_000_000L; // 50MB máximo para toda la petición
 
-            config.staticFiles.add("./uploads", Location.EXTERNAL);
+            // Configurar archivos estáticos para servir las imágenes y documentos
+            config.staticFiles.add(staticFiles -> {
+                staticFiles.hostedPath = "/uploads";
+                staticFiles.directory = "./uploads";
+                staticFiles.location = Location.EXTERNAL;
+            });
         }).start(7070);
 
         app.before(ctx -> {
