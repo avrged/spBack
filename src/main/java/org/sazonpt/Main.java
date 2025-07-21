@@ -8,10 +8,7 @@ import org.sazonpt.di.AppModule;
 public class Main {
     public static void main(String[] args) {
         Javalin app = Javalin.create(config -> {
-            // Configurar límites para archivos (en bytes)
-            config.http.maxRequestSize = 50_000_000L; // 50MB máximo para toda la petición
-
-            // Configurar archivos estáticos para servir las imágenes y documentos
+            config.http.maxRequestSize = 50_000_000L;
             config.staticFiles.add(staticFiles -> {
                 staticFiles.hostedPath = "/uploads";
                 staticFiles.directory = "./uploads";
