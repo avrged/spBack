@@ -60,44 +60,22 @@ public class Solicitud_registroController {
     }
 
     public void createWithFiles(Context ctx) {
-        System.out.println("=== INICIO createWithFiles ===");
-        System.out.println("Content-Type: " + ctx.contentType());
-        System.out.println("Content-Length: " + ctx.header("Content-Length"));
-
         try {
-            // Obtener datos del formulario con logs detallados
-            System.out.println("=== OBTENIENDO PARÁMETROS ===");
+            // Obtener datos del formulario
             var restaurante = ctx.formParam("restaurante");
-            System.out.println("restaurante obtenido: " + restaurante);
-
             var propietario = ctx.formParam("propietario");
-            System.out.println("propietario obtenido: " + propietario);
-
             var correo = ctx.formParam("correo");
-            System.out.println("correo obtenido: " + correo);
-
             var numero = ctx.formParam("numero");
             var direccion = ctx.formParam("direccion");
             var horario = ctx.formParam("horario");
             var id_restaurantero = ctx.formParam("id_restaurantero");
             var estado = ctx.formParam("estado");
 
-            System.out.println("=== TODOS LOS DATOS RECIBIDOS ===");
-            System.out.println("restaurante: " + restaurante);
-            System.out.println("propietario: " + propietario);
-            System.out.println("correo: " + correo);
-            System.out.println("numero: " + numero);
-            System.out.println("direccion: " + direccion);
-            System.out.println("horario: " + horario);
-            System.out.println("id_restaurantero: " + id_restaurantero);
-            System.out.println("estado: " + estado);
-
             // Validar campos obligatorios
             if (restaurante == null || restaurante.trim().isEmpty() ||
                 correo == null || correo.trim().isEmpty() ||
                 direccion == null || direccion.trim().isEmpty()) {
 
-                System.out.println("ERROR: Campos obligatorios faltantes");
                 ctx.status(400).json(java.util.Map.of(
                     "success", false,
                     "message", "Los campos restaurante, correo y direccion son obligatorios"
@@ -105,58 +83,20 @@ public class Solicitud_registroController {
                 return;
             }
 
-            System.out.println("=== OBTENIENDO ARCHIVOS ===");
             // Obtener archivos
             var imagen1 = ctx.uploadedFile("imagen1");
             var imagen2 = ctx.uploadedFile("imagen2");
             var imagen3 = ctx.uploadedFile("imagen3");
             var comprobante = ctx.uploadedFile("comprobante");
 
-            System.out.println("imagen1: " + (imagen1 != null ? imagen1.filename() : "null"));
-            System.out.println("imagen2: " + (imagen2 != null ? imagen2.filename() : "null"));
-            System.out.println("imagen3: " + (imagen3 != null ? imagen3.filename() : "null"));
-            System.out.println("comprobante: " + (comprobante != null ? comprobante.filename() : "null"));
-
-            System.out.println("=== GUARDANDO ARCHIVOS ===");
             // Guardar archivos y obtener URLs
-            String urlImagen1 = null;
-            String urlImagen2 = null;
-            String urlImagen3 = null;
-            String urlComprobante = null;
+            String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : null;
+            String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : null;
+            String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : null;
+            String urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : null;
 
-            try {
-                urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : null;
-                System.out.println("urlImagen1 guardada: " + urlImagen1);
-            } catch (Exception e) {
-                System.out.println("Error guardando imagen1: " + e.getMessage());
-            }
-
-            try {
-                urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : null;
-                System.out.println("urlImagen2 guardada: " + urlImagen2);
-            } catch (Exception e) {
-                System.out.println("Error guardando imagen2: " + e.getMessage());
-            }
-
-            try {
-                urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : null;
-                System.out.println("urlImagen3 guardada: " + urlImagen3);
-            } catch (Exception e) {
-                System.out.println("Error guardando imagen3: " + e.getMessage());
-            }
-
-            try {
-                urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : null;
-                System.out.println("urlComprobante guardado: " + urlComprobante);
-            } catch (Exception e) {
-                System.out.println("Error guardando comprobante: " + e.getMessage());
-            }
-
-            System.out.println("=== CREANDO OBJETO SOLICITUD ===");
             // Crear objeto solicitud
             Solicitud_registro solicitud = new Solicitud_registro();
-
-            System.out.println("Estableciendo valores en el objeto...");
             solicitud.setRestaurante(restaurante.trim());
             solicitud.setPropietario(propietario != null ? propietario.trim() : "");
             solicitud.setCorreo(correo.trim());
@@ -180,16 +120,9 @@ public class Solicitud_registroController {
             solicitud.setImagen3(urlImagen3);
             solicitud.setComprobante(urlComprobante);
 
-            System.out.println("=== LLAMANDO AL SERVICE ===");
-            System.out.println("Objeto solicitud creado, datos:");
-            System.out.println("- Restaurante: " + solicitud.getRestaurante());
-            System.out.println("- Correo: " + solicitud.getCorreo());
-            System.out.println("- ID Restaurantero: " + solicitud.getId_restaurantero());
-
-            // Llamar al service
+            // Guardar en base de datos
             solicitudService.createSolicitud(solicitud);
 
-            System.out.println("=== ÉXITO TOTAL ===");
             ctx.status(201).json(java.util.Map.of(
                 "success", true,
                 "message", "Solicitud creada correctamente con archivos",
@@ -204,37 +137,25 @@ public class Solicitud_registroController {
             ));
 
         } catch (SQLException sqlEx) {
-            System.out.println("=== ERROR SQL DETALLADO ===");
-            System.out.println("SQLException: " + sqlEx.getClass().getSimpleName());
-            System.out.println("Message: " + sqlEx.getMessage());
-            System.out.println("SQL State: " + sqlEx.getSQLState());
-            System.out.println("Error Code: " + sqlEx.getErrorCode());
-            sqlEx.printStackTrace();
-
+            System.err.println("Error de base de datos: " + sqlEx.getMessage());
             ctx.status(500).json(java.util.Map.of(
                 "success", false,
                 "message", "Error de base de datos: " + sqlEx.getMessage()
             ));
 
         } catch (IllegalArgumentException argEx) {
-            System.out.println("=== ERROR DE ARGUMENTOS ===");
-            System.out.println("IllegalArgumentException: " + argEx.getMessage());
-            argEx.printStackTrace();
-
+            System.err.println("Error de validación: " + argEx.getMessage());
             ctx.status(400).json(java.util.Map.of(
                 "success", false,
                 "message", argEx.getMessage()
             ));
 
         } catch (Exception e) {
-            System.out.println("=== ERROR GENERAL DETALLADO ===");
-            System.out.println("Exception type: " + e.getClass().getSimpleName());
-            System.out.println("Message: " + e.getMessage());
+            System.err.println("Error interno: " + e.getMessage());
             e.printStackTrace();
-
             ctx.status(500).json(java.util.Map.of(
                 "success", false,
-                "message", "Error interno del servidor: " + e.getMessage()
+                "message", "Error interno del servidor"
             ));
         }
     }
