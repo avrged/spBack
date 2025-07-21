@@ -203,14 +203,18 @@ public class Solicitud_registroRepository {
                 updateStmt.executeUpdate();
             }
 
-            // 3. Crear el restaurante incluyendo todos los campos obligatorios
+            // 3. Crear el restaurante incluyendo todos los campos obligatorios con etiquetas por defecto
             String insertRestauranteQuery = "INSERT INTO restaurante (nombre, direccion, horario, telefono, etiquetas, id_zona) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement insertStmt = conn.prepareStatement(insertRestauranteQuery)) {
                 insertStmt.setString(1, solicitud.getRestaurante()); // nombre
                 insertStmt.setString(2, solicitud.getDireccion());   // direccion
                 insertStmt.setString(3, solicitud.getHorario() != null ? solicitud.getHorario() : "No especificado"); // horario
                 insertStmt.setString(4, solicitud.getNumero() != null ? solicitud.getNumero() : ""); // telefono
-                insertStmt.setString(5, "Comida"); // etiquetas por defecto - se puede personalizar después
+
+                // Asignar etiquetas por defecto basadas en el tipo de restaurante
+                String etiquetasPorDefecto = "Comida Rápida, Familiar";
+                insertStmt.setString(5, etiquetasPorDefecto); // etiquetas por defecto
+
                 insertStmt.setInt(6, 1); // ID de zona por defecto
 
                 System.out.println("Creando restaurante con todos los campos requeridos:");
@@ -218,10 +222,10 @@ public class Solicitud_registroRepository {
                 System.out.println("- Dirección: " + solicitud.getDireccion());
                 System.out.println("- Horario: " + solicitud.getHorario());
                 System.out.println("- Teléfono: " + solicitud.getNumero());
-                System.out.println("- Etiquetas: Comida");
+                System.out.println("- Etiquetas: " + etiquetasPorDefecto);
 
                 insertStmt.executeUpdate();
-                System.out.println("Restaurante creado exitosamente");
+                System.out.println("Restaurante creado exitosamente con etiquetas por defecto");
             }
 
             conn.commit(); // Confirmar transacción

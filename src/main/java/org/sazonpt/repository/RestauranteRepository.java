@@ -178,6 +178,34 @@ public class RestauranteRepository {
         return restaurantes;
     }
 
+    // Método para obtener todos los restaurantes de un usuario específico (por ID de usuario)
+    public List<Restaurante> findRestaurantesByUsuario(int idUsuario) throws SQLException {
+        String query = """
+            SELECT rest.* 
+            FROM restaurante rest 
+            INNER JOIN solicitud_registro sr ON rest.id_solicitud_aprobada = sr.id_solicitud 
+            INNER JOIN restaurantero r ON sr.id_restaurantero = r.id_usuario 
+            WHERE r.id_usuario = ?
+            """;
+
+        List<Restaurante> restaurantes = new ArrayList<>();
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, idUsuario);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    restaurantes.add(mapResultSetToRestaurante(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error al buscar restaurantes por usuario: " + e.getMessage());
+        }
+        return restaurantes;
+    }
+
     // Método para obtener información completa del restaurante con su dueño
     public class RestauranteConDueno {
         private Restaurante restaurante;
