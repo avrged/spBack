@@ -14,12 +14,13 @@ import org.sazonpt.model.Solicitud_registro;
 public class Solicitud_registroRepository {
     
     public void AddSolicitudR(Solicitud_registro soliR) throws SQLException {
-        // Primero verificar si el restaurantero existe
-        if (!existeRestaurantero(soliR.getId_restaurantero())) {
-            throw new SQLException("Error: No existe un restaurantero con id: " + soliR.getId_restaurantero() + 
-                                 ". Debe ejecutar la migración primero o verificar que el restaurantero exista.");
+        // Modificamos para permitir solicitudes sin id_restaurantero válido
+        // Si el id_restaurantero no existe, lo establecemos como NULL
+        Integer idRestauranteroFinal = null;
+        if (soliR.getId_restaurantero() > 0 && existeRestaurantero(soliR.getId_restaurantero())) {
+            idRestauranteroFinal = soliR.getId_restaurantero();
         }
-        
+
         String query = "INSERT INTO solicitud_registro(" +
                 "id_restaurantero, propietario, correo, numero, direccion, horario, " +
                 "imagen1, imagen2, imagen3, comprobante, fecha, estado, restaurante) " +
@@ -27,7 +28,14 @@ public class Solicitud_registroRepository {
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, soliR.getId_restaurantero());
+
+            // Usar setObject para permitir NULL
+            if (idRestauranteroFinal != null) {
+                stmt.setInt(1, idRestauranteroFinal);
+            } else {
+                stmt.setNull(1, java.sql.Types.INTEGER);
+            }
+
             stmt.setString(2, soliR.getPropietario());
             stmt.setString(3, soliR.getCorreo());
             stmt.setString(4, soliR.getNumero());

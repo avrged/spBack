@@ -39,30 +39,20 @@ public class Solicitud_registroService {
             throw new IllegalArgumentException("La dirección es obligatoria");
         }
 
+        // TEMPORALMENTE COMENTAMOS LA VALIDACIÓN DEL ID RESTAURANTERO
+        // TODO: Descomentar cuando tengas restauranteros válidos en la BD
+        /*
         if (solicitud.getId_restaurantero() <= 0) {
             throw new IllegalArgumentException("ID de restaurantero inválido");
         }
+        */
 
-        // Si no se especifica fecha, usar la fecha actual
+        // Si no se especifica fecha, establecerla directamente sin recrear el objeto
         if (solicitud.getFecha() == null) {
-            solicitud = new Solicitud_registro(
-                solicitud.getId_solicitud(),
-                solicitud.getId_restaurantero(),
-                LocalDate.now(),
-                solicitud.getEstado(),
-                solicitud.getRestaurante(),
-                solicitud.getCorreo(),
-                solicitud.getDireccion(),
-                solicitud.getImagen1(),
-                solicitud.getImagen2(),
-                solicitud.getImagen3(),
-                solicitud.getComprobante(),
-                solicitud.getPropietario(),
-                solicitud.getNumero(),
-                solicitud.getHorario()
-            );
+            solicitud.setFecha(LocalDate.now());
         }
 
+        // Llamar directamente al repository sin recrear el objeto
         solicitudRepo.AddSolicitudR(solicitud);
     }
 

@@ -17,6 +17,6 @@ public class UsuarioRoutes {
         app.get("/users/{id}", userController::getById);
         app.put("/users/{id}", userController::update);
         app.delete("/users/{id}", userController::delete);
-        app.get("/login", userController::login);
+        app.post("/login", userController::login);
     }
 }
