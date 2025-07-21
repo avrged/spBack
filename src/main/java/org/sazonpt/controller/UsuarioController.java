@@ -111,7 +111,6 @@ public class UsuarioController {
             String contrasena = (String) body.get("contrasena");
             String rol = (String) body.get("rol");
 
-            // Busca el usuario por correo, contraseña y rol
             Usuario usuario = userService.login(correo, contrasena, rol);
 
             if (usuario != null) {

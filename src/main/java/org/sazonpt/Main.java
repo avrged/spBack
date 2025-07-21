@@ -8,14 +8,19 @@ import org.sazonpt.di.AppModule;
 public class Main {
     public static void main(String[] args) {
         Javalin app = Javalin.create(config -> {
-            config.bundledPlugins.enableCors(cors -> {
-                cors.addRule(it -> {
-                    it.allowHost("http://localhost:5501", "http://localhost:63342", "http://localhost:5500", "http://127.0.0.1:5501");
-                    it.allowCredentials = true;
-                });
-            });
             config.staticFiles.add("./uploads", Location.EXTERNAL);
         }).start(7070);
+
+        app.before(ctx -> {
+            ctx.header("Access-Control-Allow-Origin", "*");
+            ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Origin, X-Requested-With");
+            ctx.header("Access-Control-Allow-Credentials", "true");
+        });
+
+        app.options("/*", ctx -> {
+            ctx.status(200);
+        });
 
         app.get("/", ctx -> ctx.result("API - Catalogo de Restaurantes"));
         
@@ -29,9 +34,5 @@ public class Main {
         AppModule.initSolicitudRegistro().registerRoutes(app);
         AppModule.initAdquirirMembresia().registerRoutes(app);
         AppModule.initRevisionSolicitud().registerRoutes(app);
-
-        app.options("/*", ctx -> {
-            ctx.status(200);
-        });
     }
 }
