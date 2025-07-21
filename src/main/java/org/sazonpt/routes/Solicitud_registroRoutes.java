@@ -18,5 +18,9 @@ public class Solicitud_registroRoutes {
         app.get("/solicitudes/{id}", solicitudController::getById);
         app.put("/solicitudes/{id}", solicitudController::update);
         app.delete("/solicitudes/{id}", solicitudController::delete);
+
+        // Nuevas rutas para aprobar y rechazar solicitudes
+        app.put("/solicitudes/{id}/aprobar", solicitudController::aprobarSolicitud);
+        app.put("/solicitudes/{id}/rechazar", solicitudController::rechazarSolicitud);
     }
 }

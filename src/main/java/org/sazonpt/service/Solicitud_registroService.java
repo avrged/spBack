@@ -90,4 +90,20 @@ public class Solicitud_registroService {
             throw new SQLException("No se pudo eliminar la solicitud");
         }
     }
+
+    public void aprobarSolicitud(int idSolicitud) throws SQLException {
+        if (solicitudRepo.FindSolicitudR(idSolicitud) == null) {
+            throw new IllegalArgumentException("No existe una solicitud con este ID");
+        }
+
+        solicitudRepo.aprobarSolicitud(idSolicitud);
+    }
+
+    public void rechazarSolicitud(int idSolicitud) throws SQLException {
+        if (solicitudRepo.FindSolicitudR(idSolicitud) == null) {
+            throw new IllegalArgumentException("No existe una solicitud con este ID");
+        }
+
+        solicitudRepo.rechazarSolicitud(idSolicitud);
+    }
 }

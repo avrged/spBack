@@ -254,4 +254,74 @@ public class Solicitud_registroController {
             ctx.status(500).result("Error inesperado: " + e.getMessage());
         }
     }
+
+    public void aprobarSolicitud(Context ctx) {
+        try {
+            int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
+            solicitudService.aprobarSolicitud(idSolicitud);
+
+            ctx.status(200).json(java.util.Map.of(
+                "success", true,
+                "message", "Solicitud aprobada correctamente. El restaurante ha sido creado."
+            ));
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(java.util.Map.of(
+                "success", false,
+                "message", "ID de solicitud inválido"
+            ));
+        } catch (IllegalArgumentException e) {
+            ctx.status(404).json(java.util.Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        } catch (SQLException e) {
+            System.err.println("Error al aprobar solicitud: " + e.getMessage());
+            ctx.status(500).json(java.util.Map.of(
+                "success", false,
+                "message", "Error al aprobar solicitud: " + e.getMessage()
+            ));
+        } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
+            e.printStackTrace();
+            ctx.status(500).json(java.util.Map.of(
+                "success", false,
+                "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    public void rechazarSolicitud(Context ctx) {
+        try {
+            int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
+            solicitudService.rechazarSolicitud(idSolicitud);
+
+            ctx.status(200).json(java.util.Map.of(
+                "success", true,
+                "message", "Solicitud rechazada correctamente"
+            ));
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(java.util.Map.of(
+                "success", false,
+                "message", "ID de solicitud inválido"
+            ));
+        } catch (IllegalArgumentException e) {
+            ctx.status(404).json(java.util.Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        } catch (SQLException e) {
+            System.err.println("Error al rechazar solicitud: " + e.getMessage());
+            ctx.status(500).json(java.util.Map.of(
+                "success", false,
+                "message", "Error al rechazar solicitud: " + e.getMessage()
+            ));
+        } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
+            e.printStackTrace();
+            ctx.status(500).json(java.util.Map.of(
+                "success", false,
+                "message", "Error interno del servidor"
+            ));
+        }
+    }
 }

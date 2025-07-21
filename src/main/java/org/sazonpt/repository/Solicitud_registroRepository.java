@@ -179,4 +179,92 @@ public class Solicitud_registroRepository {
         );
         return solicitud;
     }
+
+    public void aprobarSolicitud(int idSolicitud) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = DBConfig.getDataSource().getConnection();
+            conn.setAutoCommit(false); // Iniciar transacción
+
+            // 1. Obtener datos de la solicitud
+            Solicitud_registro solicitud = FindSolicitudR(idSolicitud);
+            if (solicitud == null) {
+                throw new SQLException("No se encontró la solicitud con ID: " + idSolicitud);
+            }
+
+            if ("aprobado".equals(solicitud.getEstado())) {
+                throw new SQLException("La solicitud ya está aprobada");
+            }
+
+            // 2. Actualizar el estado de la solicitud a 'aprobado'
+            String updateQuery = "UPDATE solicitud_registro SET estado = 'aprobado' WHERE id_solicitud = ?";
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
+                updateStmt.setInt(1, idSolicitud);
+                updateStmt.executeUpdate();
+            }
+
+            // 3. Crear el restaurante incluyendo todos los campos obligatorios
+            String insertRestauranteQuery = "INSERT INTO restaurante (nombre, direccion, horario, telefono, etiquetas, id_zona) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement insertStmt = conn.prepareStatement(insertRestauranteQuery)) {
+                insertStmt.setString(1, solicitud.getRestaurante()); // nombre
+                insertStmt.setString(2, solicitud.getDireccion());   // direccion
+                insertStmt.setString(3, solicitud.getHorario() != null ? solicitud.getHorario() : "No especificado"); // horario
+                insertStmt.setString(4, solicitud.getNumero() != null ? solicitud.getNumero() : ""); // telefono
+                insertStmt.setString(5, "Comida"); // etiquetas por defecto - se puede personalizar después
+                insertStmt.setInt(6, 1); // ID de zona por defecto
+
+                System.out.println("Creando restaurante con todos los campos requeridos:");
+                System.out.println("- Nombre: " + solicitud.getRestaurante());
+                System.out.println("- Dirección: " + solicitud.getDireccion());
+                System.out.println("- Horario: " + solicitud.getHorario());
+                System.out.println("- Teléfono: " + solicitud.getNumero());
+                System.out.println("- Etiquetas: Comida");
+
+                insertStmt.executeUpdate();
+                System.out.println("Restaurante creado exitosamente");
+            }
+
+            conn.commit(); // Confirmar transacción
+            System.out.println("Transacción completada exitosamente");
+
+        } catch (SQLException e) {
+            System.err.println("Error SQL en aprobarSolicitud: " + e.getMessage());
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Revertir cambios en caso de error
+                    System.out.println("Rollback ejecutado");
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error en rollback: " + rollbackEx.getMessage());
+                }
+            }
+            throw new SQLException("Error al aprobar la solicitud: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error al cerrar conexión: " + closeEx.getMessage());
+                }
+            }
+        }
+    }
+
+    public void rechazarSolicitud(int idSolicitud) throws SQLException {
+        String query = "UPDATE solicitud_registro SET estado = 'rechazado' WHERE id_solicitud = ?";
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, idSolicitud);
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException("No se encontró la solicitud con ID: " + idSolicitud);
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error al rechazar la solicitud: " + e.getMessage());
+        }
+    }
 }
