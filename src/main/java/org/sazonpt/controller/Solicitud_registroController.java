@@ -62,45 +62,51 @@ public class Solicitud_registroController {
     public void createWithFiles(Context ctx) {
         try {
             // Obtener datos del formulario
-            var nombre_propuesto = ctx.formParam("nombre_propuesto_restaurante");
+            var restaurante = ctx.formParam("restaurante");
+            var propietario = ctx.formParam("propietario");
             var correo = ctx.formParam("correo");
-            var direccion_propuesta = ctx.formParam("direccion_propuesta");
+            var numero = ctx.formParam("numero");
+            var direccion = ctx.formParam("direccion");
+            var horario = ctx.formParam("horario");
             var id_restaurantero = ctx.formParam("id_restaurantero");
             var estado = ctx.formParam("estado");
 
             // Obtener archivos
-            var ruta_imagen = ctx.uploadedFile("ruta_imagen");
-            var ruta_imagen2 = ctx.uploadedFile("ruta_imagen2");
-            var ruta_imagen3 = ctx.uploadedFile("ruta_imagen3");
-            var ruta_comprobante = ctx.uploadedFile("ruta_comprobante");
+            var imagen1 = ctx.uploadedFile("imagen1");
+            var imagen2 = ctx.uploadedFile("imagen2");
+            var imagen3 = ctx.uploadedFile("imagen3");
+            var comprobante = ctx.uploadedFile("comprobante");
 
             // Validar campos obligatorios
-            if (nombre_propuesto == null || correo == null || direccion_propuesta == null || id_restaurantero == null) {
+            if (restaurante == null || correo == null || direccion == null || id_restaurantero == null) {
                 ctx.status(400).json(java.util.Map.of(
                     "success", false,
-                    "message", "Los campos nombre_propuesto_restaurante, correo, direccion_propuesta y id_estaurantero son obligatorios"
+                    "message", "Los campos restaurante, correo, direccion y id_restaurantero son obligatorios"
                 ));
                 return;
             }
 
             // Guardar archivos y obtener URLs
-            String urlImagen1 = ruta_imagen != null ? saveImageFile(ruta_imagen) : null;
-            String urlImagen2 = ruta_imagen2 != null ? saveImageFile(ruta_imagen2) : null;
-            String urlImagen3 = ruta_imagen3 != null ? saveImageFile(ruta_imagen3) : null;
-            String urlComprobante = ruta_comprobante != null ? saveDocumentFile(ruta_comprobante) : null;
+            String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : null;
+            String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : null;
+            String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : null;
+            String urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : null;
 
             // Crear objeto solicitud
             Solicitud_registro solicitud = new Solicitud_registro();
-            solicitud.setNombre_propuesto_restaurante(nombre_propuesto);
+            solicitud.setRestaurante(restaurante);
+            solicitud.setPropietario(propietario);
             solicitud.setCorreo(correo);
-            solicitud.setDireccion_propuesta(direccion_propuesta);
+            solicitud.setNumero(numero);
+            solicitud.setDireccion(direccion);
+            solicitud.setHorario(horario);
             solicitud.setId_restaurantero(Integer.parseInt(id_restaurantero));
             solicitud.setEstado(estado != null ? estado : "pendiente");
             solicitud.setFecha(LocalDate.now());
-            solicitud.setRuta_imagen(urlImagen1);
-            solicitud.setRuta_imagen2(urlImagen2);
-            solicitud.setRuta_imagen3(urlImagen3);
-            solicitud.setRuta_comprobante(urlComprobante);
+            solicitud.setImagen1(urlImagen1);
+            solicitud.setImagen2(urlImagen2);
+            solicitud.setImagen3(urlImagen3);
+            solicitud.setComprobante(urlComprobante);
 
             // Guardar en base de datos
             solicitudService.createSolicitud(solicitud);

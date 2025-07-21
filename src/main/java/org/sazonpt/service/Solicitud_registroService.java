@@ -23,8 +23,8 @@ public class Solicitud_registroService {
     }
 
     public void createSolicitud(Solicitud_registro solicitud) throws SQLException {
-        if (solicitud.getNombrePropuesto() == null || solicitud.getNombrePropuesto().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre propuesto del restaurante es obligatorio");
+        if (solicitud.getRestaurante() == null || solicitud.getRestaurante().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
         }
 
         if (solicitud.getCorreo() == null || solicitud.getCorreo().trim().isEmpty()) {
@@ -35,8 +35,8 @@ public class Solicitud_registroService {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
 
-        if (solicitud.getDireccionPropuesta() == null || solicitud.getDireccionPropuesta().trim().isEmpty()) {
-            throw new IllegalArgumentException("La dirección propuesta es obligatoria");
+        if (solicitud.getDireccion() == null || solicitud.getDireccion().trim().isEmpty()) {
+            throw new IllegalArgumentException("La dirección es obligatoria");
         }
 
         if (solicitud.getId_restaurantero() <= 0) {
@@ -50,13 +50,16 @@ public class Solicitud_registroService {
                 solicitud.getId_restaurantero(),
                 LocalDate.now(),
                 solicitud.getEstado(),
-                solicitud.getNombrePropuesto(),
+                solicitud.getRestaurante(),
                 solicitud.getCorreo(),
-                solicitud.getDireccionPropuesta(),
-                solicitud.getRuta_imagen(),
-                solicitud.getRuta_imagen2(),
-                solicitud.getRuta_imagen3(),
-                solicitud.getRuta_comprobante()
+                solicitud.getDireccion(),
+                solicitud.getImagen1(),
+                solicitud.getImagen2(),
+                solicitud.getImagen3(),
+                solicitud.getComprobante(),
+                solicitud.getPropietario(),
+                solicitud.getNumero(),
+                solicitud.getHorario()
             );
         }
 
@@ -68,8 +71,8 @@ public class Solicitud_registroService {
             throw new IllegalArgumentException("No existe una solicitud con este ID");
         }
 
-        if (solicitud.getNombrePropuesto() == null || solicitud.getNombrePropuesto().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre propuesto del restaurante es obligatorio");
+        if (solicitud.getRestaurante() == null || solicitud.getRestaurante().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
         }
 
         if (solicitud.getCorreo() == null || solicitud.getCorreo().trim().isEmpty()) {
@@ -80,8 +83,8 @@ public class Solicitud_registroService {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
 
-        if (solicitud.getDireccionPropuesta() == null || solicitud.getDireccionPropuesta().trim().isEmpty()) {
-            throw new IllegalArgumentException("La dirección propuesta es obligatoria");
+        if (solicitud.getDireccion() == null || solicitud.getDireccion().trim().isEmpty()) {
+            throw new IllegalArgumentException("La dirección es obligatoria");
         }
 
         solicitudRepo.UpdateSolicitud(solicitud);

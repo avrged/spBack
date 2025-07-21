@@ -20,23 +20,27 @@ public class Solicitud_registroRepository {
                                  ". Debe ejecutar la migración primero o verificar que el restaurantero exista.");
         }
         
-        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_imagen2, ruta_imagen3, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO solicitud_registro(" +
+                "id_restaurantero, propietario, correo, numero, direccion, horario, " +
+                "imagen1, imagen2, imagen3, comprobante, fecha, estado, restaurante) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            
             stmt.setInt(1, soliR.getId_restaurantero());
-            stmt.setDate(2, Date.valueOf(soliR.getFecha()));
-            stmt.setString(3, soliR.getEstado());
-            stmt.setString(4, soliR.getNombrePropuesto());
-            stmt.setString(5, soliR.getCorreo());
-            stmt.setString(6, soliR.getDireccionPropuesta());
-            stmt.setString(7, soliR.getRuta_imagen());
-            stmt.setString(8, soliR.getRuta_imagen2());
-            stmt.setString(9, soliR.getRuta_imagen3());
-            stmt.setString(10, soliR.getRuta_comprobante());
+            stmt.setString(2, soliR.getPropietario());
+            stmt.setString(3, soliR.getCorreo());
+            stmt.setString(4, soliR.getNumero());
+            stmt.setString(5, soliR.getDireccion());
+            stmt.setString(6, soliR.getHorario());
+            stmt.setString(7, soliR.getImagen1());
+            stmt.setString(8, soliR.getImagen2());
+            stmt.setString(9, soliR.getImagen3());
+            stmt.setString(10, soliR.getComprobante());
+            stmt.setDate(11, Date.valueOf(soliR.getFecha()));
+            stmt.setString(12, soliR.getEstado());
+            stmt.setString(13, soliR.getRestaurante());
             stmt.executeUpdate();
-            
         } catch (SQLException e) {
             throw new SQLException("Error al crear la solicitud de registro: " + e.getMessage());
         }
@@ -97,31 +101,34 @@ public class Solicitud_registroRepository {
     }
 
     public Solicitud_registro UpdateSolicitud(Solicitud_registro soliR) throws SQLException {
-        String query = "UPDATE solicitud_registro SET id_restaurantero = ?, fecha = ?, estado = ?, nombre_propuesto_restaurante = ?, correo = ?, direccion_propuesta = ?, ruta_imagen = ?, ruta_imagen2 = ?, ruta_imagen3 = ?, ruta_comprobante = ? WHERE id_solicitud = ?";
+        String query = "UPDATE solicitud_registro SET " +
+                "id_restaurantero = ?, propietario = ?, correo = ?, numero = ?, direccion = ?, horario = ?, " +
+                "imagen1 = ?, imagen2 = ?, imagen3 = ?, comprobante = ?, fecha = ?, estado = ?, restaurante = ? " +
+                "WHERE id_solicitud = ?";
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            
             stmt.setInt(1, soliR.getId_restaurantero());
-            stmt.setDate(2, Date.valueOf(soliR.getFecha()));
-            stmt.setString(3, soliR.getEstado());
-            stmt.setString(4, soliR.getNombrePropuesto());
-            stmt.setString(5, soliR.getCorreo());
-            stmt.setString(6, soliR.getDireccionPropuesta());
-            stmt.setString(7, soliR.getRuta_imagen());
-            stmt.setString(8, soliR.getRuta_imagen2());
-            stmt.setString(9, soliR.getRuta_imagen3());
-            stmt.setString(10, soliR.getRuta_comprobante());
-            stmt.setInt(11, soliR.getId_solicitud());
+            stmt.setString(2, soliR.getPropietario());
+            stmt.setString(3, soliR.getCorreo());
+            stmt.setString(4, soliR.getNumero());
+            stmt.setString(5, soliR.getDireccion());
+            stmt.setString(6, soliR.getHorario());
+            stmt.setString(7, soliR.getImagen1());
+            stmt.setString(8, soliR.getImagen2());
+            stmt.setString(9, soliR.getImagen3());
+            stmt.setString(10, soliR.getComprobante());
+            stmt.setDate(11, Date.valueOf(soliR.getFecha()));
+            stmt.setString(12, soliR.getEstado());
+            stmt.setString(13, soliR.getRestaurante());
+            stmt.setInt(14, soliR.getId_solicitud());
 
             int rowsAffected = stmt.executeUpdate();
-            
             if (rowsAffected > 0) {
                 return FindSolicitudR(soliR.getId_solicitud());
             } else {
                 throw new SQLException("No se encontró la solicitud con ID: " + soliR.getId_solicitud());
             }
-            
         } catch (SQLException e) {
             throw new SQLException("Error al actualizar la solicitud de registro: " + e.getMessage());
         }
@@ -146,18 +153,22 @@ public class Solicitud_registroRepository {
     }
 
     private Solicitud_registro mapResultSetToSolicitud(ResultSet rs) throws SQLException {
-        return new Solicitud_registro(
+        Solicitud_registro solicitud = new Solicitud_registro(
             rs.getInt("id_solicitud"),
             rs.getInt("id_restaurantero"),
             rs.getDate("fecha").toLocalDate(),
             rs.getString("estado"),
-            rs.getString("nombre_propuesto_restaurante"),
+            rs.getString("restaurante"),
             rs.getString("correo"),
-            rs.getString("direccion_propuesta"),
-            rs.getString("ruta_imagen"),
-            rs.getString("ruta_imagen2"),
-            rs.getString("ruta_imagen3"),
-            rs.getString("ruta_comprobante")
+            rs.getString("direccion"),
+            rs.getString("imagen1"),
+            rs.getString("imagen2"),
+            rs.getString("imagen3"),
+            rs.getString("comprobante"),
+            rs.getString("propietario"),
+            rs.getString("numero"),
+            rs.getString("horario")
         );
+        return solicitud;
     }
 }

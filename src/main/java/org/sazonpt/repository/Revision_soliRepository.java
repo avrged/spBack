@@ -15,7 +15,7 @@ import org.sazonpt.model.Solicitud_registro;
 public class Revision_soliRepository {
     
     public void AddSoli(Solicitud_registro soli) throws SQLException {
-        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, nombre_propuesto_restaurante, correo, direccion_propuesta, ruta_imagen, ruta_imagen2, ruta_imagen3, ruta_comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO solicitud_registro(id_restaurantero, fecha, estado, restaurante, correo, direccion, imagen1, imagen2, imagen3, comprobante) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -23,13 +23,13 @@ public class Revision_soliRepository {
             stmt.setInt(1, soli.getId_restaurantero());
             stmt.setDate(2, Date.valueOf(soli.getFecha()));
             stmt.setString(3, soli.getEstado());
-            stmt.setString(4, soli.getNombrePropuesto());
+            stmt.setString(4, soli.getRestaurante());
             stmt.setString(5, soli.getCorreo());
-            stmt.setString(6, soli.getDireccionPropuesta());
-            stmt.setString(7, soli.getRuta_imagen());
-            stmt.setString(8, soli.getRuta_imagen2());
-            stmt.setString(9, soli.getRuta_imagen3());
-            stmt.setString(10, soli.getRuta_comprobante());
+            stmt.setString(6, soli.getDireccion());
+            stmt.setString(7, soli.getImagen1());
+            stmt.setString(8, soli.getImagen2());
+            stmt.setString(9, soli.getImagen3());
+            stmt.setString(10, soli.getComprobante());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -226,13 +226,16 @@ public class Revision_soliRepository {
             rs.getInt("id_restaurantero"),
             rs.getDate("fecha").toLocalDate(),
             rs.getString("estado"),
-            rs.getString("nombre_propuesto_restaurante"),
+            rs.getString("restaurante"),
             rs.getString("correo"),
-            rs.getString("direccion_propuesta"),
-            rs.getString("ruta_imagen"),
-            rs.getString("ruta_imagen2"),
-            rs.getString("ruta_imagen3"),
-            rs.getString("ruta_comprobante")
+            rs.getString("direccion"),
+            rs.getString("imagen1"),
+            rs.getString("imagen2"),
+            rs.getString("imagen3"),
+            rs.getString("comprobante"),
+            rs.getString("propietario"),
+            rs.getString("numero"),
+            rs.getString("horario")
         );
     }
 

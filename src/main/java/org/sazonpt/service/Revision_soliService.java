@@ -31,8 +31,8 @@ public class Revision_soliService {
     }
 
     public void createSolicitud(Solicitud_registro solicitud) throws SQLException {
-        if (solicitud.getNombrePropuesto() == null || solicitud.getNombrePropuesto().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre propuesto del restaurante es obligatorio");
+        if (solicitud.getRestaurante() == null || solicitud.getRestaurante().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
         }
 
         if (solicitud.getCorreo() == null || solicitud.getCorreo().trim().isEmpty()) {
@@ -43,8 +43,8 @@ public class Revision_soliService {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
 
-        if (solicitud.getDireccionPropuesta() == null || solicitud.getDireccionPropuesta().trim().isEmpty()) {
-            throw new IllegalArgumentException("La dirección propuesta es obligatoria");
+        if (solicitud.getDireccion() == null || solicitud.getDireccion().trim().isEmpty()) {
+            throw new IllegalArgumentException("La dirección es obligatoria");
         }
 
         if (solicitud.getId_restaurantero() <= 0) {
