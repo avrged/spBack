@@ -45,22 +45,18 @@ public class RestauranteService {
         if (restaurante.getNombre() == null || restaurante.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
         }
-
         if (restaurante.getDireccion() == null || restaurante.getDireccion().trim().isEmpty()) {
             throw new IllegalArgumentException("La dirección del restaurante es obligatoria");
         }
-
         if (restaurante.getTelefono() == null || restaurante.getTelefono().trim().isEmpty()) {
             throw new IllegalArgumentException("El teléfono del restaurante es obligatorio");
         }
-
         if (restaurante.getId_zona() <= 0) {
             throw new IllegalArgumentException("Código de zona inválido");
         }
-
         // Validar etiquetas
         validarEtiquetas(restaurante.getEtiquetas());
-
+        // Validar imágenes y redes sociales (pueden ser nulas, pero puedes agregar validaciones si lo requieres)
         restauranteRepo.AddRestaurante(restaurante);
     }
 
@@ -68,22 +64,18 @@ public class RestauranteService {
         if (restauranteRepo.FindRestaurante(restaurante.getIdRestaurante()) == null) {
             throw new IllegalArgumentException("No existe un restaurante con este ID");
         }
-
         if (restaurante.getNombre() == null || restaurante.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
         }
-
         if (restaurante.getDireccion() == null || restaurante.getDireccion().trim().isEmpty()) {
             throw new IllegalArgumentException("La dirección del restaurante es obligatoria");
         }
-
         if (restaurante.getTelefono() == null || restaurante.getTelefono().trim().isEmpty()) {
             throw new IllegalArgumentException("El teléfono del restaurante es obligatorio");
         }
-
         // Validar etiquetas
         validarEtiquetas(restaurante.getEtiquetas());
-
+        // Validar imágenes y redes sociales (pueden ser nulas, pero puedes agregar validaciones si lo requieres)
         restauranteRepo.UpdateRestaurante(restaurante);
     }
 

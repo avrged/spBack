@@ -16,11 +16,11 @@ public class Solicitud_registroRoutes {
         app.post("/solicitudes", solicitudController::create);
         app.post("/solicitudes/with-files", solicitudController::createWithFiles);
         app.get("/solicitudes/{id}", solicitudController::getById);
-        app.put("/solicitudes/{id}", solicitudController::update);
+        app.put("/solicitudes/{id}", solicitudController::updateWithFiles);
         app.delete("/solicitudes/{id}", solicitudController::delete);
 
         // Nuevas rutas para aprobar y rechazar solicitudes
-        app.put("/solicitudes/{id}/aprobar", solicitudController::aprobarSolicitud);
+        app.put("/solicitudes/aprobar/{id}", solicitudController::updateEstado);
         app.put("/solicitudes/{id}/rechazar", solicitudController::rechazarSolicitud);
     }
 }

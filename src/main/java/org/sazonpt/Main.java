@@ -20,9 +20,10 @@ public class Main {
         app.before(ctx -> {
             ctx.header("Access-Control-Allow-Origin", "*");
             ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-            ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Origin, X-Requested-With");
+            ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Origin, X-Requested-With, X-User-Email, X-User-ID");
             ctx.header("Access-Control-Allow-Credentials", "true");
         });
+        
 
         app.options("/*", ctx -> {
             ctx.status(200);

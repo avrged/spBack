@@ -29,23 +29,22 @@ public class MenuService {
         if (menu.getRuta_archivo() == null || menu.getRuta_archivo().trim().isEmpty()) {
             throw new IllegalArgumentException("La ruta del archivo es obligatoria");
         }
-
-        if (menu.getCodigo_restaurante() <= 0) {
-            throw new IllegalArgumentException("Código de restaurante inválido");
+        if (menu.getTelefono() == null || menu.getTelefono().trim().isEmpty()) {
+            throw new IllegalArgumentException("El teléfono es obligatorio");
         }
-
         menuRepo.save(menu);
     }
 
     public void updateMenu(Menu menu) throws SQLException {
-        if (menuRepo.findById(menu.getIdMenu()) == null) {
+        if (menuRepo.findById(menu.getId_menu()) == null) {
             throw new IllegalArgumentException("No existe un menú con este ID");
         }
-
         if (menu.getRuta_archivo() == null || menu.getRuta_archivo().trim().isEmpty()) {
             throw new IllegalArgumentException("La ruta del archivo es obligatoria");
         }
-
+        if (menu.getTelefono() == null || menu.getTelefono().trim().isEmpty()) {
+            throw new IllegalArgumentException("El teléfono es obligatorio");
+        }
         menuRepo.update(menu);
     }
 

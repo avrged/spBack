@@ -6,8 +6,14 @@ import java.util.List;
 
 import org.sazonpt.model.Solicitud_registro;
 import org.sazonpt.repository.Solicitud_registroRepository;
+import org.sazonpt.model.Restaurante;
+import org.sazonpt.repository.RestauranteRepository;
 
 public class Solicitud_registroService {
+    // Actualizar solo el estado de una solicitud
+    public void updateEstado(int idSolicitud, String nuevoEstado) throws SQLException {
+        this.solicitudRepo.updateEstado(idSolicitud, nuevoEstado);
+    }
     private final Solicitud_registroRepository solicitudRepo;
 
     public Solicitud_registroService(Solicitud_registroRepository solicitudRepo) {
@@ -92,10 +98,21 @@ public class Solicitud_registroService {
     }
 
     public void aprobarSolicitud(int idSolicitud) throws SQLException {
-        if (solicitudRepo.FindSolicitudR(idSolicitud) == null) {
+        Solicitud_registro solicitud = solicitudRepo.FindSolicitudR(idSolicitud);
+        if (solicitud == null) {
             throw new IllegalArgumentException("No existe una solicitud con este ID");
         }
 
+        // Solo pasar las rutas de las imágenes
+        Restaurante restaurante = new Restaurante();
+        restaurante.setImagen1(solicitud.getImagen1());
+        restaurante.setImagen2(solicitud.getImagen2());
+        restaurante.setImagen3(solicitud.getImagen3());
+
+        RestauranteRepository restauranteRepo = new RestauranteRepository();
+        restauranteRepo.AddRestaurante(restaurante);
+
+        // Cambia el estado de la solicitud a 'aprobado'
         solicitudRepo.aprobarSolicitud(idSolicitud);
     }
 

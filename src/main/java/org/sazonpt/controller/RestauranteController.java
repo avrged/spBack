@@ -72,7 +72,12 @@ public class RestauranteController {
                 restaurante.getDireccion(),
                 restaurante.getHorario(),
                 restaurante.getTelefono(),
-                restaurante.getEtiquetas() // Incluir etiquetas en la actualización
+                restaurante.getEtiquetas(),
+                restaurante.getImagen1(),
+                restaurante.getImagen2(),
+                restaurante.getImagen3(),
+                restaurante.getFacebook(),
+                restaurante.getInstagram()
             );
 
             restauranteService.updateRestaurante(updatedRestaurante);
@@ -240,14 +245,19 @@ public class RestauranteController {
 
             // 3. Crear el restaurante actualizado preservando el ID y la asociación
             Restaurante restauranteActualizado = new Restaurante(
-                restauranteExistente.getIdRestaurante(), // Mantener el ID original
-                restauranteExistente.getId_solicitud_aprobada(), // Mantener la solicitud original
+                restauranteExistente.getIdRestaurante(),
+                restauranteExistente.getId_solicitud_aprobada(),
                 datosActualizacion.getId_zona() > 0 ? datosActualizacion.getId_zona() : restauranteExistente.getId_zona(),
                 datosActualizacion.getNombre() != null ? datosActualizacion.getNombre() : restauranteExistente.getNombre(),
                 datosActualizacion.getDireccion() != null ? datosActualizacion.getDireccion() : restauranteExistente.getDireccion(),
                 datosActualizacion.getHorario() != null ? datosActualizacion.getHorario() : restauranteExistente.getHorario(),
                 datosActualizacion.getTelefono() != null ? datosActualizacion.getTelefono() : restauranteExistente.getTelefono(),
-                datosActualizacion.getEtiquetas() != null ? datosActualizacion.getEtiquetas() : restauranteExistente.getEtiquetas()
+                datosActualizacion.getEtiquetas() != null ? datosActualizacion.getEtiquetas() : restauranteExistente.getEtiquetas(),
+                datosActualizacion.getImagen1() != null ? datosActualizacion.getImagen1() : restauranteExistente.getImagen1(),
+                datosActualizacion.getImagen2() != null ? datosActualizacion.getImagen2() : restauranteExistente.getImagen2(),
+                datosActualizacion.getImagen3() != null ? datosActualizacion.getImagen3() : restauranteExistente.getImagen3(),
+                datosActualizacion.getFacebook() != null ? datosActualizacion.getFacebook() : restauranteExistente.getFacebook(),
+                datosActualizacion.getInstagram() != null ? datosActualizacion.getInstagram() : restauranteExistente.getInstagram()
             );
 
             // 4. Actualizar el restaurante usando el servicio (que ya tiene validaciones)
@@ -334,14 +344,19 @@ public class RestauranteController {
 
             // 3. Crear el restaurante actualizado preservando el ID y la asociación
             Restaurante restauranteActualizado = new Restaurante(
-                restauranteExistente.getIdRestaurante(), // Mantener el ID original
-                restauranteExistente.getId_solicitud_aprobada(), // Mantener la solicitud original
+                restauranteExistente.getIdRestaurante(),
+                restauranteExistente.getId_solicitud_aprobada(),
                 datosActualizacion.getId_zona() > 0 ? datosActualizacion.getId_zona() : restauranteExistente.getId_zona(),
                 datosActualizacion.getNombre() != null ? datosActualizacion.getNombre() : restauranteExistente.getNombre(),
                 datosActualizacion.getDireccion() != null ? datosActualizacion.getDireccion() : restauranteExistente.getDireccion(),
                 datosActualizacion.getHorario() != null ? datosActualizacion.getHorario() : restauranteExistente.getHorario(),
                 datosActualizacion.getTelefono() != null ? datosActualizacion.getTelefono() : restauranteExistente.getTelefono(),
-                datosActualizacion.getEtiquetas() != null ? datosActualizacion.getEtiquetas() : restauranteExistente.getEtiquetas()
+                datosActualizacion.getEtiquetas() != null ? datosActualizacion.getEtiquetas() : restauranteExistente.getEtiquetas(),
+                datosActualizacion.getImagen1() != null ? datosActualizacion.getImagen1() : restauranteExistente.getImagen1(),
+                datosActualizacion.getImagen2() != null ? datosActualizacion.getImagen2() : restauranteExistente.getImagen2(),
+                datosActualizacion.getImagen3() != null ? datosActualizacion.getImagen3() : restauranteExistente.getImagen3(),
+                datosActualizacion.getFacebook() != null ? datosActualizacion.getFacebook() : restauranteExistente.getFacebook(),
+                datosActualizacion.getInstagram() != null ? datosActualizacion.getInstagram() : restauranteExistente.getInstagram()
             );
 
             // 4. Actualizar el restaurante usando el servicio (que ya tiene validaciones)

@@ -71,7 +71,7 @@ public class MenuController {
             int idMenu = Integer.parseInt(ctx.pathParam("id"));
             Menu menu = ctx.bodyAsClass(Menu.class);
             // Asegurarse de que el ID del menú coincida con el parámetro de la URL
-            Menu updatedMenu = new Menu(idMenu, menu.getCodigo_restaurante(), menu.getRuta_archivo(), menu.getEstado());
+            Menu updatedMenu = new Menu(idMenu, menu.getTelefono(), menu.getRuta_archivo());
             menuService.updateMenu(updatedMenu);
             ctx.status(200).result("Menú actualizado");
         } catch (Exception e) {

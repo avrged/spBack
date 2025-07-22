@@ -13,14 +13,13 @@ import org.sazonpt.model.Menu;
 public class MenuRepository {
     
     public void save(Menu menu) throws SQLException {
-        String query = "INSERT INTO menu(id_restaurante, ruta_archivo, estado) VALUES(?, ?, ?)";
+        String query = "INSERT INTO menu(telefono, ruta_archivo) VALUES(?, ?)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
-            stmt.setInt(1, menu.getId_restaurante());
+            stmt.setString(1, menu.getTelefono());
             stmt.setString(2, menu.getRuta_archivo());
-            stmt.setString(3, menu.getEstado());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -89,15 +88,14 @@ public class MenuRepository {
     }
 
     public void update(Menu menu) throws SQLException {
-        String query = "UPDATE menu SET id_restaurante = ?, ruta_archivo = ?, estado = ? WHERE id_menu = ?";
+        String query = "UPDATE menu SET telefono = ?, ruta_archivo = ? WHERE id_menu = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
-            stmt.setInt(1, menu.getId_restaurante());
+            stmt.setString(1, menu.getTelefono());
             stmt.setString(2, menu.getRuta_archivo());
-            stmt.setString(3, menu.getEstado());
-            stmt.setInt(4, menu.getIdMenu());
+            stmt.setInt(3, menu.getId_menu());
             
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -126,9 +124,8 @@ public class MenuRepository {
     private Menu mapResultSetToMenu(ResultSet rs) throws SQLException {
         return new Menu(
             rs.getInt("id_menu"),
-            rs.getInt("id_restaurante"),
-            rs.getString("ruta_archivo"),
-            rs.getString("estado")
+            rs.getString("telefono"),
+            rs.getString("ruta_archivo")
         );
     }
 }

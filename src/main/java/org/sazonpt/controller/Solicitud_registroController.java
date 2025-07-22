@@ -16,6 +16,47 @@ import io.javalin.http.HttpStatus;
 import io.javalin.http.UploadedFile;
 
 public class Solicitud_registroController {
+    // Endpoint para actualizar solo el estado de una solicitud
+    public void updateEstado(Context ctx) {
+        try {
+            int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
+            String nuevoEstado = ctx.bodyAsClass(EstadoRequest.class).getEstado();
+            if (nuevoEstado == null || nuevoEstado.trim().isEmpty()) {
+                ctx.status(400).json(java.util.Map.of(
+                    "success", false,
+                    "message", "El campo 'estado' es obligatorio"
+                ));
+                return;
+            }
+            solicitudService.updateEstado(idSolicitud, nuevoEstado.trim());
+            ctx.status(200).json(java.util.Map.of(
+                "success", true,
+                "message", "Estado actualizado correctamente"
+            ));
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(java.util.Map.of(
+                "success", false,
+                "message", "ID de solicitud inválido"
+            ));
+        } catch (SQLException e) {
+            ctx.status(500).json(java.util.Map.of(
+                "success", false,
+                "message", "Error al actualizar estado: " + e.getMessage()
+            ));
+        } catch (Exception e) {
+            ctx.status(500).json(java.util.Map.of(
+                "success", false,
+                "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    // Clase auxiliar para recibir solo el campo estado
+    public static class EstadoRequest {
+        private String estado;
+        public String getEstado() { return estado; }
+        public void setEstado(String estado) { this.estado = estado; }
+    }
     private final Solicitud_registroService solicitudService;
 
     public Solicitud_registroController(Solicitud_registroService solicitudService) {
@@ -224,16 +265,83 @@ public class Solicitud_registroController {
         return String.format("http://%s:7070/uploads/documents/%s", host, fileName);
     }
 
-    public void update(Context ctx) {
+    // Actualizar solicitud con archivos (multipart/form-data)
+    public void updateWithFiles(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
-            Solicitud_registro solicitud = ctx.bodyAsClass(Solicitud_registro.class);
-            // Asegurarse de que el ID de la solicitud coincida con el parámetro de la URL
+            Solicitud_registro solicitudExistente = solicitudService.getById(idSolicitud);
+            if (solicitudExistente == null) {
+                ctx.status(404).json(java.util.Map.of(
+                    "success", false,
+                    "message", "No existe una solicitud con este ID"
+                ));
+                return;
+            }
+
+            // Obtener datos del formulario (si no vienen, se mantienen los existentes)
+            var restaurante = ctx.formParam("restaurante");
+            var propietario = ctx.formParam("propietario");
+            var correo = ctx.formParam("correo");
+            var numero = ctx.formParam("numero");
+            var direccion = ctx.formParam("direccion");
+            var horario = ctx.formParam("horario");
+            var id_restaurantero = ctx.formParam("id_restaurantero");
+            var estado = ctx.formParam("estado");
+
+            // Archivos
+            var imagen1 = ctx.uploadedFile("imagen1");
+            var imagen2 = ctx.uploadedFile("imagen2");
+            var imagen3 = ctx.uploadedFile("imagen3");
+            var comprobante = ctx.uploadedFile("comprobante");
+
+            // Guardar archivos y obtener URLs (si no se suben, se mantienen los existentes)
+            String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : solicitudExistente.getImagen1();
+            String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : solicitudExistente.getImagen2();
+            String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : solicitudExistente.getImagen3();
+            String urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : solicitudExistente.getComprobante();
+
+            // Actualizar campos (si no vienen, se mantienen los existentes)
+            Solicitud_registro solicitud = new Solicitud_registro();
             solicitud.setId_solicitud(idSolicitud);
+            solicitud.setRestaurante(restaurante != null ? restaurante.trim() : solicitudExistente.getRestaurante());
+            solicitud.setPropietario(propietario != null ? propietario.trim() : solicitudExistente.getPropietario());
+            solicitud.setCorreo(correo != null ? correo.trim() : solicitudExistente.getCorreo());
+            solicitud.setNumero(numero != null ? numero.trim() : solicitudExistente.getNumero());
+            solicitud.setDireccion(direccion != null ? direccion.trim() : solicitudExistente.getDireccion());
+            solicitud.setHorario(horario != null ? horario.trim() : solicitudExistente.getHorario());
+            int idRestauranteroFinal;
+            if (id_restaurantero != null && !id_restaurantero.trim().isEmpty()) {
+                idRestauranteroFinal = Integer.parseInt(id_restaurantero);
+            } else {
+                idRestauranteroFinal = solicitudExistente.getId_restaurantero();
+            }
+            solicitud.setId_restaurantero(idRestauranteroFinal);
+            solicitud.setEstado(estado != null ? estado.trim() : solicitudExistente.getEstado());
+            solicitud.setFecha(solicitudExistente.getFecha()); // No se actualiza la fecha
+            solicitud.setImagen1(urlImagen1);
+            solicitud.setImagen2(urlImagen2);
+            solicitud.setImagen3(urlImagen3);
+            solicitud.setComprobante(urlComprobante);
+
             solicitudService.updateSolicitud(solicitud);
-            ctx.status(200).result("Solicitud actualizada");
+
+            ctx.status(200).json(java.util.Map.of(
+                "success", true,
+                "message", "Solicitud actualizada correctamente con archivos",
+                "data", java.util.Map.of(
+                    "restaurante", solicitud.getRestaurante(),
+                    "correo", solicitud.getCorreo(),
+                    "imagen1", urlImagen1 != null ? urlImagen1 : "No se subió imagen",
+                    "imagen2", urlImagen2 != null ? urlImagen2 : "No se subió imagen",
+                    "imagen3", urlImagen3 != null ? urlImagen3 : "No se subió imagen",
+                    "comprobante", urlComprobante != null ? urlComprobante : "No se subió comprobante"
+                )
+            ));
         } catch (Exception e) {
-            ctx.status(400).result("Error al actualizar solicitud: " + e.getMessage());
+            ctx.status(400).json(java.util.Map.of(
+                "success", false,
+                "message", "Error al actualizar solicitud: " + e.getMessage()
+            ));
         }
     }
 

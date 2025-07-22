@@ -14,11 +14,10 @@ import org.sazonpt.model.Restaurantero;
 public class RestauranteRepository {
     
     public void AddRestaurante(Restaurante re) throws SQLException {
-        String query = "INSERT INTO restaurante(id_solicitud_aprobada, id_zona, nombre, direccion, horario, telefono, etiquetas) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO restaurante(id_solicitud_aprobada, id_zona, nombre, direccion, horario, telefono, etiquetas, imagen1, imagen2, imagen3, facebook, instagram) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            
             stmt.setInt(1, re.getId_solicitud_aprobada());
             stmt.setInt(2, re.getId_zona());
             stmt.setString(3, re.getNombre());
@@ -26,6 +25,11 @@ public class RestauranteRepository {
             stmt.setString(5, re.getHorario());
             stmt.setString(6, re.getTelefono());
             stmt.setString(7, re.getEtiquetas());
+            stmt.setString(8, re.getImagen1());
+            stmt.setString(9, re.getImagen2());
+            stmt.setString(10, re.getImagen3());
+            stmt.setString(11, re.getFacebook());
+            stmt.setString(12, re.getInstagram());
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -71,11 +75,10 @@ public class RestauranteRepository {
     }
 
     public Restaurante UpdateRestaurante(Restaurante re) throws SQLException {
-        String query = "UPDATE restaurante SET id_solicitud_aprobada = ?, id_zona = ?, nombre = ?, direccion = ?, horario = ?, telefono = ?, etiquetas = ? WHERE id_restaurante = ?";
+        String query = "UPDATE restaurante SET id_solicitud_aprobada = ?, id_zona = ?, nombre = ?, direccion = ?, horario = ?, telefono = ?, etiquetas = ?, imagen1 = ?, imagen2 = ?, imagen3 = ?, facebook = ?, instagram = ? WHERE id_restaurante = ?";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            
             stmt.setInt(1, re.getId_solicitud_aprobada());
             stmt.setInt(2, re.getId_zona());
             stmt.setString(3, re.getNombre());
@@ -83,7 +86,12 @@ public class RestauranteRepository {
             stmt.setString(5, re.getHorario());
             stmt.setString(6, re.getTelefono());
             stmt.setString(7, re.getEtiquetas());
-            stmt.setInt(8, re.getIdRestaurante());
+            stmt.setString(8, re.getImagen1());
+            stmt.setString(9, re.getImagen2());
+            stmt.setString(10, re.getImagen3());
+            stmt.setString(11, re.getFacebook());
+            stmt.setString(12, re.getInstagram());
+            stmt.setInt(13, re.getIdRestaurante());
             
             int rowsAffected = stmt.executeUpdate();
             
@@ -240,7 +248,12 @@ public class RestauranteRepository {
             rs.getString("direccion"),
             rs.getString("horario"),
             rs.getString("telefono"),
-            rs.getString("etiquetas")
+            rs.getString("etiquetas"),
+            rs.getString("imagen1"),
+            rs.getString("imagen2"),
+            rs.getString("imagen3"),
+            rs.getString("facebook"),
+            rs.getString("instagram")
         );
     }
 }
