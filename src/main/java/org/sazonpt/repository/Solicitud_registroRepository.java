@@ -29,61 +29,32 @@ public class Solicitud_registroRepository {
     }
     
     public void AddSolicitudR(Solicitud_registro soliR) throws SQLException {
-        // Modificamos para permitir solicitudes sin id_restaurantero válido
-        // Si el id_restaurantero no existe, lo establecemos como NULL
-        Integer idRestauranteroFinal = null;
-        if (soliR.getId_restaurantero() > 0 && existeRestaurantero(soliR.getId_restaurantero())) {
-            idRestauranteroFinal = soliR.getId_restaurantero();
-        }
-
         String query = "INSERT INTO solicitud_registro(" +
-                "id_restaurantero, propietario, correo, numero, direccion, horario, " +
-                "imagen1, imagen2, imagen3, comprobante, fecha, estado, restaurante) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "propietario, correo, numero, direccion, horario, " +
+                "imagen1, imagen2, imagen3, menu, comprobante, fecha, estado, restaurante, facebook, instagram) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            // Usar setObject para permitir NULL
-            if (idRestauranteroFinal != null) {
-                stmt.setInt(1, idRestauranteroFinal);
-            } else {
-                stmt.setNull(1, java.sql.Types.INTEGER);
-            }
-
-            stmt.setString(2, soliR.getPropietario());
-            stmt.setString(3, soliR.getCorreo());
-            stmt.setString(4, soliR.getNumero());
-            stmt.setString(5, soliR.getDireccion());
-            stmt.setString(6, soliR.getHorario());
-            stmt.setString(7, soliR.getImagen1());
-            stmt.setString(8, soliR.getImagen2());
-            stmt.setString(9, soliR.getImagen3());
+            stmt.setString(1, soliR.getPropietario());
+            stmt.setString(2, soliR.getCorreo());
+            stmt.setString(3, soliR.getNumero());
+            stmt.setString(4, soliR.getDireccion());
+            stmt.setString(5, soliR.getHorario());
+            stmt.setString(6, soliR.getImagen1());
+            stmt.setString(7, soliR.getImagen2());
+            stmt.setString(8, soliR.getImagen3());
+            stmt.setString(9, soliR.getMenu());
             stmt.setString(10, soliR.getComprobante());
             stmt.setDate(11, Date.valueOf(soliR.getFecha()));
             stmt.setString(12, soliR.getEstado());
             stmt.setString(13, soliR.getRestaurante());
+            stmt.setString(14, soliR.getFacebook());
+            stmt.setString(15, soliR.getInstagram());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException("Error al crear la solicitud de registro: " + e.getMessage());
         }
-    }
-    
-    private boolean existeRestaurantero(int idRestaurantero) throws SQLException {
-        String query = "SELECT COUNT(*) FROM restaurantero WHERE id_usuario = ?";
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            
-            stmt.setInt(1, idRestaurantero);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
     }
 
     public Solicitud_registro FindSolicitudR(int id) throws SQLException {
@@ -125,26 +96,28 @@ public class Solicitud_registroRepository {
 
     public Solicitud_registro UpdateSolicitud(Solicitud_registro soliR) throws SQLException {
         String query = "UPDATE solicitud_registro SET " +
-                "id_restaurantero = ?, propietario = ?, correo = ?, numero = ?, direccion = ?, horario = ?, " +
-                "imagen1 = ?, imagen2 = ?, imagen3 = ?, comprobante = ?, fecha = ?, estado = ?, restaurante = ? " +
+                "propietario = ?, correo = ?, numero = ?, direccion = ?, horario = ?, " +
+                "imagen1 = ?, imagen2 = ?, imagen3 = ?, menu = ?, comprobante = ?, fecha = ?, estado = ?, restaurante = ?, facebook = ?, instagram = ? " +
                 "WHERE id_solicitud = ?";
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, soliR.getId_restaurantero());
-            stmt.setString(2, soliR.getPropietario());
-            stmt.setString(3, soliR.getCorreo());
-            stmt.setString(4, soliR.getNumero());
-            stmt.setString(5, soliR.getDireccion());
-            stmt.setString(6, soliR.getHorario());
-            stmt.setString(7, soliR.getImagen1());
-            stmt.setString(8, soliR.getImagen2());
-            stmt.setString(9, soliR.getImagen3());
+            stmt.setString(1, soliR.getPropietario());
+            stmt.setString(2, soliR.getCorreo());
+            stmt.setString(3, soliR.getNumero());
+            stmt.setString(4, soliR.getDireccion());
+            stmt.setString(5, soliR.getHorario());
+            stmt.setString(6, soliR.getImagen1());
+            stmt.setString(7, soliR.getImagen2());
+            stmt.setString(8, soliR.getImagen3());
+            stmt.setString(9, soliR.getMenu());
             stmt.setString(10, soliR.getComprobante());
             stmt.setDate(11, Date.valueOf(soliR.getFecha()));
             stmt.setString(12, soliR.getEstado());
             stmt.setString(13, soliR.getRestaurante());
-            stmt.setInt(14, soliR.getId_solicitud());
+            stmt.setString(14, soliR.getFacebook());
+            stmt.setString(15, soliR.getInstagram());
+            stmt.setInt(16, soliR.getId_solicitud());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -178,7 +151,6 @@ public class Solicitud_registroRepository {
     private Solicitud_registro mapResultSetToSolicitud(ResultSet rs) throws SQLException {
         Solicitud_registro solicitud = new Solicitud_registro(
             rs.getInt("id_solicitud"),
-            rs.getInt("id_restaurantero"),
             rs.getDate("fecha").toLocalDate(),
             rs.getString("estado"),
             rs.getString("restaurante"),
@@ -187,10 +159,13 @@ public class Solicitud_registroRepository {
             rs.getString("imagen1"),
             rs.getString("imagen2"),
             rs.getString("imagen3"),
+            rs.getString("menu"),
             rs.getString("comprobante"),
             rs.getString("propietario"),
             rs.getString("numero"),
-            rs.getString("horario")
+            rs.getString("horario"),
+            rs.getString("facebook"),
+            rs.getString("instagram")
         );
         return solicitud;
     }

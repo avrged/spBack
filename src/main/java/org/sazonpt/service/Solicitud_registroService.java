@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.sazonpt.model.Solicitud_registro;
 import org.sazonpt.repository.Solicitud_registroRepository;
-import org.sazonpt.model.Restaurante;
-import org.sazonpt.repository.RestauranteRepository;
 
 public class Solicitud_registroService {
     // Actualizar solo el estado de una solicitud
@@ -32,33 +30,21 @@ public class Solicitud_registroService {
         if (solicitud.getRestaurante() == null || solicitud.getRestaurante().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
         }
-
         if (solicitud.getCorreo() == null || solicitud.getCorreo().trim().isEmpty()) {
             throw new IllegalArgumentException("El correo es obligatorio");
         }
-
         if (!solicitud.getCorreo().contains("@")) {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
-
         if (solicitud.getDireccion() == null || solicitud.getDireccion().trim().isEmpty()) {
             throw new IllegalArgumentException("La dirección es obligatoria");
         }
-
-        // TEMPORALMENTE COMENTAMOS LA VALIDACIÓN DEL ID RESTAURANTERO
-        // TODO: Descomentar cuando tengas restauranteros válidos en la BD
-        /*
-        if (solicitud.getId_restaurantero() <= 0) {
-            throw new IllegalArgumentException("ID de restaurantero inválido");
-        }
-        */
-
-        // Si no se especifica fecha, establecerla directamente sin recrear el objeto
+        if (solicitud.getFacebook() == null) solicitud.setFacebook("");
+        if (solicitud.getInstagram() == null) solicitud.setInstagram("");
+        if (solicitud.getMenu() == null) solicitud.setMenu("");
         if (solicitud.getFecha() == null) {
             solicitud.setFecha(LocalDate.now());
         }
-
-        // Llamar directamente al repository sin recrear el objeto
         solicitudRepo.AddSolicitudR(solicitud);
     }
 
@@ -66,23 +52,21 @@ public class Solicitud_registroService {
         if (solicitudRepo.FindSolicitudR(solicitud.getId_solicitud()) == null) {
             throw new IllegalArgumentException("No existe una solicitud con este ID");
         }
-
         if (solicitud.getRestaurante() == null || solicitud.getRestaurante().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
         }
-
         if (solicitud.getCorreo() == null || solicitud.getCorreo().trim().isEmpty()) {
             throw new IllegalArgumentException("El correo es obligatorio");
         }
-
         if (!solicitud.getCorreo().contains("@")) {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
-
         if (solicitud.getDireccion() == null || solicitud.getDireccion().trim().isEmpty()) {
             throw new IllegalArgumentException("La dirección es obligatoria");
         }
-
+        if (solicitud.getFacebook() == null) solicitud.setFacebook("");
+        if (solicitud.getInstagram() == null) solicitud.setInstagram("");
+        if (solicitud.getMenu() == null) solicitud.setMenu("");
         solicitudRepo.UpdateSolicitud(solicitud);
     }
 
@@ -98,20 +82,9 @@ public class Solicitud_registroService {
     }
 
     public void aprobarSolicitud(int idSolicitud) throws SQLException {
-        Solicitud_registro solicitud = solicitudRepo.FindSolicitudR(idSolicitud);
-        if (solicitud == null) {
+        if (solicitudRepo.FindSolicitudR(idSolicitud) == null) {
             throw new IllegalArgumentException("No existe una solicitud con este ID");
         }
-
-        // Solo pasar las rutas de las imágenes
-        Restaurante restaurante = new Restaurante();
-        restaurante.setImagen1(solicitud.getImagen1());
-        restaurante.setImagen2(solicitud.getImagen2());
-        restaurante.setImagen3(solicitud.getImagen3());
-
-        RestauranteRepository restauranteRepo = new RestauranteRepository();
-        restauranteRepo.AddRestaurante(restaurante);
-
         // Cambia el estado de la solicitud a 'aprobado'
         solicitudRepo.aprobarSolicitud(idSolicitud);
     }

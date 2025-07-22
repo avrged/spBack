@@ -30,20 +30,15 @@ public class Main {
         });
 
         app.get("/", ctx -> ctx.result("API - Catalogo de Restaurantes"));
-        
-        // Ruta manual para servir archivos estáticos
+
         app.get("/uploads/*", StaticFileHandler::handleStaticFile);
 
-        // Registrar rutas de módulos
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
-        AppModule.initRestaurantero().registerRoutes(app);
+        // Eliminada la línea de rutas de restaurantero
         AppModule.initMenu().registerRoutes(app);
-        AppModule.initZona().registerRoutes(app);
-        AppModule.initRestaurante().registerRoutes(app);
         AppModule.initDescarga().registerRoutes(app);
         AppModule.initSolicitudRegistro().registerRoutes(app);
         AppModule.initAdquirirMembresia().registerRoutes(app);
-        AppModule.initRevisionSolicitud().registerRoutes(app);
     }
 }

@@ -4,10 +4,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.sazonpt.model.Administrador;
-import org.sazonpt.model.Restaurantero;
 import org.sazonpt.model.Usuario;
 import org.sazonpt.repository.AdminRepository;
-import org.sazonpt.repository.RestauranteroRepository;
 import org.sazonpt.repository.UsuarioRepository;
 
 public class UsuarioService {
@@ -43,11 +41,8 @@ public class UsuarioService {
 
         int id_usuario = userRepo.save(user);
 
-        if("restaurantero".equalsIgnoreCase(user.getTipo())){
-            RestauranteroRepository restRepo = new RestauranteroRepository();
-            restRepo.CreateRestaurantero(new Restaurantero(id_usuario));
-        }
-        else if("administrador".equalsIgnoreCase(user.getTipo())){
+        // Si el usuario es administrador, crear también el registro de administrador
+        if("administrador".equalsIgnoreCase(user.getTipo())){
             AdminRepository adminRepo = new AdminRepository();
             adminRepo.createAdmin(new Administrador(id_usuario));
         }

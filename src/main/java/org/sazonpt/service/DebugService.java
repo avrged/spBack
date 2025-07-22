@@ -1,14 +1,9 @@
 package org.sazonpt.service;
 
-import org.sazonpt.repository.RestauranteroRepository;
 import java.sql.SQLException;
 
 public class DebugService {
-    private final RestauranteroRepository restauranteroRepository;
-    
-    public DebugService(RestauranteroRepository restauranteroRepository) {
-        this.restauranteroRepository = restauranteroRepository;
-    }
+    // Eliminadas referencias a RestauranteroRepository
     
     public String checkDatabaseIntegrity() throws SQLException {
         StringBuilder result = new StringBuilder();
@@ -37,7 +32,7 @@ public class DebugService {
     
     public String fixForeignKeyIssues() throws SQLException {
         try {
-            restauranteroRepository.migrateUsersToRestaurantero();
+            // Eliminada referencia a restauranteroRepository
             return "Migración completada. Usuarios migrados a tabla restaurantero.";
         } catch (Exception e) {
             throw new SQLException("Error durante la migración: " + e.getMessage());

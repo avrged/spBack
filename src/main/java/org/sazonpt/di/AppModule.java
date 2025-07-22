@@ -21,33 +21,11 @@ public class AppModule {
         return new UsuarioRoutes(userController);
     }
 
-    public static RestauranteroRoutes initRestaurantero() {
-        RestauranteroRepository restauranteroRepo = new RestauranteroRepository();
-        RestauranteroService restauranteroService = new RestauranteroService(restauranteroRepo);
-        RestauranteroController restauranteroController = new RestauranteroController(restauranteroService);
-        return new RestauranteroRoutes(restauranteroController);
-    }
-
-    // Nuevas rutas implementadas
     public static MenuRoutes initMenu() {
         MenuRepository menuRepo = new MenuRepository();
         MenuService menuService = new MenuService(menuRepo);
         MenuController menuController = new MenuController(menuService);
         return new MenuRoutes(menuController);
-    }
-
-    public static ZonaRoutes initZona() {
-        ZonaRepository zonaRepo = new ZonaRepository();
-        ZonaService zonaService = new ZonaService(zonaRepo);
-        ZonaController zonaController = new ZonaController(zonaService);
-        return new ZonaRoutes(zonaController);
-    }
-
-    public static RestauranteRoutes initRestaurante() {
-        RestauranteRepository restauranteRepo = new RestauranteRepository();
-        RestauranteService restauranteService = new RestauranteService(restauranteRepo);
-        RestauranteController restauranteController = new RestauranteController(restauranteService);
-        return new RestauranteRoutes(restauranteController);
     }
 
     public static DescargaRoutes initDescarga() {
@@ -70,12 +48,4 @@ public class AppModule {
         Adquirir_membresiaController membresiaController = new Adquirir_membresiaController(membresiaService);
         return new Adquirir_membresiaRoutes(membresiaController);
     }
-
-    public static Revision_soliRoutes initRevisionSolicitud() {
-        Revision_soliRepository revisionRepo = new Revision_soliRepository();
-        Revision_soliService revisionService = new Revision_soliService(revisionRepo);
-        Revision_solicitudController revisionController = new Revision_solicitudController(revisionService);
-        return new Revision_soliRoutes(revisionController);
-    }
-
 }

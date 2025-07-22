@@ -109,8 +109,11 @@ public class Solicitud_registroController {
             var numero = ctx.formParam("numero");
             var direccion = ctx.formParam("direccion");
             var horario = ctx.formParam("horario");
-            var id_restaurantero = ctx.formParam("id_restaurantero");
+            // id_restaurantero eliminado
             var estado = ctx.formParam("estado");
+            var facebook = ctx.formParam("facebook");
+            var instagram = ctx.formParam("instagram");
+            var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
 
             // Validar campos obligatorios
             if (restaurante == null || restaurante.trim().isEmpty() ||
@@ -129,12 +132,14 @@ public class Solicitud_registroController {
             var imagen2 = ctx.uploadedFile("imagen2");
             var imagen3 = ctx.uploadedFile("imagen3");
             var comprobante = ctx.uploadedFile("comprobante");
+            var menuFile = ctx.uploadedFile("menu");
 
             // Guardar archivos y obtener URLs
             String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : null;
             String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : null;
             String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : null;
             String urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : null;
+            String urlMenu = menuFile != null ? saveDocumentFile(menuFile) : "";
 
             // Crear objeto solicitud
             Solicitud_registro solicitud = new Solicitud_registro();
@@ -144,16 +149,12 @@ public class Solicitud_registroController {
             solicitud.setNumero(numero != null ? numero.trim() : "");
             solicitud.setDireccion(direccion.trim());
             solicitud.setHorario(horario != null ? horario.trim() : "");
+            solicitud.setFacebook(facebook != null ? facebook.trim() : "");
+            solicitud.setInstagram(instagram != null ? instagram.trim() : "");
+            solicitud.setMenu(urlMenu);
 
             // Usar un ID de restaurantero existente o crear uno temporal
-            int idRestauranteroFinal;
-            if (id_restaurantero != null && !id_restaurantero.trim().isEmpty()) {
-                idRestauranteroFinal = Integer.parseInt(id_restaurantero);
-            } else {
-                idRestauranteroFinal = 1; // Cambia por un ID que exista en tu BD
-            }
-
-            solicitud.setId_restaurantero(idRestauranteroFinal);
+            // idRestauranteroFinal y setId_restaurantero eliminados
             solicitud.setEstado("pendiente");
             solicitud.setFecha(LocalDate.now());
             solicitud.setImagen1(urlImagen1);
@@ -170,6 +171,9 @@ public class Solicitud_registroController {
                 "data", java.util.Map.of(
                     "restaurante", solicitud.getRestaurante(),
                     "correo", solicitud.getCorreo(),
+                    "facebook", solicitud.getFacebook(),
+                    "instagram", solicitud.getInstagram(),
+                    "menu", urlMenu != null ? urlMenu : "No se subió menú",
                     "imagen1", urlImagen1 != null ? urlImagen1 : "No se subió imagen",
                     "imagen2", urlImagen2 != null ? urlImagen2 : "No se subió imagen",
                     "imagen3", urlImagen3 != null ? urlImagen3 : "No se subió imagen",
@@ -285,20 +289,25 @@ public class Solicitud_registroController {
             var numero = ctx.formParam("numero");
             var direccion = ctx.formParam("direccion");
             var horario = ctx.formParam("horario");
-            var id_restaurantero = ctx.formParam("id_restaurantero");
+            // id_restaurantero eliminado
             var estado = ctx.formParam("estado");
+            var facebook = ctx.formParam("facebook");
+            var instagram = ctx.formParam("instagram");
+            var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
 
             // Archivos
             var imagen1 = ctx.uploadedFile("imagen1");
             var imagen2 = ctx.uploadedFile("imagen2");
             var imagen3 = ctx.uploadedFile("imagen3");
             var comprobante = ctx.uploadedFile("comprobante");
+            var menuFile = ctx.uploadedFile("menu");
 
             // Guardar archivos y obtener URLs (si no se suben, se mantienen los existentes)
             String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : solicitudExistente.getImagen1();
             String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : solicitudExistente.getImagen2();
             String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : solicitudExistente.getImagen3();
             String urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : solicitudExistente.getComprobante();
+            String urlMenu = menuFile != null ? saveDocumentFile(menuFile) : solicitudExistente.getMenu();
 
             // Actualizar campos (si no vienen, se mantienen los existentes)
             Solicitud_registro solicitud = new Solicitud_registro();
@@ -309,15 +318,11 @@ public class Solicitud_registroController {
             solicitud.setNumero(numero != null ? numero.trim() : solicitudExistente.getNumero());
             solicitud.setDireccion(direccion != null ? direccion.trim() : solicitudExistente.getDireccion());
             solicitud.setHorario(horario != null ? horario.trim() : solicitudExistente.getHorario());
-            int idRestauranteroFinal;
-            if (id_restaurantero != null && !id_restaurantero.trim().isEmpty()) {
-                idRestauranteroFinal = Integer.parseInt(id_restaurantero);
-            } else {
-                idRestauranteroFinal = solicitudExistente.getId_restaurantero();
-            }
-            solicitud.setId_restaurantero(idRestauranteroFinal);
+            solicitud.setFacebook(facebook != null ? facebook.trim() : solicitudExistente.getFacebook());
+            solicitud.setInstagram(instagram != null ? instagram.trim() : solicitudExistente.getInstagram());
+            solicitud.setMenu(urlMenu);
             solicitud.setEstado(estado != null ? estado.trim() : solicitudExistente.getEstado());
-            solicitud.setFecha(solicitudExistente.getFecha()); // No se actualiza la fecha
+            solicitud.setFecha(solicitudExistente.getFecha());
             solicitud.setImagen1(urlImagen1);
             solicitud.setImagen2(urlImagen2);
             solicitud.setImagen3(urlImagen3);
@@ -331,6 +336,9 @@ public class Solicitud_registroController {
                 "data", java.util.Map.of(
                     "restaurante", solicitud.getRestaurante(),
                     "correo", solicitud.getCorreo(),
+                    "facebook", solicitud.getFacebook(),
+                    "instagram", solicitud.getInstagram(),
+                    "menu", urlMenu != null ? urlMenu : "No se subió menú",
                     "imagen1", urlImagen1 != null ? urlImagen1 : "No se subió imagen",
                     "imagen2", urlImagen2 != null ? urlImagen2 : "No se subió imagen",
                     "imagen3", urlImagen3 != null ? urlImagen3 : "No se subió imagen",

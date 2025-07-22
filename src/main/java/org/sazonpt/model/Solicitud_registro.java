@@ -3,7 +3,7 @@ import java.time.LocalDate;
 
 public class Solicitud_registro {
     private int id_solicitud;
-    private int id_restaurantero;
+    // id_restaurantero eliminado
     private LocalDate fecha;
     private String estado;
     private String restaurante;
@@ -13,19 +13,25 @@ public class Solicitud_registro {
     private String imagen2;
     private String imagen3;
     private String comprobante;
+    private String menu;
     private String propietario;
     private String numero;
     private String horario;
+    private String facebook;
+    private String instagram;
 
     public Solicitud_registro() {
         this.estado = "pendiente";
         this.propietario = "";
         this.numero = "";
         this.horario = "";
+        this.facebook = "";
+        this.instagram = "";
+        this.menu = "";
     }
 
-    public Solicitud_registro(int id_restaurantero, LocalDate fecha, String restaurante, String correo, String direccion, String imagen1, String comprobante) {
-        this.id_restaurantero = id_restaurantero;
+    // Constructor reducido sin id_restaurantero
+    public Solicitud_registro(LocalDate fecha, String restaurante, String correo, String direccion, String imagen1, String comprobante) {
         this.fecha = fecha;
         this.estado = "pendiente";
         this.restaurante = restaurante;
@@ -33,14 +39,14 @@ public class Solicitud_registro {
         this.direccion = direccion;
         this.imagen1 = imagen1;
         this.comprobante = comprobante;
-        this.numero = "";
-        this.horario = "";
+        this.menu = "";
+        this.facebook = "";
+        this.instagram = "";
     }
 
     // Constructor con parámetros completo
-    public Solicitud_registro(int id_solicitud, int id_restaurantero, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String comprobante, String propietario, String numero, String horario){
+    public Solicitud_registro(int id_solicitud, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String menu, String comprobante, String propietario, String numero, String horario, String facebook, String instagram){
         this.id_solicitud = id_solicitud;
-        this.id_restaurantero = id_restaurantero;
         this.fecha = fecha;
         this.estado = estado;
         this.restaurante = restaurante;
@@ -49,15 +55,21 @@ public class Solicitud_registro {
         this.imagen1 = imagen1;
         this.imagen2 = imagen2;
         this.imagen3 = imagen3;
+        this.menu = menu;
         this.comprobante = comprobante;
         this.propietario = propietario;
         this.numero = numero;
         this.horario = horario;
+        this.facebook = facebook;
+        this.instagram = instagram;
     }
 
     // Getters
+    public String getFacebook() { return facebook; }
+    public String getInstagram() { return instagram; }
+    public String getMenu() { return menu; }
     public int getId_solicitud(){return id_solicitud;}
-    public int getId_restaurantero(){return id_restaurantero;}
+    // getId_restaurantero eliminado
     public LocalDate getFecha(){return fecha;}
     public String getEstado(){return estado;}
     public String getRestaurante(){return restaurante;}
@@ -72,21 +84,22 @@ public class Solicitud_registro {
     public String getHorario(){return horario;}
 
     // Setters (necesarios para Jackson)
+    public void setFacebook(String facebook) { this.facebook = facebook; }
+    public void setInstagram(String instagram) { this.instagram = instagram; }
+    public void setMenu(String menu) { this.menu = menu; }
     public void setId_solicitud(int id_solicitud) {
         this.id_solicitud = id_solicitud;
     }
 
-    public void setId_restaurantero(int id_restaurantero) {
-        this.id_restaurantero = id_restaurantero;
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
 
     public void setRestaurante(String restaurante) {
         this.restaurante = restaurante;
