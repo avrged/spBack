@@ -28,11 +28,11 @@ public class AppModule {
         return new MenuRoutes(menuController);
     }
 
-    public static DescargaRoutes initDescarga() {
-        DescargaRepository descargaRepo = new DescargaRepository();
-        DescargaService descargaService = new DescargaService(descargaRepo);
-        DescargaController descargaController = new DescargaController(descargaService);
-        return new DescargaRoutes(descargaController);
+    public static EstadisticaRoutes initEstadistica() {
+        EstadisticaRepository estadisticaRepo = new EstadisticaRepository();
+        EstadisticaService estadisticaService = new EstadisticaService(estadisticaRepo);
+        EstadisticaController estadisticaController = new EstadisticaController(estadisticaService);
+        return new EstadisticaRoutes(estadisticaController);
     }
 
     public static Solicitud_registroRoutes initSolicitudRegistro() {

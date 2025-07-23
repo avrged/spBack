@@ -37,7 +37,7 @@ public class Main {
         AppModule.initUser().registerRoutes(app);
         // Eliminada la línea de rutas de restaurantero
         AppModule.initMenu().registerRoutes(app);
-        AppModule.initDescarga().registerRoutes(app);
+        AppModule.initEstadistica().registerRoutes(app);
         AppModule.initSolicitudRegistro().registerRoutes(app);
         AppModule.initAdquirirMembresia().registerRoutes(app);
     }

@@ -117,7 +117,7 @@ public class Solicitud_registroController {
             var estado = ctx.formParam("estado");
             var facebook = ctx.formParam("facebook");
             var instagram = ctx.formParam("instagram");
-            var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
+            var menu = ctx.formParam("menu");
             var etiqueta1 = ctx.formParam("etiqueta1");
             var etiqueta2 = ctx.formParam("etiqueta2");
             var etiqueta3 = ctx.formParam("etiqueta3");
