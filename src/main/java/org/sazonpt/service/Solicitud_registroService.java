@@ -42,7 +42,9 @@ public class Solicitud_registroService {
         if (solicitud.getFacebook() == null) solicitud.setFacebook("");
         if (solicitud.getInstagram() == null) solicitud.setInstagram("");
         if (solicitud.getMenu() == null) solicitud.setMenu("");
-        if (solicitud.getEtiqueta() == null) solicitud.setEtiqueta("");
+        if (solicitud.getEtiqueta1() == null) solicitud.setEtiqueta1("");
+        if (solicitud.getEtiqueta2() == null) solicitud.setEtiqueta2("");
+        if (solicitud.getEtiqueta3() == null) solicitud.setEtiqueta3("");
         if (solicitud.getFecha() == null) {
             solicitud.setFecha(LocalDate.now());
         }
@@ -68,7 +70,9 @@ public class Solicitud_registroService {
         if (solicitud.getFacebook() == null) solicitud.setFacebook("");
         if (solicitud.getInstagram() == null) solicitud.setInstagram("");
         if (solicitud.getMenu() == null) solicitud.setMenu("");
-        if (solicitud.getEtiqueta() == null) solicitud.setEtiqueta("");
+        if (solicitud.getEtiqueta1() == null) solicitud.setEtiqueta1("");
+        if (solicitud.getEtiqueta2() == null) solicitud.setEtiqueta2("");
+        if (solicitud.getEtiqueta3() == null) solicitud.setEtiqueta3("");
         solicitudRepo.UpdateSolicitud(solicitud);
     }
 

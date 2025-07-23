@@ -90,8 +90,10 @@ public class Solicitud_registroController {
     public void create(Context ctx) {
         try {
             Solicitud_registro solicitud = ctx.bodyAsClass(Solicitud_registro.class);
-            // Si etiqueta viene null, se inicializa a ""
-            if (solicitud.getEtiqueta() == null) solicitud.setEtiqueta("");
+            // Si etiquetas vienen null, se inicializan a ""
+            if (solicitud.getEtiqueta1() == null) solicitud.setEtiqueta1("");
+            if (solicitud.getEtiqueta2() == null) solicitud.setEtiqueta2("");
+            if (solicitud.getEtiqueta3() == null) solicitud.setEtiqueta3("");
             solicitudService.createSolicitud(solicitud);
             ctx.status(201).result("Solicitud creada correctamente");
         } catch (Exception e) {
@@ -116,7 +118,9 @@ public class Solicitud_registroController {
             var facebook = ctx.formParam("facebook");
             var instagram = ctx.formParam("instagram");
             var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
-            var etiqueta = ctx.formParam("etiqueta");
+            var etiqueta1 = ctx.formParam("etiqueta1");
+            var etiqueta2 = ctx.formParam("etiqueta2");
+            var etiqueta3 = ctx.formParam("etiqueta3");
 
             // Validar campos obligatorios
             if (restaurante == null || restaurante.trim().isEmpty() ||
@@ -155,7 +159,9 @@ public class Solicitud_registroController {
             solicitud.setFacebook(facebook != null ? facebook.trim() : "");
             solicitud.setInstagram(instagram != null ? instagram.trim() : "");
             solicitud.setMenu(urlMenu);
-            solicitud.setEtiqueta(etiqueta != null ? etiqueta.trim() : "");
+            solicitud.setEtiqueta1(etiqueta1 != null ? etiqueta1.trim() : "");
+            solicitud.setEtiqueta2(etiqueta2 != null ? etiqueta2.trim() : "");
+            solicitud.setEtiqueta3(etiqueta3 != null ? etiqueta3.trim() : "");
 
             // Usar un ID de restaurantero existente o crear uno temporal
             // idRestauranteroFinal y setId_restaurantero eliminados
@@ -298,7 +304,9 @@ public class Solicitud_registroController {
             var facebook = ctx.formParam("facebook");
             var instagram = ctx.formParam("instagram");
             var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
-            var etiqueta = ctx.formParam("etiqueta");
+            var etiqueta1 = ctx.formParam("etiqueta1");
+            var etiqueta2 = ctx.formParam("etiqueta2");
+            var etiqueta3 = ctx.formParam("etiqueta3");
 
             // Archivos
             var imagen1 = ctx.uploadedFile("imagen1");
@@ -326,7 +334,9 @@ public class Solicitud_registroController {
             solicitud.setFacebook(facebook != null ? facebook.trim() : solicitudExistente.getFacebook());
             solicitud.setInstagram(instagram != null ? instagram.trim() : solicitudExistente.getInstagram());
             solicitud.setMenu(urlMenu);
-            solicitud.setEtiqueta(etiqueta != null ? etiqueta.trim() : solicitudExistente.getEtiqueta());
+            solicitud.setEtiqueta1(etiqueta1 != null ? etiqueta1.trim() : solicitudExistente.getEtiqueta1());
+            solicitud.setEtiqueta2(etiqueta2 != null ? etiqueta2.trim() : solicitudExistente.getEtiqueta2());
+            solicitud.setEtiqueta3(etiqueta3 != null ? etiqueta3.trim() : solicitudExistente.getEtiqueta3());
             solicitud.setEstado(estado != null ? estado.trim() : solicitudExistente.getEstado());
             solicitud.setFecha(solicitudExistente.getFecha());
             solicitud.setImagen1(urlImagen1);

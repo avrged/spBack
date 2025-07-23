@@ -18,7 +18,9 @@ public class Solicitud_registro {
     private String horario;
     private String facebook;
     private String instagram;
-    private String etiqueta;
+    private String etiqueta1;
+    private String etiqueta2;
+    private String etiqueta3;
 
     public Solicitud_registro() {
         this.estado = "pendiente";
@@ -28,7 +30,9 @@ public class Solicitud_registro {
         this.facebook = "";
         this.instagram = "";
         this.menu = "";
-        this.etiqueta = "";
+        this.etiqueta1 = "";
+        this.etiqueta2 = "";
+        this.etiqueta3 = "";
     }
 
     // Constructor reducido sin id_restaurantero
@@ -43,11 +47,13 @@ public class Solicitud_registro {
         this.menu = "";
         this.facebook = "";
         this.instagram = "";
-        this.etiqueta = "";
+        this.etiqueta1 = "";
+        this.etiqueta2 = "";
+        this.etiqueta3 = "";
     }
 
     // Constructor con parámetros completo
-    public Solicitud_registro(int id_solicitud, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String menu, String comprobante, String propietario, String numero, String horario, String facebook, String instagram, String etiqueta){
+    public Solicitud_registro(int id_solicitud, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String menu, String comprobante, String propietario, String numero, String horario, String facebook, String instagram, String etiqueta1, String etiqueta2, String etiqueta3){
         this.id_solicitud = id_solicitud;
         this.fecha = fecha;
         this.estado = estado;
@@ -64,7 +70,9 @@ public class Solicitud_registro {
         this.horario = horario;
         this.facebook = facebook;
         this.instagram = instagram;
-        this.etiqueta = etiqueta;
+        this.etiqueta1 = etiqueta1;
+        this.etiqueta2 = etiqueta2;
+        this.etiqueta3 = etiqueta3;
     }
 
     // Getters
@@ -72,7 +80,9 @@ public class Solicitud_registro {
     public String getInstagram() { return instagram; }
     public String getMenu() { return menu; }
     public int getId_solicitud(){return id_solicitud;}
-    public String getEtiqueta() { return etiqueta; }
+    public String getEtiqueta1() { return etiqueta1; }
+    public String getEtiqueta2() { return etiqueta2; }
+    public String getEtiqueta3() { return etiqueta3; }
     public LocalDate getFecha(){return fecha;}
     public String getEstado(){return estado;}
     public String getRestaurante(){return restaurante;}
@@ -94,8 +104,14 @@ public class Solicitud_registro {
         this.id_solicitud = id_solicitud;
     }
 
-    public void setEtiqueta(String etiqueta) {
-        this.etiqueta = etiqueta;
+    public void setEtiqueta1(String etiqueta1) {
+        this.etiqueta1 = etiqueta1;
+    }
+    public void setEtiqueta2(String etiqueta2) {
+        this.etiqueta2 = etiqueta2;
+    }
+    public void setEtiqueta3(String etiqueta3) {
+        this.etiqueta3 = etiqueta3;
     }
 
     public void setEstado(String estado) {
