@@ -43,9 +43,8 @@ public class UsuarioController {
     public void create(Context ctx) {
         try {
             Usuario user = ctx.bodyAsClass(Usuario.class);
-            int id_usuario = userService.createUser(user); // Debe retornar el id generado
+            int id_usuario = userService.createUser(user);
 
-            // Construir datos de respuesta
             java.util.Map<String, Object> data = new java.util.HashMap<>();
             data.put("id_usuario", id_usuario);
             data.put("nombre", user.getNombre());
@@ -117,7 +116,7 @@ public class UsuarioController {
                 ctx.json(java.util.Map.of(
                         "success", true,
                         "rol", usuario.getTipo(),
-                        "id_usuario", usuario.getId_usuario(), // <-- AGREGA ESTA LÍNEA
+                        "id_usuario", usuario.getId_usuario(),
                         "message", "Login exitoso"
                 ));
             } else {

@@ -35,7 +35,6 @@ public class Solicitud_registro {
         this.etiqueta3 = "";
     }
 
-    // Constructor reducido sin id_restaurantero
     public Solicitud_registro(LocalDate fecha, String restaurante, String correo, String direccion, String imagen1, String comprobante) {
         this.fecha = fecha;
         this.estado = "pendiente";
@@ -52,7 +51,6 @@ public class Solicitud_registro {
         this.etiqueta3 = "";
     }
 
-    // Constructor con parámetros completo
     public Solicitud_registro(int id_solicitud, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String menu, String comprobante, String propietario, String numero, String horario, String facebook, String instagram, String etiqueta1, String etiqueta2, String etiqueta3){
         this.id_solicitud = id_solicitud;
         this.fecha = fecha;
@@ -75,7 +73,6 @@ public class Solicitud_registro {
         this.etiqueta3 = etiqueta3;
     }
 
-    // Getters
     public String getFacebook() { return facebook; }
     public String getInstagram() { return instagram; }
     public String getMenu() { return menu; }
@@ -96,7 +93,6 @@ public class Solicitud_registro {
     public String getNumero(){return numero;}
     public String getHorario(){return horario;}
 
-    // Setters (necesarios para Jackson)
     public void setFacebook(String facebook) { this.facebook = facebook; }
     public void setInstagram(String instagram) { this.instagram = instagram; }
     public void setMenu(String menu) { this.menu = menu; }

@@ -42,10 +42,4 @@ public class AppModule {
         return new Solicitud_registroRoutes(solicitudController);
     }
 
-    public static Adquirir_membresiaRoutes initAdquirirMembresia() {
-        Adquirir_membresiaRepository membresiaRepo = new Adquirir_membresiaRepository();
-        Adquirir_membresiaService membresiaService = new Adquirir_membresiaService(membresiaRepo);
-        Adquirir_membresiaController membresiaController = new Adquirir_membresiaController(membresiaService);
-        return new Adquirir_membresiaRoutes(membresiaController);
-    }
 }

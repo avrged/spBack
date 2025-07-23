@@ -8,12 +8,10 @@ public class StaticFileHandler {
 
     public static void handleStaticFile(Context ctx) {
         try {
-            // Obtener la ruta del archivo y decodificar URL
             String requestPath = ctx.path();
             String decodedPath = java.net.URLDecoder.decode(requestPath, "UTF-8");
             String filePath = decodedPath.substring("/uploads/".length());
 
-            // Crear archivo con la ruta decodificada
             File file = new File("uploads/" + filePath);
 
             if (file.exists() && file.isFile()) {
@@ -31,24 +29,20 @@ public class StaticFileHandler {
     }
 
     private static String detectContentType(String fileName) {
-        // Normalizar el nombre del archivo (decodificar URL y limpiar)
         try {
             fileName = java.net.URLDecoder.decode(fileName, "UTF-8");
         } catch (Exception e) {
-            // Si no se puede decodificar, usar el nombre original
+
         }
 
-        // Convertir a minúsculas para la comparación
         String lowerFileName = fileName.toLowerCase();
 
-        // Detectar extensión de manera más robusta
         String extension = "";
         int lastDotIndex = lowerFileName.lastIndexOf('.');
         if (lastDotIndex > 0 && lastDotIndex < lowerFileName.length() - 1) {
             extension = lowerFileName.substring(lastDotIndex + 1);
         }
 
-        // Mapeo de extensiones a content types
         switch (extension) {
             case "jpg":
             case "jpeg":
@@ -68,14 +62,12 @@ public class StaticFileHandler {
             case "docx":
                 return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
             default:
-                // Si el nombre contiene "pdf" en cualquier parte, asumir que es PDF
                 if (lowerFileName.contains("pdf")) {
                     return "application/pdf";
                 }
-                // Si contiene extensiones de imagen conocidas, asumir imagen
                 if (lowerFileName.contains("jpg") || lowerFileName.contains("jpeg") ||
                     lowerFileName.contains("png") || lowerFileName.contains("gif")) {
-                    return "image/jpeg"; // Por defecto JPEG para imágenes
+                    return "image/jpeg";
                 }
                 return "application/octet-stream";
         }

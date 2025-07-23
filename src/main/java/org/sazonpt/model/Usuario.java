@@ -8,9 +8,8 @@ public class Usuario {
     private String tipo;
     private String status;
 
-    // Constructor vacío requerido por Jackson
     public Usuario() {
-        this.status = "activo"; // Status por defecto
+        this.status = "activo";
     }
 
     // Constructor sin status (usa "activo" por defecto)
@@ -19,7 +18,7 @@ public class Usuario {
         this.correo = correo;
         this.contrasena = contrasena;
         this.tipo = tipo;
-        this.status = "activo"; // Status por defecto
+        this.status = "activo";
     }
 
     public Usuario(int id_usuario, String nombre, String correo, String contrasena, String tipo, String status){

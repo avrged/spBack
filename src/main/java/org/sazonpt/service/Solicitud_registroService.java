@@ -8,7 +8,6 @@ import org.sazonpt.model.Solicitud_registro;
 import org.sazonpt.repository.Solicitud_registroRepository;
 
 public class Solicitud_registroService {
-    // Actualizar solo el estado de una solicitud
     public void updateEstado(int idSolicitud, String nuevoEstado) throws SQLException {
         this.solicitudRepo.updateEstado(idSolicitud, nuevoEstado);
     }
@@ -91,7 +90,6 @@ public class Solicitud_registroService {
         if (solicitudRepo.FindSolicitudR(idSolicitud) == null) {
             throw new IllegalArgumentException("No existe una solicitud con este ID");
         }
-        // Cambia el estado de la solicitud a 'aprobado'
         solicitudRepo.aprobarSolicitud(idSolicitud);
     }
 

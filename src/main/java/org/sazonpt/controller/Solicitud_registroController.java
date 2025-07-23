@@ -16,7 +16,6 @@ import io.javalin.http.HttpStatus;
 import io.javalin.http.UploadedFile;
 
 public class Solicitud_registroController {
-    // Endpoint para actualizar solo el estado de una solicitud
     public void updateEstado(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
@@ -51,7 +50,6 @@ public class Solicitud_registroController {
         }
     }
 
-    // Clase auxiliar para recibir solo el campo estado
     public static class EstadoRequest {
         private String estado;
         public String getEstado() { return estado; }
@@ -90,7 +88,6 @@ public class Solicitud_registroController {
     public void create(Context ctx) {
         try {
             Solicitud_registro solicitud = ctx.bodyAsClass(Solicitud_registro.class);
-            // Si etiquetas vienen null, se inicializan a ""
             if (solicitud.getEtiqueta1() == null) solicitud.setEtiqueta1("");
             if (solicitud.getEtiqueta2() == null) solicitud.setEtiqueta2("");
             if (solicitud.getEtiqueta3() == null) solicitud.setEtiqueta3("");
@@ -106,14 +103,12 @@ public class Solicitud_registroController {
 
     public void createWithFiles(Context ctx) {
         try {
-            // Obtener datos del formulario
             var restaurante = ctx.formParam("restaurante");
             var propietario = ctx.formParam("propietario");
             var correo = ctx.formParam("correo");
             var numero = ctx.formParam("numero");
             var direccion = ctx.formParam("direccion");
             var horario = ctx.formParam("horario");
-            // id_restaurantero eliminado
             var estado = ctx.formParam("estado");
             var facebook = ctx.formParam("facebook");
             var instagram = ctx.formParam("instagram");
@@ -122,7 +117,6 @@ public class Solicitud_registroController {
             var etiqueta2 = ctx.formParam("etiqueta2");
             var etiqueta3 = ctx.formParam("etiqueta3");
 
-            // Validar campos obligatorios
             if (restaurante == null || restaurante.trim().isEmpty() ||
                 correo == null || correo.trim().isEmpty() ||
                 direccion == null || direccion.trim().isEmpty()) {
@@ -134,21 +128,18 @@ public class Solicitud_registroController {
                 return;
             }
 
-            // Obtener archivos
             var imagen1 = ctx.uploadedFile("imagen1");
             var imagen2 = ctx.uploadedFile("imagen2");
             var imagen3 = ctx.uploadedFile("imagen3");
             var comprobante = ctx.uploadedFile("comprobante");
             var menuFile = ctx.uploadedFile("menu");
 
-            // Guardar archivos y obtener URLs
             String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : null;
             String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : null;
             String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : null;
             String urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : null;
             String urlMenu = menuFile != null ? saveDocumentFile(menuFile) : "";
 
-            // Crear objeto solicitud
             Solicitud_registro solicitud = new Solicitud_registro();
             solicitud.setRestaurante(restaurante.trim());
             solicitud.setPropietario(propietario != null ? propietario.trim() : "");
@@ -162,17 +153,12 @@ public class Solicitud_registroController {
             solicitud.setEtiqueta1(etiqueta1 != null ? etiqueta1.trim() : "");
             solicitud.setEtiqueta2(etiqueta2 != null ? etiqueta2.trim() : "");
             solicitud.setEtiqueta3(etiqueta3 != null ? etiqueta3.trim() : "");
-
-            // Usar un ID de restaurantero existente o crear uno temporal
-            // idRestauranteroFinal y setId_restaurantero eliminados
             solicitud.setEstado("pendiente");
             solicitud.setFecha(LocalDate.now());
             solicitud.setImagen1(urlImagen1);
             solicitud.setImagen2(urlImagen2);
             solicitud.setImagen3(urlImagen3);
             solicitud.setComprobante(urlComprobante);
-
-            // Guardar en base de datos
             solicitudService.createSolicitud(solicitud);
 
             ctx.status(201).json(java.util.Map.of(
@@ -216,13 +202,11 @@ public class Solicitud_registroController {
     }
 
     private String saveImageFile(UploadedFile file) throws IOException {
-        // Validar que sea una imagen
         String contentType = file.contentType();
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("El archivo debe ser una imagen");
         }
 
-        // Ruta de guardado para imágenes
         String staticPath = "uploads/images";
         File uploadDir = new File(staticPath);
         if (!uploadDir.exists()) {
@@ -232,29 +216,24 @@ public class Solicitud_registroController {
             }
         }
 
-        // Nombre único del archivo
         String fileName = System.currentTimeMillis() + "_" + file.filename();
         File destino = new File(uploadDir, fileName);
 
-        // Guardar el archivo
         try (InputStream is = file.content();
              FileOutputStream os = new FileOutputStream(destino)) {
             is.transferTo(os);
         }
 
-        // Construcción de la URL completa
-        String host = "52.23.26.163"; // Puedes configurar esto como variable de entorno
+        String host = "52.23.26.163";
         return String.format("http://%s:7070/uploads/images/%s", host, fileName);
     }
 
     private String saveDocumentFile(UploadedFile file) throws IOException {
-        // Validar que sea un PDF
         String contentType = file.contentType();
         if (contentType == null || !contentType.equals("application/pdf")) {
             throw new IllegalArgumentException("El comprobante debe ser un archivo PDF");
         }
 
-        // Ruta de guardado para documentos
         String staticPath = "uploads/documents";
         File uploadDir = new File(staticPath);
         if (!uploadDir.exists()) {
@@ -264,22 +243,19 @@ public class Solicitud_registroController {
             }
         }
 
-        // Nombre único del archivo
         String fileName = System.currentTimeMillis() + "_" + file.filename();
         File destino = new File(uploadDir, fileName);
 
-        // Guardar el archivo
         try (InputStream is = file.content();
              FileOutputStream os = new FileOutputStream(destino)) {
             is.transferTo(os);
         }
 
-        // Construcción de la URL completa
-        String host = "52.23.26.163"; // Puedes configurar esto como variable de entorno
+        String host = "52.23.26.163";
         return String.format("http://%s:7070/uploads/documents/%s", host, fileName);
     }
 
-    // Actualizar solicitud con archivos (multipart/form-data)
+
     public void updateWithFiles(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
@@ -292,37 +268,32 @@ public class Solicitud_registroController {
                 return;
             }
 
-            // Obtener datos del formulario (si no vienen, se mantienen los existentes)
             var restaurante = ctx.formParam("restaurante");
             var propietario = ctx.formParam("propietario");
             var correo = ctx.formParam("correo");
             var numero = ctx.formParam("numero");
             var direccion = ctx.formParam("direccion");
             var horario = ctx.formParam("horario");
-            // id_restaurantero eliminado
             var estado = ctx.formParam("estado");
             var facebook = ctx.formParam("facebook");
             var instagram = ctx.formParam("instagram");
-            var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
+            var menu = ctx.formParam("menu");
             var etiqueta1 = ctx.formParam("etiqueta1");
             var etiqueta2 = ctx.formParam("etiqueta2");
             var etiqueta3 = ctx.formParam("etiqueta3");
 
-            // Archivos
             var imagen1 = ctx.uploadedFile("imagen1");
             var imagen2 = ctx.uploadedFile("imagen2");
             var imagen3 = ctx.uploadedFile("imagen3");
             var comprobante = ctx.uploadedFile("comprobante");
             var menuFile = ctx.uploadedFile("menu");
 
-            // Guardar archivos y obtener URLs (si no se suben, se mantienen los existentes)
             String urlImagen1 = imagen1 != null ? saveImageFile(imagen1) : solicitudExistente.getImagen1();
             String urlImagen2 = imagen2 != null ? saveImageFile(imagen2) : solicitudExistente.getImagen2();
             String urlImagen3 = imagen3 != null ? saveImageFile(imagen3) : solicitudExistente.getImagen3();
             String urlComprobante = comprobante != null ? saveDocumentFile(comprobante) : solicitudExistente.getComprobante();
             String urlMenu = menuFile != null ? saveDocumentFile(menuFile) : solicitudExistente.getMenu();
 
-            // Actualizar campos (si no vienen, se mantienen los existentes)
             Solicitud_registro solicitud = new Solicitud_registro();
             solicitud.setId_solicitud(idSolicitud);
             solicitud.setRestaurante(restaurante != null ? restaurante.trim() : solicitudExistente.getRestaurante());

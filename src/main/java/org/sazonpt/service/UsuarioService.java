@@ -24,24 +24,20 @@ public class UsuarioService {
     }
 
     public int createUser(Usuario user) throws SQLException {
-        // Validaciones antes de guardar
         if (user.getNombre() == null || user.getCorreo() == null || user.getContrasena() == null) {
             throw new IllegalArgumentException("Nombre, correo y contraseña obligatorios");
         }
 
-        // Validación de correo
         if (!user.getCorreo().contains("@")) {
             throw new IllegalArgumentException("El correo debe contener un '@'");
         }
 
-        // Validación de usuario existente por correo
         if (userRepo.findByCorreo(user.getCorreo()) != null) {
             throw new IllegalArgumentException("Ya existe un usuario con este correo");
         }
 
         int id_usuario = userRepo.save(user);
 
-        // Si el usuario es administrador, crear también el registro de administrador
         if("administrador".equalsIgnoreCase(user.getTipo())){
             AdminRepository adminRepo = new AdminRepository();
             adminRepo.createAdmin(new Administrador(id_usuario));

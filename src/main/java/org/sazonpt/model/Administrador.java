@@ -6,7 +6,7 @@ public class Administrador extends Usuario{
 
     public Administrador(){
         super();
-        this.status = "activo"; // Status por defecto
+        this.status = "activo";
     }
 
     public Administrador(int id_usuario) {
@@ -15,7 +15,7 @@ public class Administrador extends Usuario{
 
     public Administrador(String nombre, String correo, String contrasena) {
         super(nombre, correo, contrasena, "administrador");
-        this.status = "activo"; // Status por defecto
+        this.status = "activo";
     }
 
     public Administrador(int id_usuario, String nombre, String correo, String contrasena, String tipo, int id_usuario_fk, String status){
@@ -29,6 +29,5 @@ public class Administrador extends Usuario{
     public void setStatus(String status){this.status = status;}
     public String getStatus(){return status;}
     
-    // Métodos de compatibilidad (mantener nombres antiguos)
     public void setCodigoUsuario(int codigo_usuario) {this.id_usuario = codigo_usuario;}
 }

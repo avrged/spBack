@@ -25,7 +25,6 @@ public class EstadisticaService {
         if (estadistica.getCorreo() == null || estadistica.getCorreo().trim().isEmpty()) {
             throw new IllegalArgumentException("El correo es obligatorio");
         }
-        // Inicializar a 0 los nuevos atributos si no se envían
         if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
         if (estadistica.getComida() == 0) estadistica.setComida(0);
         if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);
@@ -39,7 +38,6 @@ public class EstadisticaService {
         if (estadisticaRepo.findEstadistica(estadistica.getId_estadistica()) == null) {
             throw new IllegalArgumentException("No existe una estadística con este ID");
         }
-        // Inicializar a 0 los nuevos atributos si no se envían
         if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
         if (estadistica.getComida() == 0) estadistica.setComida(0);
         if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);

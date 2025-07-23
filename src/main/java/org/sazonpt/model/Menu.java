@@ -5,7 +5,6 @@ public class Menu {
     private String telefono;
     private String ruta_archivo;
 
-    // Constructor por defecto
     public Menu() {
     }
 
@@ -15,12 +14,10 @@ public class Menu {
         this.ruta_archivo = ruta_archivo;
     }
 
-    // Getters nuevos
     public int getId_menu() {return id_menu;}
     public String getTelefono() {return telefono;}
     public String getRuta_archivo() {return ruta_archivo;}
 
-    // Setters nuevos
     public void setId_menu(int id_menu) {this.id_menu = id_menu;}
     public void setTelefono(String telefono) {this.telefono = telefono;}
     public void setRuta_archivo(String ruta_archivo) {this.ruta_archivo = ruta_archivo;}

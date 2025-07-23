@@ -43,7 +43,6 @@ public class EstadisticaController {
     public void create(Context ctx) {
         try {
             Estadistica estadistica = ctx.bodyAsClass(Estadistica.class);
-            // Inicializar a 0 los nuevos atributos si no se envían
             if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
             if (estadistica.getComida() == 0) estadistica.setComida(0);
             if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);
@@ -68,7 +67,6 @@ public class EstadisticaController {
             int idEstadistica = Integer.parseInt(ctx.pathParam("id"));
             Estadistica estadistica = ctx.bodyAsClass(Estadistica.class);
             estadistica.setId_estadistica(idEstadistica);
-            // Inicializar a 0 los nuevos atributos si no se envían
             if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
             if (estadistica.getComida() == 0) estadistica.setComida(0);
             if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);

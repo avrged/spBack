@@ -23,7 +23,6 @@ public class Main {
             ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Origin, X-Requested-With, X-User-Email, X-User-ID");
             ctx.header("Access-Control-Allow-Credentials", "true");
         });
-        
 
         app.options("/*", ctx -> {
             ctx.status(200);
@@ -35,10 +34,8 @@ public class Main {
 
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
-        // Eliminada la línea de rutas de restaurantero
         AppModule.initMenu().registerRoutes(app);
         AppModule.initEstadistica().registerRoutes(app);
         AppModule.initSolicitudRegistro().registerRoutes(app);
-        AppModule.initAdquirirMembresia().registerRoutes(app);
     }
 }

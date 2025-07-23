@@ -87,9 +87,8 @@ public class AdminRepository {
         Connection conn = null;
         try {
             conn = DBConfig.getDataSource().getConnection();
-            conn.setAutoCommit(false); // Usar transacción para múltiples DELETE
+            conn.setAutoCommit(false);
             
-            // Primero eliminar de la tabla administrador
             String queryAdmin = "DELETE FROM administrador WHERE id_usuario = ?";
             PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
             stmtAdmin.setInt(1, idAdmin);
@@ -98,7 +97,6 @@ public class AdminRepository {
             System.out.println("Query executed: " + queryAdmin);
             System.out.println("Admin rows affected: " + rowsAffectedAdmin);
             
-            // Luego eliminar de la tabla usuario
             String queryUsuario = "DELETE FROM usuario WHERE id_usuario = ?";
             PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario);
             stmtUsuario.setInt(1, idAdmin);

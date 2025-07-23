@@ -28,7 +28,6 @@ public class UsuarioRepository {
         return user;
     }
     public int save(Usuario user) throws SQLException {
-        // Validar si el usuario ya existe por correo antes de insertar
         if (findByCorreo(user.getCorreo()) != null) {
             throw new SQLException("Ya existe un usuario con ese correo");
         }
@@ -126,9 +125,8 @@ public class UsuarioRepository {
         Connection conn = null;
         try {
             conn = DBConfig.getDataSource().getConnection();
-            conn.setAutoCommit(false); // Usar transacción
+            conn.setAutoCommit(false);
             
-            // Primero verificar el tipo de usuario
             String queryTipo = "SELECT tipo FROM usuario WHERE id_usuario = ?";
             PreparedStatement stmtTipo = conn.prepareStatement(queryTipo);
             stmtTipo.setInt(1, idUser);
