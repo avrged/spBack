@@ -90,6 +90,8 @@ public class Solicitud_registroController {
     public void create(Context ctx) {
         try {
             Solicitud_registro solicitud = ctx.bodyAsClass(Solicitud_registro.class);
+            // Si etiqueta viene null, se inicializa a ""
+            if (solicitud.getEtiqueta() == null) solicitud.setEtiqueta("");
             solicitudService.createSolicitud(solicitud);
             ctx.status(201).result("Solicitud creada correctamente");
         } catch (Exception e) {
@@ -114,6 +116,7 @@ public class Solicitud_registroController {
             var facebook = ctx.formParam("facebook");
             var instagram = ctx.formParam("instagram");
             var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
+            var etiqueta = ctx.formParam("etiqueta");
 
             // Validar campos obligatorios
             if (restaurante == null || restaurante.trim().isEmpty() ||
@@ -152,6 +155,7 @@ public class Solicitud_registroController {
             solicitud.setFacebook(facebook != null ? facebook.trim() : "");
             solicitud.setInstagram(instagram != null ? instagram.trim() : "");
             solicitud.setMenu(urlMenu);
+            solicitud.setEtiqueta(etiqueta != null ? etiqueta.trim() : "");
 
             // Usar un ID de restaurantero existente o crear uno temporal
             // idRestauranteroFinal y setId_restaurantero eliminados
@@ -294,6 +298,7 @@ public class Solicitud_registroController {
             var facebook = ctx.formParam("facebook");
             var instagram = ctx.formParam("instagram");
             var menu = ctx.formParam("menu"); // solo para compatibilidad, pero el archivo se sube abajo
+            var etiqueta = ctx.formParam("etiqueta");
 
             // Archivos
             var imagen1 = ctx.uploadedFile("imagen1");
@@ -321,6 +326,7 @@ public class Solicitud_registroController {
             solicitud.setFacebook(facebook != null ? facebook.trim() : solicitudExistente.getFacebook());
             solicitud.setInstagram(instagram != null ? instagram.trim() : solicitudExistente.getInstagram());
             solicitud.setMenu(urlMenu);
+            solicitud.setEtiqueta(etiqueta != null ? etiqueta.trim() : solicitudExistente.getEtiqueta());
             solicitud.setEstado(estado != null ? estado.trim() : solicitudExistente.getEstado());
             solicitud.setFecha(solicitudExistente.getFecha());
             solicitud.setImagen1(urlImagen1);

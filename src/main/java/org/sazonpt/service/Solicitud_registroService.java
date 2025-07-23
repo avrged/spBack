@@ -42,6 +42,7 @@ public class Solicitud_registroService {
         if (solicitud.getFacebook() == null) solicitud.setFacebook("");
         if (solicitud.getInstagram() == null) solicitud.setInstagram("");
         if (solicitud.getMenu() == null) solicitud.setMenu("");
+        if (solicitud.getEtiqueta() == null) solicitud.setEtiqueta("");
         if (solicitud.getFecha() == null) {
             solicitud.setFecha(LocalDate.now());
         }
@@ -67,6 +68,7 @@ public class Solicitud_registroService {
         if (solicitud.getFacebook() == null) solicitud.setFacebook("");
         if (solicitud.getInstagram() == null) solicitud.setInstagram("");
         if (solicitud.getMenu() == null) solicitud.setMenu("");
+        if (solicitud.getEtiqueta() == null) solicitud.setEtiqueta("");
         solicitudRepo.UpdateSolicitud(solicitud);
     }
 

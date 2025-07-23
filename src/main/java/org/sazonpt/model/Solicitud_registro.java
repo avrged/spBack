@@ -3,7 +3,6 @@ import java.time.LocalDate;
 
 public class Solicitud_registro {
     private int id_solicitud;
-    // id_restaurantero eliminado
     private LocalDate fecha;
     private String estado;
     private String restaurante;
@@ -19,6 +18,7 @@ public class Solicitud_registro {
     private String horario;
     private String facebook;
     private String instagram;
+    private String etiqueta;
 
     public Solicitud_registro() {
         this.estado = "pendiente";
@@ -28,6 +28,7 @@ public class Solicitud_registro {
         this.facebook = "";
         this.instagram = "";
         this.menu = "";
+        this.etiqueta = "";
     }
 
     // Constructor reducido sin id_restaurantero
@@ -42,10 +43,11 @@ public class Solicitud_registro {
         this.menu = "";
         this.facebook = "";
         this.instagram = "";
+        this.etiqueta = "";
     }
 
     // Constructor con parámetros completo
-    public Solicitud_registro(int id_solicitud, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String menu, String comprobante, String propietario, String numero, String horario, String facebook, String instagram){
+    public Solicitud_registro(int id_solicitud, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String menu, String comprobante, String propietario, String numero, String horario, String facebook, String instagram, String etiqueta){
         this.id_solicitud = id_solicitud;
         this.fecha = fecha;
         this.estado = estado;
@@ -62,6 +64,7 @@ public class Solicitud_registro {
         this.horario = horario;
         this.facebook = facebook;
         this.instagram = instagram;
+        this.etiqueta = etiqueta;
     }
 
     // Getters
@@ -69,7 +72,7 @@ public class Solicitud_registro {
     public String getInstagram() { return instagram; }
     public String getMenu() { return menu; }
     public int getId_solicitud(){return id_solicitud;}
-    // getId_restaurantero eliminado
+    public String getEtiqueta() { return etiqueta; }
     public LocalDate getFecha(){return fecha;}
     public String getEstado(){return estado;}
     public String getRestaurante(){return restaurante;}
@@ -91,6 +94,9 @@ public class Solicitud_registro {
         this.id_solicitud = id_solicitud;
     }
 
+    public void setEtiqueta(String etiqueta) {
+        this.etiqueta = etiqueta;
+    }
 
     public void setEstado(String estado) {
         this.estado = estado;
@@ -99,7 +105,6 @@ public class Solicitud_registro {
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
     }
-
 
     public void setRestaurante(String restaurante) {
         this.restaurante = restaurante;
