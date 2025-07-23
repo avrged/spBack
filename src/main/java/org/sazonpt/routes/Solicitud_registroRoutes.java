@@ -17,6 +17,7 @@ public class Solicitud_registroRoutes {
         app.post("/solicitudes/with-files", solicitudController::createWithFiles);
         app.get("/solicitudes/{id}", solicitudController::getById);
         app.put("/solicitudes/{id}", solicitudController::updateWithFiles);
+        app.put("/solicitudes/{id}/with-files", solicitudController::updateWithFiles);
         app.delete("/solicitudes/{id}", solicitudController::delete);
 
         app.put("/solicitudes/aprobar/{id}", solicitudController::updateEstado);
