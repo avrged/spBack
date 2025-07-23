@@ -117,6 +117,7 @@ public class UsuarioController {
                 ctx.json(java.util.Map.of(
                         "success", true,
                         "rol", usuario.getTipo(),
+                        "id_usuario", usuario.getId_usuario(), // <-- AGREGA ESTA LÍNEA
                         "message", "Login exitoso"
                 ));
             } else {
