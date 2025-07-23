@@ -25,12 +25,20 @@ public class EstadisticaService {
         if (estadistica.getCorreo() == null || estadistica.getCorreo().trim().isEmpty()) {
             throw new IllegalArgumentException("El correo es obligatorio");
         }
+        // Si descargas viene null (por ejemplo, no enviado en el JSON), inicializar a 0
+        if (estadistica.getDescargas() == 0) {
+            estadistica.setDescargas(0);
+        }
         estadisticaRepo.addEstadistica(estadistica);
     }
 
     public void updateEstadistica(Estadistica estadistica) throws SQLException {
         if (estadisticaRepo.findEstadistica(estadistica.getId_estadistica()) == null) {
             throw new IllegalArgumentException("No existe una estadística con este ID");
+        }
+        // Si descargas viene null (por ejemplo, no enviado en el JSON), inicializar a 0
+        if (estadistica.getDescargas() == 0) {
+            estadistica.setDescargas(0);
         }
         estadisticaRepo.updateEstadistica(estadistica);
     }

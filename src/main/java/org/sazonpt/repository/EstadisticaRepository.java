@@ -14,12 +14,13 @@ public class EstadisticaRepository {
     
 
     public void addEstadistica(Estadistica e) throws SQLException {
-        String query = "INSERT INTO estadistica(nacional, extranjero, correo) VALUES(?, ?, ?)";
+        String query = "INSERT INTO estadistica(nacional, extranjero, correo, descargas) VALUES(?, ?, ?, ?)";
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setObject(1, e.getNacional());
             stmt.setObject(2, e.getExtranjero());
             stmt.setString(3, e.getCorreo());
+            stmt.setInt(4, e.getDescargas());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new SQLException("Error al crear la estadística: " + ex.getMessage());
@@ -59,13 +60,14 @@ public class EstadisticaRepository {
 
 
     public Estadistica updateEstadistica(Estadistica e) throws SQLException {
-        String query = "UPDATE estadistica SET nacional = ?, extranjero = ?, correo = ? WHERE id_estadistica = ?";
+        String query = "UPDATE estadistica SET nacional = ?, extranjero = ?, correo = ?, descargas = ? WHERE id_estadistica = ?";
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setObject(1, e.getNacional());
             stmt.setObject(2, e.getExtranjero());
             stmt.setString(3, e.getCorreo());
-            stmt.setInt(4, e.getId_estadistica());
+            stmt.setInt(4, e.getDescargas());
+            stmt.setInt(5, e.getId_estadistica());
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 return findEstadistica(e.getId_estadistica());
@@ -98,7 +100,8 @@ public class EstadisticaRepository {
             rs.getInt("id_estadistica"),
             (Integer) rs.getObject("nacional"),
             (Integer) rs.getObject("extranjero"),
-            rs.getString("correo")
+            rs.getString("correo"),
+            rs.getInt("descargas")
         );
     }
 }
