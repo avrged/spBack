@@ -243,7 +243,7 @@ public class Solicitud_registroController {
         }
 
         // Construcción de la URL completa
-        String host = "localhost"; // Puedes configurar esto como variable de entorno
+        String host = "52.23.26.163"; // Puedes configurar esto como variable de entorno
         return String.format("http://%s:7070/uploads/images/%s", host, fileName);
     }
 
