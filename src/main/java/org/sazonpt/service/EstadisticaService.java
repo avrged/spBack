@@ -25,10 +25,13 @@ public class EstadisticaService {
         if (estadistica.getCorreo() == null || estadistica.getCorreo().trim().isEmpty()) {
             throw new IllegalArgumentException("El correo es obligatorio");
         }
-        // Si descargas viene null (por ejemplo, no enviado en el JSON), inicializar a 0
-        if (estadistica.getDescargas() == 0) {
-            estadistica.setDescargas(0);
-        }
+        // Inicializar a 0 los nuevos atributos si no se envían
+        if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
+        if (estadistica.getComida() == 0) estadistica.setComida(0);
+        if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);
+        if (estadistica.getRecomendacion() == 0) estadistica.setRecomendacion(0);
+        if (estadistica.getHorario() == 0) estadistica.setHorario(0);
+        if (estadistica.getVista() == 0) estadistica.setVista(0);
         estadisticaRepo.addEstadistica(estadistica);
     }
 
@@ -36,10 +39,13 @@ public class EstadisticaService {
         if (estadisticaRepo.findEstadistica(estadistica.getId_estadistica()) == null) {
             throw new IllegalArgumentException("No existe una estadística con este ID");
         }
-        // Si descargas viene null (por ejemplo, no enviado en el JSON), inicializar a 0
-        if (estadistica.getDescargas() == 0) {
-            estadistica.setDescargas(0);
-        }
+        // Inicializar a 0 los nuevos atributos si no se envían
+        if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
+        if (estadistica.getComida() == 0) estadistica.setComida(0);
+        if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);
+        if (estadistica.getRecomendacion() == 0) estadistica.setRecomendacion(0);
+        if (estadistica.getHorario() == 0) estadistica.setHorario(0);
+        if (estadistica.getVista() == 0) estadistica.setVista(0);
         estadisticaRepo.updateEstadistica(estadistica);
     }
 

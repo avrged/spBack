@@ -43,10 +43,13 @@ public class EstadisticaController {
     public void create(Context ctx) {
         try {
             Estadistica estadistica = ctx.bodyAsClass(Estadistica.class);
-            // Si descargas viene null (por ejemplo, no enviado en el JSON), inicializar a 0
-            if (estadistica.getDescargas() == 0) {
-                estadistica.setDescargas(0);
-            }
+            // Inicializar a 0 los nuevos atributos si no se envían
+            if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
+            if (estadistica.getComida() == 0) estadistica.setComida(0);
+            if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);
+            if (estadistica.getRecomendacion() == 0) estadistica.setRecomendacion(0);
+            if (estadistica.getHorario() == 0) estadistica.setHorario(0);
+            if (estadistica.getVista() == 0) estadistica.setVista(0);
             estadisticaService.createEstadistica(estadistica);
             ctx.status(201).json(java.util.Map.of(
                     "success", true,
@@ -65,10 +68,13 @@ public class EstadisticaController {
             int idEstadistica = Integer.parseInt(ctx.pathParam("id"));
             Estadistica estadistica = ctx.bodyAsClass(Estadistica.class);
             estadistica.setId_estadistica(idEstadistica);
-            // Si descargas viene null (por ejemplo, no enviado en el JSON), inicializar a 0
-            if (estadistica.getDescargas() == 0) {
-                estadistica.setDescargas(0);
-            }
+            // Inicializar a 0 los nuevos atributos si no se envían
+            if (estadistica.getDescargas() == 0) estadistica.setDescargas(0);
+            if (estadistica.getComida() == 0) estadistica.setComida(0);
+            if (estadistica.getUbicacion() == 0) estadistica.setUbicacion(0);
+            if (estadistica.getRecomendacion() == 0) estadistica.setRecomendacion(0);
+            if (estadistica.getHorario() == 0) estadistica.setHorario(0);
+            if (estadistica.getVista() == 0) estadistica.setVista(0);
             estadisticaService.updateEstadistica(estadistica);
             ctx.status(200).result("Estadística actualizada");
         } catch (Exception e) {
