@@ -14,6 +14,7 @@ Funcionalidades
 - Solicitudes de registro con carga de archivos (3 imágenes + 1 PDF)
 - Operaciones CRUD para Solicitud_registro
 - Servir archivos estáticos para los archivos subidos
+  
 Tecnologías
 - Java (JDK 21): Lenguaje de programación principal
 - Javalin (6.6.0): Framework web ligero
