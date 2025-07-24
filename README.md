@@ -12,7 +12,6 @@ Funcionalidades
 - Autenticación de usuarios (login/logout)
 - Registro de usuarios
 - Solicitudes de registro con carga de archivos (3 imágenes + 1 PDF)
-- Operaciones CRUD para Solicitud_registro
 - Servir archivos estáticos para los archivos subidos
   
 Tecnologías
