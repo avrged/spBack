@@ -28,7 +28,7 @@ public class Main {
             ctx.status(200);
         });
 
-        app.get("/", ctx -> ctx.result("API - Catalogo de Restaurantes"));
+        app.get("/", ctx -> ctx.result("API - Hola mundo"));
 
         app.get("/uploads/*", StaticFileHandler::handleStaticFile);
 
