@@ -34,7 +34,6 @@ public class Main {
 
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
-        AppModule.initMenu().registerRoutes(app);
         AppModule.initEstadistica().registerRoutes(app);
         AppModule.initSolicitudRegistro().registerRoutes(app);
     }
