@@ -224,7 +224,7 @@ public class Solicitud_registroController {
             is.transferTo(os);
         }
 
-        String host = "52.23.26.163";
+        String host = "75.101.159.172";
         return String.format("http://%s:7070/uploads/images/%s", host, fileName);
     }
 
@@ -251,7 +251,7 @@ public class Solicitud_registroController {
             is.transferTo(os);
         }
 
-        String host = "52.23.26.163";
+        String host = "75.101.159.172";
         return String.format("http://%s:7070/uploads/documents/%s", host, fileName);
     }
 
