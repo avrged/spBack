@@ -31,7 +31,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: build/libs/spBack-1.0-all.jar
-          target: /home/ubuntu/spBack/build/libs/
+          target: /home/ubuntu/spBack/
 
       - name: Reiniciar servicio en EC2
         uses: appleboy/ssh-action@v1.0.0
