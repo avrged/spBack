@@ -41,10 +41,30 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
-    - name: Test SSH connection
+    - name: Debug SSH agent and keys
       run: |
+        echo "=== SSH Agent Debug ==="
+        echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+        echo "SSH_AGENT_PID: $SSH_AGENT_PID"
+        echo "=== Listing SSH keys ==="
+        ssh-add -l || echo "No keys loaded"
+        echo "=== Key fingerprints ==="
+        ssh-add -L || echo "No public keys available"
+        echo "=== Testing SSH connectivity ==="
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'echo "SSH connection successful!" && whoami && pwd'
+        echo "=== Host key added ==="
+
+    - name: Test basic connectivity
+      run: |
+        echo "=== Testing basic network connectivity ==="
+        ping -c 3 ${{ secrets.EC2_HOST }} || echo "Ping failed - checking if host is reachable"
+        echo "=== Testing SSH port ==="
+        nc -zv ${{ secrets.EC2_HOST }} 22 || echo "SSH port 22 not reachable"
+
+    - name: Test SSH connection with verbose output
+      run: |
+        echo "=== Attempting SSH connection ==="
+        ssh -v -o StrictHostKeyChecking=no -o ConnectTimeout=10 ubuntu@${{ secrets.EC2_HOST }} 'echo "SSH connection successful!" && whoami && pwd'
 
     - name: Crear carpetas destino en EC2
       run: |
