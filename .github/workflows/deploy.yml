@@ -1,75 +1,115 @@
-name: Deploy Java App to Amazon EC2
+name: Despliegue a EC2
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Rama a desplegar'
-        required: true
-        default: 'develop'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses:   actions/checkout@v4
+    - name: Clonar repositorio
+      uses: actions/checkout@v3
 
-        with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
+    - name: Setup Java 21
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '21'
+        cache: 'gradle'
 
-      - name: Setup on jdk 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: microsoft
-          java-version: '21'
-          cache: 'gradle'
+    - name: Dar permisos a gradlew
+      run: chmod +x gradlew
 
-      - name: Make Gradle wrapper executable
-        run: chmod +x gradlew
+    - name: Construir el proyecto
+      run: ./gradlew clean shadowJar
 
-      - name: Build with Gradle and Shadowjar
-        run: ./gradlew clean shadowjar
+    - name: Verificar existencia del JAR
+      run: |
+        echo "Verificando JAR generado localmente..."
+        if [ ! -f build/libs/spBack-1.0-all.jar ]; then
+          echo "El archivo JAR no fue generado"
+          exit 1
+        fi
+        ls -lh build/libs/spBack-1.0-all.jar
 
-      - name: Print generated JAR path
-        run: find build/libs -name "*.jar" -print
+    - name: Debug SSH connection
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
-      - name: Move JAR to root for SCP
-        id: move_jar # Asignamos un ID a este paso para referenciar sus salidas
-        run: |
-          JAR_FULL_PATH=$(find build/libs -name "spBack-*.jar" | head -n 1)
-          JAR_FILENAME=$(basename "$JAR_FULL_PATH")
-          mv "$JAR_FULL_PATH" "$JAR_FILENAME"
-          echo "JAR movido a la raíz: $JAR_FILENAME"
-          echo "moved_jar_filename=$JAR_FILENAME" >> $GITHUB_OUTPUT
+    - name: Test SSH connection
+      run: |
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'echo "SSH connection successful!" && whoami && pwd'
 
-      - name: Execute pre-deployment script on EC2 (Stop old app)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{secrets.EC2_HOST}}
-          username: ${{secrets.EC2_USER}}
-          key: ${{secrets.EC2_SSH_PRIVATE_KEY}}
-          script: |
-            sudo /opt/apps/backend/scripts/pre-deploy
+    - name: Crear carpetas destino en EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Creando estructura de carpetas en EC2..."
+          sudo mkdir -p /opt/apps/backend/scripts
+          sudo chmod -R 755 /opt/apps/backend/
+          echo "Estructura creada:"
+          ls -lh /opt/apps/backend/
+        '
 
-      - name: Copy JAR to  EC2
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{secrets.EC2_HOST}}
-          username: ${{secrets.EC2_USER}}
-          key: ${{secrets.EC2_SSH_PRIVATE_KEY}}
-          source: "${{ steps.move_jar.outputs.moved_jar_filename }}"
-          target: "/opt/apps/backend/"
+    - name: Copiar archivo JAR a EC2
+      run: |
+        scp -o StrictHostKeyChecking=no build/libs/spBack-1.0-all.jar ubuntu@${{ secrets.EC2_HOST }}:/opt/apps/backend/
 
-      - name: Execute post-deployment script on EC2 (Restart app and configure systemd)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{secrets.EC2_HOST}}
-          username: ${{secrets.EC2_USER}}
-          key: ${{secrets.EC2_SSH_PRIVATE_KEY}}
-          script: |
-            sudo /opt/apps/backend/scripts/post-deploy
+    - name: Verificar archivo JAR copiado en EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Verificando archivo JAR en EC2:"
+          ls -lh /opt/apps/backend/
+        '
+
+    - name: Copiar scripts de despliegue a EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -r scripts_ubuntu/* ubuntu@${{ secrets.EC2_HOST }}:/opt/apps/backend/scripts/
+
+    - name: Dar permisos de ejecución a los scripts en EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Asignando permisos a scripts..."
+          sudo chmod +x /opt/apps/backend/scripts/pre_deploy.sh
+          sudo chmod +x /opt/apps/backend/scripts/post_deploy.sh
+          ls -lh /opt/apps/backend/scripts/
+        '
+
+    - name: Ejecutar pre-deploy en EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Ejecutando script pre-deploy..."
+          sudo /opt/apps/backend/scripts/pre_deploy.sh
+          echo "Contenido en backend después de pre-deploy:"
+          ls -lh /opt/apps/backend/
+        '
+
+    - name: Copiar JAR nuevamente por seguridad (post pre-deploy)
+      run: |
+        scp -o StrictHostKeyChecking=no build/libs/spBack-1.0-all.jar ubuntu@${{ secrets.EC2_HOST }}:/opt/apps/backend/
+
+    - name: Verificar JAR final antes del post-deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Confirmando existencia del JAR antes del post-deploy..."
+          ls -lh /opt/apps/backend/
+        '
+
+    - name: Esperar antes de ejecutar post-deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Esperando 5 segundos para asegurar sincronización..."
+          sleep 5
+        '
+
+    - name: Ejecutar post-deploy en EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} '
+          echo "Iniciando aplicación con post-deploy..."
+          sudo /opt/apps/backend/scripts/post_deploy.sh
+        '
