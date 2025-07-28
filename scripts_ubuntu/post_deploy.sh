@@ -2,7 +2,7 @@
 
 echo "Iniciando aplicación..."
 
-JAR_NAME=$(ls /opt/apps/backend/app*.jar | head -n 1)
+JAR_NAME=$(ls /opt/apps/backend/spBack*.jar | head -n 1)
 
 if [ ! -f "$JAR_NAME" ]; then
     echo "ERROR: No se encontró ningún archivo JAR en /opt/apps/backend/"
@@ -24,7 +24,7 @@ if [ -f "/etc/systemd/system/myapp.service" ]; then
     while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         echo "Verificando proceso (Intento $((RETRY_COUNT + 1)) de $MAX_RETRIES)..."
 
-        pgrep -f "java -jar /opt/apps/backend/app" > /dev/null 2>&1
+        pgrep -f "java -jar /opt/apps/backend/spBack" > /dev/null 2>&1
         if [ $? -eq 0 ]; then
             echo "Proceso encontrado."
             PROCESS_FOUND=1
