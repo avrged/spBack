@@ -45,6 +45,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          debug: true
           source: "scripts_ubuntu/*"
           target: "/opt/apps/backend/scripts/"
           strip_components: 1
