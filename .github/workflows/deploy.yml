@@ -69,7 +69,7 @@ jobs:
           ls -lh /opt/apps/backend/
 
     - name: Copiar archivo JAR a EC2
-      uses: appleboy/scp-action@v0.1.8
+      uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
@@ -94,7 +94,7 @@ jobs:
           ls -lh /opt/apps/backend/
 
     - name: Copiar scripts de despliegue a EC2
-      uses: appleboy/scp-action@v0.1.8
+      uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
@@ -134,7 +134,7 @@ jobs:
           ls -lh /opt/apps/backend/
 
     - name: Copiar JAR nuevamente por seguridad (post pre-deploy)
-      uses: appleboy/scp-action@v0.1.8
+      uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
