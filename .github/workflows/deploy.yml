@@ -36,12 +36,32 @@ jobs:
         fi
         ls -lh build/libs/spBack-1.0-all.jar
 
+    - name: Debug SSH connection
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        port: 22
+        timeout: 30s
+        debug: true
+        script: |
+          echo "SSH connection successful!"
+          echo "User: $(whoami)"
+          echo "Home: $HOME"
+          echo "Working directory: $(pwd)"
+          echo "System info: $(uname -a)"
+          echo "Available disk space:"
+          df -h
+
     - name: Crear carpetas destino en EC2
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        port: 22
+        timeout: 30s
         script: |
           echo "Creando estructura de carpetas en EC2..."
           sudo mkdir -p /opt/apps/backend/scripts
@@ -55,6 +75,8 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        port: 22
+        timeout: 30s
         source: "build/libs/spBack-1.0-all.jar"
         target: "/opt/apps/backend/"
         strip_components: 2
