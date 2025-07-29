@@ -15,7 +15,7 @@ public class Main {
                 staticFiles.directory = "./uploads";
                 staticFiles.location = Location.EXTERNAL;
             });
-        }).start(7070);
+        }).start("0.0.0.0",7070);
 
         app.before(ctx -> {
             ctx.header("Access-Control-Allow-Origin", "*");
