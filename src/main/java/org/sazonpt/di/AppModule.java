@@ -21,13 +21,6 @@ public class AppModule {
         return new UsuarioRoutes(userController);
     }
 
-    public static MenuRoutes initMenu() {
-        MenuRepository menuRepo = new MenuRepository();
-        MenuService menuService = new MenuService(menuRepo);
-        MenuController menuController = new MenuController(menuService);
-        return new MenuRoutes(menuController);
-    }
-
     public static EstadisticaRoutes initEstadistica() {
         EstadisticaRepository estadisticaRepo = new EstadisticaRepository();
         EstadisticaService estadisticaService = new EstadisticaService(estadisticaRepo);
