@@ -32,9 +32,9 @@ public class Main {
 
         app.get("/uploads/*", StaticFileHandler::handleStaticFile);
 
-        AppModule.initAdmin().registerRoutes(app);
+        //AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
-        AppModule.initEstadistica().registerRoutes(app);
-        AppModule.initSolicitudRegistro().registerRoutes(app);
+        ////AppModule.initEstadistica().registerRoutes(app);
+        ////AppModule.initSolicitudRegistro().registerRoutes(app);
     }
 }

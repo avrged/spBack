@@ -7,12 +7,6 @@ import org.sazonpt.service.*;
 
 public class AppModule {
 
-    public static AdminRoutes initAdmin() {
-        AdminRepository adminRepo = new AdminRepository();
-        AdminService adminService = new AdminService(adminRepo);
-        AdminController adminController = new AdminController(adminService);
-        return new AdminRoutes(adminController);
-    }
 
     public static UsuarioRoutes initUser() {
         UsuarioRepository userRepo = new UsuarioRepository();
@@ -20,19 +14,11 @@ public class AppModule {
         UsuarioController userController = new UsuarioController(userService);
         return new UsuarioRoutes(userController);
     }
-
-    public static EstadisticaRoutes initEstadistica() {
-        EstadisticaRepository estadisticaRepo = new EstadisticaRepository();
-        EstadisticaService estadisticaService = new EstadisticaService(estadisticaRepo);
-        EstadisticaController estadisticaController = new EstadisticaController(estadisticaService);
-        return new EstadisticaRoutes(estadisticaController);
-    }
-
-    public static Solicitud_registroRoutes initSolicitudRegistro() {
-        Solicitud_registroRepository solicitudRepo = new Solicitud_registroRepository();
-        Solicitud_registroService solicitudService = new Solicitud_registroService(solicitudRepo);
-        Solicitud_registroController solicitudController = new Solicitud_registroController(solicitudService);
-        return new Solicitud_registroRoutes(solicitudController);
-    }
-
+    
+    /*public static AdministradorRoutes initAdmin() {
+        AdminRepository adminRepo = new AdminRepository();
+        AdminService adminService = new AdminService(adminRepo);
+        AdministradorController adminController = new AdministradorController(adminService);
+        return new AdministradorRoutes(adminController);
+    }*/
 }

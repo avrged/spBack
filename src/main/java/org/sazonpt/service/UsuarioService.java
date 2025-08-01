@@ -19,43 +19,4 @@ public class UsuarioService {
         return userRepo.findAll();
     }
 
-    public Usuario getByIdUser(int idUser) throws SQLException {
-        return userRepo.findByIdUser(idUser);
-    }
-
-    public int createUser(Usuario user) throws SQLException {
-        if (user.getNombre() == null || user.getCorreo() == null || user.getContrasena() == null) {
-            throw new IllegalArgumentException("Nombre, correo y contraseña obligatorios");
-        }
-
-        if (!user.getCorreo().contains("@")) {
-            throw new IllegalArgumentException("El correo debe contener un '@'");
-        }
-
-        if (userRepo.findByCorreo(user.getCorreo()) != null) {
-            throw new IllegalArgumentException("Ya existe un usuario con este correo");
-        }
-
-        int id_usuario = userRepo.save(user);
-
-        if("administrador".equalsIgnoreCase(user.getTipo())){
-            AdminRepository adminRepo = new AdminRepository();
-            adminRepo.createAdmin(new Administrador(id_usuario));
-        }
-
-        return id_usuario;
-    }
-
-    public void updateUser(Usuario user) throws SQLException {
-        userRepo.UpdateUser(user);
-    }
-
-    public void deleteUser(int idUser) throws SQLException {
-        userRepo.deleteUser(idUser);
-    }
-
-    public Usuario login(String correo, String contrasena, String rol) throws SQLException {
-        return userRepo.findByCorreoAndContrasenaAndRol(correo, contrasena, rol);
-    }
-
 }
