@@ -175,6 +175,7 @@ public class AdminService {
     
     /**
      * Valida los datos básicos de un administrador
+     * Solo validaciones esenciales para el CRUD
      * @param administrador Administrador a validar
      * @throws IllegalArgumentException Si los datos no son válidos
      */
@@ -183,54 +184,24 @@ public class AdminService {
             throw new IllegalArgumentException("Los datos del administrador no pueden ser null");
         }
         
-        // Validar email
+        // Validaciones básicas - solo campos obligatorios
         if (administrador.getEmail() == null || administrador.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("El email es obligatorio");
         }
         
-        if (!isValidEmail(administrador.getEmail())) {
-            throw new IllegalArgumentException("El formato del email no es válido");
-        }
-        
-        // Validar nombre
         if (administrador.getNombre() == null || administrador.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre es obligatorio");
         }
         
-        if (administrador.getNombre().trim().length() < 2) {
-            throw new IllegalArgumentException("El nombre debe tener al menos 2 caracteres");
-        }
-        
-        // Validar password hash (solo para nuevos registros)
+        // Password solo para nuevos administradores
         if (administrador.getId_usuario() == 0 && 
             (administrador.getPassword_hash() == null || administrador.getPassword_hash().trim().isEmpty())) {
             throw new IllegalArgumentException("La contraseña es obligatoria");
         }
         
-        // Validar teléfono (opcional, pero si existe debe ser válido)
-        if (administrador.getTelefono() != null && !administrador.getTelefono().trim().isEmpty()) {
-            if (administrador.getTelefono().trim().length() < 10) {
-                throw new IllegalArgumentException("El teléfono debe tener al menos 10 dígitos");
-            }
-        }
-        
-        // Validar nivel de permiso
+        // Nivel de permiso es obligatorio para administradores
         if (administrador.getNivel_permiso() == null) {
             throw new IllegalArgumentException("El nivel de permiso es obligatorio");
         }
-    }
-    
-    /**
-     * Valida el formato de un email
-     * @param email Email a validar
-     * @return true si el formato es válido
-     */
-    private boolean isValidEmail(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            return false;
-        }
-        
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        return email.matches(emailRegex);
     }
 }

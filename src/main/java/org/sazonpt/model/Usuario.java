@@ -14,14 +14,16 @@ public class Usuario {
     private LocalDateTime actualizado_en;
     private LocalDateTime eliminado_en;
     
-    public Usuario() {}
+    public Usuario() {
+        this.activo = true; // Valor por defecto
+    }
     
     public Usuario(String email, String password_hash, String nombre, String telefono) {
         this.email = email;
         this.password_hash = password_hash;
         this.nombre = nombre;
         this.telefono = telefono;
-        this.activo = true; // Por defecto activo
+        this.activo = true;
         this.creado_en = LocalDateTime.now();
         this.actualizado_en = LocalDateTime.now();
     }
