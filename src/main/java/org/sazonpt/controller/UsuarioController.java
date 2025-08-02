@@ -1,356 +1,185 @@
 package org.sazonpt.controller;
 
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
+import org.sazonpt.model.Usuario;
+import org.sazonpt.service.UsuarioService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sazonpt.model.Usuario;
-import org.sazonpt.service.UsuarioService;
-
-import io.javalin.http.Context;
-import io.javalin.http.HttpStatus;
-
-/**
- * Controlador REST para la gestión de usuarios
- * Siguiendo la arquitectura del template API con Javalin
- */
 public class UsuarioController {
-    
-    private final UsuarioService userService;
+    private final UsuarioService usuarioService;
+    private final ObjectMapper objectMapper;
 
-    public UsuarioController(UsuarioService userService) {
-        this.userService = userService;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+        this.objectMapper = new ObjectMapper();
     }
 
-    /**
-     * Crea un nuevo usuario
-     * POST /users
-     */
-    public void createUser(Context ctx) {
-        try {
-            // Parsear el JSON del request
-            Usuario usuario = ctx.bodyAsClass(Usuario.class);
-            
-            // Crear el usuario
-            int userId = userService.createUser(usuario);
-            
-            // Respuesta exitosa con timestamp para evitar cache
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Usuario creado exitosamente");
-            response.put("data", Map.of("id", userId));
-            response.put("timestamp", System.currentTimeMillis());
-            
-            // Headers para evitar cache
-            ctx.header("Cache-Control", "no-cache, no-store, must-revalidate");
-            ctx.header("Pragma", "no-cache");
-            ctx.header("Expires", "0");
-            
-            ctx.status(HttpStatus.CREATED).json(response);
-            
-        } catch (IllegalArgumentException e) {
-            handleError(ctx, HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
-        } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Obtiene un usuario por ID
-     * GET /api/users/{id}
-     */
-    public void getUserById(Context ctx) {
-        try {
-            int id = ctx.pathParamAsClass("id", Integer.class).get();
-            
-            Usuario usuario = userService.getUserById(id);
-            
-            if (usuario == null) {
-                handleError(ctx, HttpStatus.NOT_FOUND, "Usuario no encontrado");
-                return;
-            }
-            
-            // Ocultar información sensible
-            usuario.setPassword_hash(null);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", usuario);
-            
-            ctx.status(HttpStatus.OK).json(response);
-            
-        } catch (IllegalArgumentException e) {
-            handleError(ctx, HttpStatus.BAD_REQUEST, "ID inválido");
-        } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
-        } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Obtiene todos los usuarios
-     * GET /api/users
-     */
     public void getAll(Context ctx) {
         try {
-            List<Usuario> users = userService.getAllUsers();
-            
-            // Ocultar información sensible
-            users.forEach(user -> user.setPassword_hash(null));
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", users);
-            response.put("total", users.size());
-            
-            ctx.status(HttpStatus.OK).json(response);
-            
+            List<Usuario> usuarios = usuarioService.getAllUsuarios();
+            ctx.json(usuarios);
         } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
-        } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
+            System.err.println("Error al obtener usuarios: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).result("Error al obtener usuarios");
         }
     }
 
-    /**
-     * Actualiza un usuario
-     * PUT /api/users/{id}
-     */
-    public void updateUser(Context ctx) {
+    public void getById(Context ctx) {
         try {
-            int id = ctx.pathParamAsClass("id", Integer.class).get();
-            
-            // Parsear el JSON del request
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            Usuario usuario = usuarioService.getByIdUsuario(id);
+            if (usuario != null) {
+                ctx.json(usuario);
+            } else {
+                ctx.status(HttpStatus.NOT_FOUND).result("Usuario no encontrado");
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(HttpStatus.BAD_REQUEST).result("ID de usuario inválido");
+        } catch (SQLException e) {
+            System.err.println("Error al obtener usuario: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).result("Error al obtener usuario");
+        }
+    }
+
+    public void create(Context ctx) {
+        try {
             Usuario usuario = ctx.bodyAsClass(Usuario.class);
-            usuario.setId_usuario(id); // Asegurar que el ID coincida con la URL
-            
-            // Actualizar el usuario
-            boolean updated = userService.updateUser(usuario);
-            
-            if (!updated) {
-                handleError(ctx, HttpStatus.NOT_FOUND, "Usuario no encontrado o no se pudo actualizar");
-                return;
-            }
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Usuario actualizado exitosamente");
-            
-            ctx.status(HttpStatus.OK).json(response);
-            
+            Usuario usuarioCreado = usuarioService.createUsuario(usuario);
+            ctx.status(HttpStatus.CREATED).json(Map.of(
+                "message", "Usuario creado exitosamente",
+                "success", true,
+                "usuario", usuarioCreado
+            ));
         } catch (IllegalArgumentException e) {
-            handleError(ctx, HttpStatus.BAD_REQUEST, e.getMessage());
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "message", e.getMessage(),
+                "success", false
+            ));
         } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
+            System.err.println("Error al crear usuario: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(Map.of(
+                "message", "Error interno del servidor",
+                "success", false
+            ));
         } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
+            System.err.println("Error inesperado al crear usuario: " + e.getMessage());
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "message", "Error al procesar la solicitud",
+                "success", false
+            ));
         }
     }
 
-    /**
-     * Elimina un usuario
-     * DELETE /api/users/{id}
-     */
-    public void deleteUser(Context ctx) {
+    public void update(Context ctx) {
         try {
-            int id = ctx.pathParamAsClass("id", Integer.class).get();
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            Usuario usuario = ctx.bodyAsClass(Usuario.class);
+            usuario.setId_usuario(id); // Asegurar que el ID coincida con el parámetro de la URL
             
-            boolean deleted = userService.deleteUser(id);
-            
-            if (!deleted) {
-                handleError(ctx, HttpStatus.NOT_FOUND, "Usuario no encontrado");
-                return;
-            }
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Usuario eliminado exitosamente");
-            
-            ctx.status(HttpStatus.OK).json(response);
-            
+            usuarioService.updateUsuario(usuario);
+            ctx.status(HttpStatus.OK).json(Map.of(
+                "message", "Usuario actualizado exitosamente",
+                "success", true
+            ));
+        } catch (NumberFormatException e) {
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "message", "ID de usuario inválido",
+                "success", false
+            ));
         } catch (IllegalArgumentException e) {
-            handleError(ctx, HttpStatus.BAD_REQUEST, e.getMessage());
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "message", e.getMessage(),
+                "success", false
+            ));
         } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
+            System.err.println("Error al actualizar usuario: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(Map.of(
+                "message", "Error interno del servidor",
+                "success", false
+            ));
         } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
+            System.err.println("Error inesperado al actualizar usuario: " + e.getMessage());
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "message", "Error al procesar la solicitud",
+                "success", false
+            ));
         }
     }
 
-    /**
-     * Busca un usuario por email
-     * GET /api/users/search?email=valor
-     */
-    public void searchUserByEmail(Context ctx) {
+    public void delete(Context ctx) {
         try {
-            String email = ctx.queryParam("email");
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean deleted = usuarioService.deleteUsuario(id);
             
-            if (email == null || email.trim().isEmpty()) {
-                handleError(ctx, HttpStatus.BAD_REQUEST, "El parámetro 'email' es requerido");
-                return;
+            if (deleted) {
+                ctx.status(HttpStatus.OK).json(Map.of(
+                    "message", "Usuario eliminado exitosamente",
+                    "success", true
+                ));
+            } else {
+                ctx.status(HttpStatus.NOT_FOUND).json(Map.of(
+                    "message", "Usuario no encontrado",
+                    "success", false
+                ));
             }
-            
-            Usuario usuario = userService.getUserByEmail(email.trim());
-            
-            if (usuario == null) {
-                handleError(ctx, HttpStatus.NOT_FOUND, "Usuario no encontrado");
-                return;
-            }
-            
-            // Ocultar información sensible
-            usuario.setPassword_hash(null);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", usuario);
-            
-            ctx.status(HttpStatus.OK).json(response);
-            
+        } catch (NumberFormatException e) {
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "message", "ID de usuario inválido",
+                "success", false
+            ));
         } catch (IllegalArgumentException e) {
-            handleError(ctx, HttpStatus.BAD_REQUEST, e.getMessage());
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "message", e.getMessage(),
+                "success", false
+            ));
         } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
-        } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
+            System.err.println("Error al eliminar usuario: " + e.getMessage());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(Map.of(
+                "message", "Error interno del servidor",
+                "success", false
+            ));
         }
     }
 
-    /**
-     * Login unificado para usuarios (administradores y restauranteros)
-     * POST /users/login
-     */
     public void login(Context ctx) {
         try {
-            // Obtener credenciales del body
             @SuppressWarnings("unchecked")
-            Map<String, Object> loginData = ctx.bodyAsClass(Map.class);
-            String email = (String) loginData.get("email");
-            String password = (String) loginData.get("password");
+            Map<String, String> credentials = objectMapper.readValue(ctx.body(), Map.class);
+            String correo = credentials.get("correo");
+            String contrasena = credentials.get("contrasena");
 
-            if (email == null || email.trim().isEmpty()) {
-                handleError(ctx, HttpStatus.BAD_REQUEST, "El email es obligatorio");
-                return;
-            }
-            
-            if (password == null || password.trim().isEmpty()) {
-                handleError(ctx, HttpStatus.BAD_REQUEST, "La contraseña es obligatoria");
-                return;
-            }
-
-            // Buscar usuario por email y validar contraseña
-            Usuario usuario = userService.loginUser(email.trim(), password);
+            Usuario usuario = usuarioService.autenticarUsuario(correo, contrasena);
             
             if (usuario != null) {
-                // Obtener información completa del usuario (tipo, roles, etc.)
-                Object[] userInfo = userService.getUserLoginInfo(email.trim());
-                
-                // Crear respuesta con información completa
-                Map<String, Object> userData = new HashMap<>();
-                userData.put("id_usuario", usuario.getId_usuario());
-                userData.put("email", usuario.getEmail());
-                userData.put("nombre", usuario.getNombre());
-                userData.put("telefono", usuario.getTelefono());
-                userData.put("avatar_url", usuario.getAvatar_url());
-                userData.put("activo", usuario.isActivo());
-                
-                // Agregar información de rol si está disponible
-                if (userInfo != null) {
-                    userData.put("tipo_usuario", userInfo[11]); // tipo_usuario
-                    
-                    // Si es administrador, agregar nivel de permiso
-                    if ("Administrador".equals(userInfo[11]) && userInfo[8] != null) {
-                        userData.put("nivel_permiso", userInfo[8]);
-                    }
-                    
-                    // Si es restaurantero, agregar información de verificación
-                    if ("Restaurantero".equals(userInfo[11])) {
-                        userData.put("rfc", userInfo[9]);
-                        userData.put("verificado", userInfo[10]);
-                    }
-                }
-                
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", true);
-                response.put("message", "Login exitoso");
-                response.put("data", userData);
-                
+                // Crear respuesta sin incluir la contraseña
+                Map<String, Object> response = Map.of(
+                    "success", true,
+                    "message", "Autenticación exitosa",
+                    "usuario", Map.of(
+                        "id_usuario", usuario.getId_usuario(),
+                        "nombre", usuario.getNombre(),
+                        "correo", usuario.getCorreo(),
+                        "tipo", usuario.getTipo()
+                    )
+                );
                 ctx.status(HttpStatus.OK).json(response);
             } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("error", "Credenciales inválidas");
-                
-                ctx.status(HttpStatus.UNAUTHORIZED).json(response);
+                ctx.status(HttpStatus.UNAUTHORIZED).json(Map.of(
+                    "success", false,
+                    "message", "Credenciales inválidas"
+                ));
             }
-
-        } catch (IllegalArgumentException e) {
-            handleError(ctx, HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
         } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
+            System.err.println("Error en login: " + e.getMessage());
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of(
+                "success", false,
+                "message", "Error al procesar la solicitud"
+            ));
         }
-    }
-
-    /**
-     * Obtiene estadísticas básicas de usuarios
-     * GET /api/users/stats
-     */
-    public void getUserStats(Context ctx) {
-        try {
-            int totalUsers = userService.getTotalUsers();
-            
-            Map<String, Object> stats = new HashMap<>();
-            stats.put("total_usuarios", totalUsers);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", stats);
-            
-            ctx.status(HttpStatus.OK).json(response);
-            
-        } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
-        } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Obtiene usuarios con información de roles
-     * GET /api/users/with-roles
-     */
-    public void getUsersWithRoles(Context ctx) {
-        try {
-            List<Object[]> usersWithRoles = userService.getUsersWithRoles();
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", usersWithRoles);
-            response.put("total", usersWithRoles.size());
-            
-            ctx.status(HttpStatus.OK).json(response);
-            
-        } catch (SQLException e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
-        } catch (Exception e) {
-            handleError(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error inesperado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Maneja errores y devuelve respuesta JSON consistente
-     */
-    private void handleError(Context ctx, HttpStatus status, String message) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("success", false);
-        errorResponse.put("error", message);
-        errorResponse.put("timestamp", System.currentTimeMillis());
-        
-        ctx.status(status).json(errorResponse);
     }
 }

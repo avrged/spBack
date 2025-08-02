@@ -1,56 +1,48 @@
 package org.sazonpt.model;
 
-import java.time.LocalDateTime;
-
 public class Usuario {
-    private int id_usuario;
-    private String email;
-    private String password_hash;
+    private Integer id_usuario;
     private String nombre;
-    private String telefono;
-    private String avatar_url;
-    private boolean activo;
-    private String tipo_usuario;    // Nuevo campo para el tipo de usuario
-    private LocalDateTime creado_en;
-    private LocalDateTime actualizado_en;
-    private LocalDateTime eliminado_en;
+    private String correo;
+    private String contrasena;
+    private String tipo;
     
+    // Constructor vacío
     public Usuario() {
-        this.activo = true; // Valor por defecto
     }
     
-    public Usuario(String email, String password_hash, String nombre, String telefono) {
-        this.email = email;
-        this.password_hash = password_hash;
+    // Constructor con todos los parámetros
+    public Usuario(Integer id_usuario, String nombre, String correo, String contrasena, String tipo) {
+        this.id_usuario = id_usuario;
         this.nombre = nombre;
-        this.telefono = telefono;
-        this.activo = true;
-        this.creado_en = LocalDateTime.now();
-        this.actualizado_en = LocalDateTime.now();
+        this.correo = correo;
+        this.contrasena = contrasena;
+        this.tipo = tipo;
     }
     
-    public int getId_usuario() {
+    // Constructor sin ID (útil para crear nuevos usuarios)
+    public Usuario(String nombre, String correo, String contrasena, String tipo) {
+        this.nombre = nombre;
+        this.correo = correo;
+        this.contrasena = contrasena;
+        this.tipo = tipo;
+    }
+    
+    // Getters y Setters
+    public Integer getIdUsuario() {
         return id_usuario;
     }
     
-    public void setId_usuario(int id_usuario) {
+    public void setIdUsuario(Integer id_usuario) {
         this.id_usuario = id_usuario;
     }
     
-    public String getEmail() {
-        return email;
+    public Integer getId_usuario() {
+        return id_usuario;
     }
     
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public String getPassword_hash() {
-        return password_hash;
-    }
-    
-    public void setPassword_hash(String password_hash) {
-        this.password_hash = password_hash;
+    public void setId_usuario(Integer id_usuario) {
+        this.id_usuario = id_usuario;
     }
     
     public String getNombre() {
@@ -61,59 +53,52 @@ public class Usuario {
         this.nombre = nombre;
     }
     
-    public String getTelefono() {
-        return telefono;
+    public String getCorreo() {
+        return correo;
     }
     
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public void setCorreo(String correo) {
+        this.correo = correo;
     }
     
-    public String getAvatar_url() {
-        return avatar_url;
+    public String getContrasena() {
+        return contrasena;
     }
     
-    public void setAvatar_url(String avatar_url) {
-        this.avatar_url = avatar_url;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
     
-    public boolean isActivo() {
-        return activo;
+    public String getTipo() {
+        return tipo;
     }
     
-    public void setActivo(boolean activo) {
-        this.activo = activo;
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
     
-    public String getTipo_usuario() {
-        return tipo_usuario;
+    // Método toString para facilitar el debugging
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id_usuario=" + id_usuario +
+                ", nombre='" + nombre + '\'' +
+                ", correo='" + correo + '\'' +
+                ", tipo='" + tipo + '\'' +
+                '}';
     }
     
-    public void setTipo_usuario(String tipo_usuario) {
-        this.tipo_usuario = tipo_usuario;
+    // Método equals y hashCode basados en el ID
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Usuario usuario = (Usuario) obj;
+        return id_usuario != null && id_usuario.equals(usuario.id_usuario);
     }
     
-    public LocalDateTime getCreado_en() {
-        return creado_en;
-    }
-    
-    public void setCreado_en(LocalDateTime creado_en) {
-        this.creado_en = creado_en;
-    }
-    
-    public LocalDateTime getActualizado_en() {
-        return actualizado_en;
-    }
-    
-    public void setActualizado_en(LocalDateTime actualizado_en) {
-        this.actualizado_en = actualizado_en;
-    }
-    
-    public LocalDateTime getEliminado_en() {
-        return eliminado_en;
-    }
-    
-    public void setEliminado_en(LocalDateTime eliminado_en) {
-        this.eliminado_en = eliminado_en;
+    @Override
+    public int hashCode() {
+        return id_usuario != null ? id_usuario.hashCode() : 0;
     }
 }

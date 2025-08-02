@@ -1,7 +1,7 @@
 package org.sazonpt.repository;
 
 import org.sazonpt.config.DBConfig;
-import org.sazonpt.model.Restaurantero;
+import org.sazonpt.model.Administrador;
 import org.sazonpt.model.Usuario;
 
 import java.sql.Connection;
@@ -11,14 +11,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RestauranteroRepository {
+public class AdministradorRepository {
     
-    public List<Restaurantero> findAll() throws SQLException {
-        List<Restaurantero> restauranteros = new ArrayList<>();
+    public List<Administrador> findAll() throws SQLException {
+        List<Administrador> administradores = new ArrayList<>();
         String query = """
-            SELECT r.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
-            FROM restaurantero r 
-            INNER JOIN usuario u ON r.id_usuario = u.id_usuario
+            SELECT a.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
+            FROM administrador a 
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
             """;
             
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -33,19 +33,19 @@ public class RestauranteroRepository {
                 usuario.setContrasena(rs.getString("contrasena"));
                 usuario.setTipo(rs.getString("tipo"));
                 
-                Restaurantero restaurantero = new Restaurantero(usuario);
-                restauranteros.add(restaurantero);
+                Administrador administrador = new Administrador(usuario);
+                administradores.add(administrador);
             }
         }
-        return restauranteros;
+        return administradores;
     }
 
-    public Restaurantero findByIdUsuario(int idUsuario) throws SQLException {
+    public Administrador findByIdUsuario(int idUsuario) throws SQLException {
         String query = """
-            SELECT r.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
-            FROM restaurantero r 
-            INNER JOIN usuario u ON r.id_usuario = u.id_usuario 
-            WHERE r.id_usuario = ?
+            SELECT a.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
+            FROM administrador a 
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario 
+            WHERE a.id_usuario = ?
             """;
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -62,18 +62,18 @@ public class RestauranteroRepository {
                     usuario.setContrasena(rs.getString("contrasena"));
                     usuario.setTipo(rs.getString("tipo"));
                     
-                    return new Restaurantero(usuario);
+                    return new Administrador(usuario);
                 }
             }
         }
         return null;
     }
 
-    public Restaurantero findByCorreo(String correo) throws SQLException {
+    public Administrador findByCorreo(String correo) throws SQLException {
         String query = """
-            SELECT r.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
-            FROM restaurantero r 
-            INNER JOIN usuario u ON r.id_usuario = u.id_usuario 
+            SELECT a.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
+            FROM administrador a 
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario 
             WHERE u.correo = ?
             """;
 
@@ -91,24 +91,24 @@ public class RestauranteroRepository {
                     usuario.setContrasena(rs.getString("contrasena"));
                     usuario.setTipo(rs.getString("tipo"));
                     
-                    return new Restaurantero(usuario);
+                    return new Administrador(usuario);
                 }
             }
         }
         return null;
     }
 
-    public void save(Restaurantero restaurantero) throws SQLException {
-        String query = "INSERT INTO restaurantero (id_usuario) VALUES (?)";
+    public void save(Administrador administrador) throws SQLException {
+        String query = "INSERT INTO administrador (id_usuario) VALUES (?)";
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, restaurantero.getId_usuario());
+            stmt.setInt(1, administrador.getId_usuario());
             stmt.executeUpdate();
         }
     }
 
     public boolean delete(int idUsuario) throws SQLException {
-        String query = "DELETE FROM restaurantero WHERE id_usuario = ?";
+        String query = "DELETE FROM administrador WHERE id_usuario = ?";
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, idUsuario);
@@ -118,7 +118,7 @@ public class RestauranteroRepository {
     }
 
     public boolean existsById(int idUsuario) throws SQLException {
-        String query = "SELECT 1 FROM restaurantero WHERE id_usuario = ?";
+        String query = "SELECT 1 FROM administrador WHERE id_usuario = ?";
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, idUsuario);
@@ -128,12 +128,12 @@ public class RestauranteroRepository {
         }
     }
 
-    public List<Restaurantero> findAllWithFullUserData() throws SQLException {
-        List<Restaurantero> restauranteros = new ArrayList<>();
+    public List<Administrador> findAllWithFullUserData() throws SQLException {
+        List<Administrador> administradores = new ArrayList<>();
         String query = """
-            SELECT r.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
-            FROM restaurantero r 
-            INNER JOIN usuario u ON r.id_usuario = u.id_usuario
+            SELECT a.id_usuario, u.nombre, u.correo, u.contrasena, u.tipo 
+            FROM administrador a 
+            INNER JOIN usuario u ON a.id_usuario = u.id_usuario
             ORDER BY u.nombre
             """;
             
@@ -149,15 +149,15 @@ public class RestauranteroRepository {
                 usuario.setContrasena(rs.getString("contrasena"));
                 usuario.setTipo(rs.getString("tipo"));
                 
-                Restaurantero restaurantero = new Restaurantero(usuario);
-                restauranteros.add(restaurantero);
+                Administrador administrador = new Administrador(usuario);
+                administradores.add(administrador);
             }
         }
-        return restauranteros;
+        return administradores;
     }
 
-    public void insertRestaurantero(int idUsuario) throws SQLException {
-        String query = "INSERT INTO restaurantero (id_usuario) VALUES (?)";
+    public void insertAdministrador(int idUsuario) throws SQLException {
+        String query = "INSERT INTO administrador (id_usuario) VALUES (?)";
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, idUsuario);

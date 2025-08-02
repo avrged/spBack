@@ -1,77 +1,75 @@
 package org.sazonpt.model;
 
-public class Administrador extends Usuario {
+public class Administrador {
+    private Usuario usuario;
+    private Integer id_usuario;
     
-    // Enum para representar los niveles de permiso
-    public enum NivelPermiso {
-        SUPER("super"),
-        MODERADOR("moderador");
-        
-        private final String valor;
-        
-        NivelPermiso(String valor) {
-            this.valor = valor;
-        }
-        
-        public String getValor() {
-            return valor;
-        }
-        
-        public static NivelPermiso fromValor(String valor) {
-            for (NivelPermiso nivel : NivelPermiso.values()) {
-                if (nivel.valor.equals(valor)) {
-                    return nivel;
-                }
-            }
-            throw new IllegalArgumentException("Valor de nivel de permiso no válido: " + valor);
-        }
-        
-        @Override
-        public String toString() {
-            return valor;
-        }
-    }
-    
-    private int id_administrador;
-    private NivelPermiso nivel_permiso;
-    
+    // Constructor vacío
     public Administrador() {
-        super();
-        this.nivel_permiso = NivelPermiso.MODERADOR;
     }
     
-    public Administrador(String email, String password_hash, String nombre, String telefono) {
-        super(email, password_hash, nombre, telefono);
-        this.nivel_permiso = NivelPermiso.MODERADOR;
+    // Constructor con Usuario completo
+    public Administrador(Usuario usuario) {
+        this.usuario = usuario;
+        this.id_usuario = usuario != null ? usuario.getIdUsuario() : null;
     }
     
-    public Administrador(String email, String password_hash, String nombre, String telefono, NivelPermiso nivel_permiso) {
-        super(email, password_hash, nombre, telefono);
-        this.nivel_permiso = nivel_permiso;
+    // Constructor solo con ID
+    public Administrador(Integer id_usuario) {
+        this.id_usuario = id_usuario;
     }
     
-    public int getId_administrador() {
-        return id_administrador;
+    // Getters y Setters
+    public Usuario getUsuario() {
+        return usuario;
     }
     
-    public void setId_administrador(int id_administrador) {
-        this.id_administrador = id_administrador;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+        this.id_usuario = usuario != null ? usuario.getIdUsuario() : null;
     }
     
-    public NivelPermiso getNivel_permiso() {
-        return nivel_permiso;
+    public Integer getId_usuario() {
+        return id_usuario;
     }
     
-    public void setNivel_permiso(NivelPermiso nivel_permiso) {
-        this.nivel_permiso = nivel_permiso;
+    public void setId_usuario(Integer id_usuario) {
+        this.id_usuario = id_usuario;
     }
     
-    public boolean esSuper() {
-        return this.nivel_permiso == NivelPermiso.SUPER;
+    // Métodos de conveniencia para acceder a datos del usuario
+    public String getNombre() {
+        return usuario != null ? usuario.getNombre() : null;
     }
     
-    public boolean esModerador() {
-        return this.nivel_permiso == NivelPermiso.MODERADOR;
+    public String getCorreo() {
+        return usuario != null ? usuario.getCorreo() : null;
     }
     
+    public String getTipo() {
+        return usuario != null ? usuario.getTipo() : null;
+    }
+    
+    // Método toString
+    @Override
+    public String toString() {
+        return "Administrador{" +
+                "id_usuario=" + id_usuario +
+                ", usuario=" + (usuario != null ? usuario.getNombre() : "null") +
+                '}';
+    }
+    
+    // Métodos equals y hashCode basados en el ID
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Administrador admin = (Administrador) obj;
+        return id_usuario != null && id_usuario.equals(admin.id_usuario);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id_usuario != null ? id_usuario.hashCode() : 0;
+    }
 }

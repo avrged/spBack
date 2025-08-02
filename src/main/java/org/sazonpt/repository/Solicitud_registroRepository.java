@@ -2,372 +2,233 @@ package org.sazonpt.repository;
 
 import org.sazonpt.config.DBConfig;
 import org.sazonpt.model.Solicitud_registro;
-import org.sazonpt.model.Solicitud_registro.EstadoSolicitud;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repositorio para la gestión de solicitudes de registro
- * Mapea la tabla 'solicitud_registro' de la base de datos
- */
 public class Solicitud_registroRepository {
-    
-    // Crear una nueva solicitud de registro
-    public Solicitud_registro save(Solicitud_registro solicitud) {
+
+    public List<Solicitud_registro> findAll() throws SQLException {
+        List<Solicitud_registro> solicitudes = new ArrayList<>();
         String sql = """
-            INSERT INTO solicitud_registro (id_restaurantero, estado, datos_restaurante, creado_en)
-            VALUES (?, ?, ?, ?)
+            SELECT sr.id_solicitud, sr.fecha, sr.estado, sr.nombre_propuesto_restaurante, 
+                   sr.correo, sr.nombre_propietario, sr.horario_atencion, sr.id_restaurantero,
+                   u.nombre, u.correo as restaurantero_correo
+            FROM solicitud_registro sr
+            INNER JOIN restaurantero r ON sr.id_restaurantero = r.id_usuario
+            INNER JOIN usuario u ON r.id_usuario = u.id_usuario
+            ORDER BY sr.fecha DESC
             """;
-        
+
         try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
-            stmt.setInt(1, solicitud.getId_restaurantero());
-            stmt.setString(2, solicitud.getEstado().getValor());
-            stmt.setString(3, solicitud.getDatos_restaurante());
-            stmt.setTimestamp(4, Timestamp.valueOf(solicitud.getCreado_en()));
-            
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Error al crear solicitud, no se insertaron filas.");
-            }
-            
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    solicitud.setId_solicitud(generatedKeys.getInt(1));
-                    return solicitud;
-                } else {
-                    throw new SQLException("Error al crear solicitud, no se obtuvo el ID.");
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Solicitud_registro solicitud = new Solicitud_registro();
+                solicitud.setId_solicitud(rs.getInt("id_solicitud"));
+                
+                Timestamp timestamp = rs.getTimestamp("fecha");
+                if (timestamp != null) {
+                    solicitud.setFecha(timestamp.toLocalDateTime());
                 }
-            }
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al guardar solicitud: " + e.getMessage(), e);
-        }
-    }
-    
-    // Buscar solicitud por ID
-    public Optional<Solicitud_registro> findById(int id) {
-        String sql = """
-            SELECT * FROM solicitud_registro 
-            WHERE id_solicitud = ?
-            """;
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return Optional.of(mapResultSetToSolicitud(rs));
-            }
-            return Optional.empty();
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar solicitud por ID: " + e.getMessage(), e);
-        }
-    }
-    
-    // Buscar solicitud por ID de restaurantero
-    public Optional<Solicitud_registro> findByRestauranteroId(int restauranteroId) {
-        String sql = """
-            SELECT * FROM solicitud_registro 
-            WHERE id_restaurantero = ? 
-            ORDER BY creado_en DESC 
-            LIMIT 1
-            """;
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, restauranteroId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return Optional.of(mapResultSetToSolicitud(rs));
-            }
-            return Optional.empty();
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar solicitud por restaurantero: " + e.getMessage(), e);
-        }
-    }
-    
-    // Obtener todas las solicitudes
-    public List<Solicitud_registro> findAll() {
-        String sql = """
-            SELECT * FROM solicitud_registro 
-            ORDER BY creado_en DESC
-            """;
-        
-        List<Solicitud_registro> solicitudes = new ArrayList<>();
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                solicitudes.add(mapResultSetToSolicitud(rs));
-            }
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener todas las solicitudes: " + e.getMessage(), e);
-        }
-        
-        return solicitudes;
-    }
-    
-    // Obtener solicitudes por estado
-    public List<Solicitud_registro> findByEstado(EstadoSolicitud estado) {
-        String sql = """
-            SELECT * FROM solicitud_registro 
-            WHERE estado = ? 
-            ORDER BY creado_en DESC
-            """;
-        
-        List<Solicitud_registro> solicitudes = new ArrayList<>();
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, estado.getValor());
-            ResultSet rs = stmt.executeQuery();
-            
-            while (rs.next()) {
-                solicitudes.add(mapResultSetToSolicitud(rs));
-            }
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar solicitudes por estado: " + e.getMessage(), e);
-        }
-        
-        return solicitudes;
-    }
-    
-    // Obtener solicitudes pendientes
-    public List<Solicitud_registro> findPendientes() {
-        return findByEstado(EstadoSolicitud.PENDIENTE);
-    }
-    
-    // Obtener solicitudes aprobadas
-    public List<Solicitud_registro> findAprobadas() {
-        return findByEstado(EstadoSolicitud.APROBADO);
-    }
-    
-    // Obtener solicitudes rechazadas
-    public List<Solicitud_registro> findRechazadas() {
-        return findByEstado(EstadoSolicitud.RECHAZADO);
-    }
-    
-    // Actualizar solicitud
-    public Solicitud_registro update(Solicitud_registro solicitud) {
-        String sql = """
-            UPDATE solicitud_registro 
-            SET estado = ?, datos_restaurante = ?, revisado_por = ?, revisado_en = ?
-            WHERE id_solicitud = ?
-            """;
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, solicitud.getEstado().getValor());
-            stmt.setString(2, solicitud.getDatos_restaurante());
-            
-            if (solicitud.getRevisado_por() != null) {
-                stmt.setInt(3, solicitud.getRevisado_por());
-            } else {
-                stmt.setNull(3, Types.INTEGER);
-            }
-            
-            if (solicitud.getRevisado_en() != null) {
-                stmt.setTimestamp(4, Timestamp.valueOf(solicitud.getRevisado_en()));
-            } else {
-                stmt.setNull(4, Types.TIMESTAMP);
-            }
-            
-            stmt.setInt(5, solicitud.getId_solicitud());
-            
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Error al actualizar solicitud, no se encontró el registro.");
-            }
-            
-            return solicitud;
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar solicitud: " + e.getMessage(), e);
-        }
-    }
-    
-    // Verificar si el restaurantero ya tiene una solicitud pendiente
-    public boolean hasPendingSolicitud(int restauranteroId) {
-        String sql = """
-            SELECT COUNT(*) FROM solicitud_registro 
-            WHERE id_restaurantero = ? AND estado = 'pendiente'
-            """;
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, restauranteroId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-            return false;
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al verificar solicitud pendiente: " + e.getMessage(), e);
-        }
-    }
-    
-    // Verificar si el restaurantero tiene una solicitud aprobada
-    public boolean hasApprovedSolicitud(int restauranteroId) {
-        String sql = """
-            SELECT COUNT(*) FROM solicitud_registro 
-            WHERE id_restaurantero = ? AND estado = 'aprobado'
-            """;
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, restauranteroId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-            return false;
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al verificar solicitud aprobada: " + e.getMessage(), e);
-        }
-    }
-    
-    // Contar solicitudes por estado
-    public int countByEstado(EstadoSolicitud estado) {
-        String sql = """
-            SELECT COUNT(*) FROM solicitud_registro 
-            WHERE estado = ?
-            """;
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, estado.getValor());
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-            return 0;
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al contar solicitudes por estado: " + e.getMessage(), e);
-        }
-    }
-    
-    // Obtener solicitudes con información del restaurantero (JOIN)
-    public List<SolicitudConRestaurantero> findAllWithRestauranteroInfo() {
-        String sql = """
-            SELECT s.*, u.nombre, u.email, u.telefono, r.rfc, r.verificado
-            FROM solicitud_registro s
-            INNER JOIN restaurantero r ON s.id_restaurantero = r.id_restaurantero
-            INNER JOIN usuario u ON r.id_restaurantero = u.id_usuario
-            ORDER BY s.creado_en DESC
-            """;
-        
-        List<SolicitudConRestaurantero> solicitudes = new ArrayList<>();
-        
-        try (Connection conn = DBConfig.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                SolicitudConRestaurantero solicitud = new SolicitudConRestaurantero();
                 
-                // Datos de la solicitud
-                solicitud.setSolicitud(mapResultSetToSolicitud(rs));
-                
-                // Datos del usuario/restaurantero
-                solicitud.setNombreRestaurantero(rs.getString("nombre"));
-                solicitud.setEmailRestaurantero(rs.getString("email"));
-                solicitud.setTelefonoRestaurantero(rs.getString("telefono"));
-                solicitud.setRfcRestaurantero(rs.getString("rfc"));
-                solicitud.setVerificado(rs.getBoolean("verificado"));
+                solicitud.setEstado(rs.getString("estado"));
+                solicitud.setNombre_propuesto_restaurante(rs.getString("nombre_propuesto_restaurante"));
+                solicitud.setCorreo(rs.getString("correo"));
+                solicitud.setNombre_propietario(rs.getString("nombre_propietario"));
+                solicitud.setHorario_atencion(rs.getString("horario_atencion"));
+                solicitud.setId_restaurantero(rs.getInt("id_restaurantero"));
                 
                 solicitudes.add(solicitud);
             }
-            
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener solicitudes con info de restaurantero: " + e.getMessage(), e);
         }
-        
         return solicitudes;
     }
-    
-    // Método privado para mapear ResultSet a Solicitud_registro
-    private Solicitud_registro mapResultSetToSolicitud(ResultSet rs) throws SQLException {
-        Solicitud_registro solicitud = new Solicitud_registro();
-        
-        solicitud.setId_solicitud(rs.getInt("id_solicitud"));
-        solicitud.setId_restaurantero(rs.getInt("id_restaurantero"));
-        
-        // Convertir estado de String a Enum
-        String estadoStr = rs.getString("estado");
-        if (estadoStr != null) {
-            solicitud.setEstado(EstadoSolicitud.fromValor(estadoStr));
+
+    public Optional<Solicitud_registro> findById(int id) throws SQLException {
+        String sql = """
+            SELECT sr.id_solicitud, sr.fecha, sr.estado, sr.nombre_propuesto_restaurante, 
+                   sr.correo, sr.nombre_propietario, sr.horario_atencion, sr.id_restaurantero,
+                   u.nombre, u.correo as restaurantero_correo
+            FROM solicitud_registro sr
+            INNER JOIN restaurantero r ON sr.id_restaurantero = r.id_usuario
+            INNER JOIN usuario u ON r.id_usuario = u.id_usuario
+            WHERE sr.id_solicitud = ?
+            """;
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Solicitud_registro solicitud = new Solicitud_registro();
+                solicitud.setId_solicitud(rs.getInt("id_solicitud"));
+                
+                Timestamp timestamp = rs.getTimestamp("fecha");
+                if (timestamp != null) {
+                    solicitud.setFecha(timestamp.toLocalDateTime());
+                }
+                
+                solicitud.setEstado(rs.getString("estado"));
+                solicitud.setNombre_propuesto_restaurante(rs.getString("nombre_propuesto_restaurante"));
+                solicitud.setCorreo(rs.getString("correo"));
+                solicitud.setNombre_propietario(rs.getString("nombre_propietario"));
+                solicitud.setHorario_atencion(rs.getString("horario_atencion"));
+                solicitud.setId_restaurantero(rs.getInt("id_restaurantero"));
+                
+                return Optional.of(solicitud);
+            }
         }
-        
-        solicitud.setDatos_restaurante(rs.getString("datos_restaurante"));
-        
-        // Manejar campos que pueden ser null
-        int revisadoPor = rs.getInt("revisado_por");
-        if (!rs.wasNull()) {
-            solicitud.setRevisado_por(revisadoPor);
+        return Optional.empty();
+    }
+
+    public List<Solicitud_registro> findByRestaurantero(int idRestaurantero) throws SQLException {
+        List<Solicitud_registro> solicitudes = new ArrayList<>();
+        String sql = """
+            SELECT sr.id_solicitud, sr.fecha, sr.estado, sr.nombre_propuesto_restaurante, 
+                   sr.correo, sr.nombre_propietario, sr.horario_atencion, sr.id_restaurantero
+            FROM solicitud_registro sr
+            WHERE sr.id_restaurantero = ?
+            ORDER BY sr.fecha DESC
+            """;
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idRestaurantero);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Solicitud_registro solicitud = new Solicitud_registro();
+                solicitud.setId_solicitud(rs.getInt("id_solicitud"));
+                
+                Timestamp timestamp = rs.getTimestamp("fecha");
+                if (timestamp != null) {
+                    solicitud.setFecha(timestamp.toLocalDateTime());
+                }
+                
+                solicitud.setEstado(rs.getString("estado"));
+                solicitud.setNombre_propuesto_restaurante(rs.getString("nombre_propuesto_restaurante"));
+                solicitud.setCorreo(rs.getString("correo"));
+                solicitud.setNombre_propietario(rs.getString("nombre_propietario"));
+                solicitud.setHorario_atencion(rs.getString("horario_atencion"));
+                solicitud.setId_restaurantero(rs.getInt("id_restaurantero"));
+                
+                solicitudes.add(solicitud);
+            }
         }
-        
-        Timestamp revisadoEn = rs.getTimestamp("revisado_en");
-        if (revisadoEn != null) {
-            solicitud.setRevisado_en(revisadoEn.toLocalDateTime());
+        return solicitudes;
+    }
+
+    public Solicitud_registro save(Solicitud_registro solicitud) throws SQLException {
+        String sql = """
+            INSERT INTO solicitud_registro (fecha, estado, nombre_propuesto_restaurante, 
+                                          correo, nombre_propietario, horario_atencion, id_restaurantero)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setTimestamp(1, solicitud.getFecha() != null ? 
+                Timestamp.valueOf(solicitud.getFecha()) : Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setString(2, solicitud.getEstado() != null ? 
+                solicitud.getEstado() : "pendiente");
+            stmt.setString(3, solicitud.getNombre_propuesto_restaurante());
+            stmt.setString(4, solicitud.getCorreo());
+            stmt.setString(5, solicitud.getNombre_propietario());
+            stmt.setString(6, solicitud.getHorario_atencion());
+            stmt.setInt(7, solicitud.getId_restaurantero());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Error al crear la solicitud de registro");
+            }
+
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                solicitud.setId_solicitud(generatedKeys.getInt(1));
+            }
         }
-        
-        solicitud.setCreado_en(rs.getTimestamp("creado_en").toLocalDateTime());
-        
         return solicitud;
     }
-    
-    // Clase auxiliar para solicitudes con información del restaurantero
-    public static class SolicitudConRestaurantero {
-        private Solicitud_registro solicitud;
-        private String nombreRestaurantero;
-        private String emailRestaurantero;
-        private String telefonoRestaurantero;
-        private String rfcRestaurantero;
-        private boolean verificado;
-        
-        // Getters y Setters
-        public Solicitud_registro getSolicitud() { return solicitud; }
-        public void setSolicitud(Solicitud_registro solicitud) { this.solicitud = solicitud; }
-        
-        public String getNombreRestaurantero() { return nombreRestaurantero; }
-        public void setNombreRestaurantero(String nombreRestaurantero) { this.nombreRestaurantero = nombreRestaurantero; }
-        
-        public String getEmailRestaurantero() { return emailRestaurantero; }
-        public void setEmailRestaurantero(String emailRestaurantero) { this.emailRestaurantero = emailRestaurantero; }
-        
-        public String getTelefonoRestaurantero() { return telefonoRestaurantero; }
-        public void setTelefonoRestaurantero(String telefonoRestaurantero) { this.telefonoRestaurantero = telefonoRestaurantero; }
-        
-        public String getRfcRestaurantero() { return rfcRestaurantero; }
-        public void setRfcRestaurantero(String rfcRestaurantero) { this.rfcRestaurantero = rfcRestaurantero; }
-        
-        public boolean isVerificado() { return verificado; }
-        public void setVerificado(boolean verificado) { this.verificado = verificado; }
+
+    public boolean update(Solicitud_registro solicitud) throws SQLException {
+        String sql = """
+            UPDATE solicitud_registro 
+            SET estado = ?, nombre_propuesto_restaurante = ?, correo = ?, 
+                nombre_propietario = ?, horario_atencion = ?
+            WHERE id_solicitud = ? AND id_restaurantero = ?
+            """;
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, solicitud.getEstado());
+            stmt.setString(2, solicitud.getNombre_propuesto_restaurante());
+            stmt.setString(3, solicitud.getCorreo());
+            stmt.setString(4, solicitud.getNombre_propietario());
+            stmt.setString(5, solicitud.getHorario_atencion());
+            stmt.setInt(6, solicitud.getId_solicitud());
+            stmt.setInt(7, solicitud.getId_restaurantero());
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean updateEstado(int idSolicitud, String nuevoEstado) throws SQLException {
+        String sql = "UPDATE solicitud_registro SET estado = ? WHERE id_solicitud = ?";
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, nuevoEstado);
+            stmt.setInt(2, idSolicitud);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean delete(int idSolicitud, int idRestaurantero) throws SQLException {
+        String sql = "DELETE FROM solicitud_registro WHERE id_solicitud = ? AND id_restaurantero = ?";
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idSolicitud);
+            stmt.setInt(2, idRestaurantero);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean existsById(int id) throws SQLException {
+        String sql = "SELECT 1 FROM solicitud_registro WHERE id_solicitud = ?";
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        }
+    }
+
+    public boolean restauranteroExists(int idRestaurantero) throws SQLException {
+        String sql = "SELECT 1 FROM restaurantero WHERE id_usuario = ?";
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idRestaurantero);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        }
     }
 }

@@ -1,69 +1,75 @@
 package org.sazonpt.model;
 
 public class Restaurantero {
-    private int id_restaurantero;   // PK/FK referencia a usuario.id_usuario
-    private String rfc;             // VARCHAR(13)
-    private boolean verificado;     // BOOLEAN DEFAULT FALSE
-
+    private Usuario usuario;
+    private Integer id_usuario;
+    
     // Constructor vacío
     public Restaurantero() {
-        this.verificado = false; // Valor por defecto
     }
-
-    // Constructor completo
-    public Restaurantero(int id_restaurantero, String rfc, boolean verificado) {
-        this.id_restaurantero = id_restaurantero;
-        this.rfc = rfc;
-        this.verificado = verificado;
+    
+    // Constructor con Usuario completo
+    public Restaurantero(Usuario usuario) {
+        this.usuario = usuario;
+        this.id_usuario = usuario != null ? usuario.getId_usuario() : null;
     }
-
-    // Constructor sin verificado (default false)
-    public Restaurantero(int id_restaurantero, String rfc) {
-        this.id_restaurantero = id_restaurantero;
-        this.rfc = rfc;
-        this.verificado = false;
+    
+    // Constructor solo con ID
+    public Restaurantero(Integer id_usuario) {
+        this.id_usuario = id_usuario;
     }
-
+    
     // Getters y Setters
-    public int getId_restaurantero() {
-        return id_restaurantero;
+    public Usuario getUsuario() {
+        return usuario;
     }
-
-    public void setId_restaurantero(int id_restaurantero) {
-        this.id_restaurantero = id_restaurantero;
+    
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+        this.id_usuario = usuario != null ? usuario.getId_usuario() : null;
     }
-
-    public String getRfc() {
-        return rfc;
+    
+    public Integer getId_usuario() {
+        return id_usuario;
     }
-
-    public void setRfc(String rfc) {
-        this.rfc = rfc;
+    
+    public void setId_usuario(Integer id_usuario) {
+        this.id_usuario = id_usuario;
     }
-
-    public boolean isVerificado() {
-        return verificado;
+    
+    // Métodos de conveniencia para acceder a datos del usuario
+    public String getNombre() {
+        return usuario != null ? usuario.getNombre() : null;
     }
-
-    public void setVerificado(boolean verificado) {
-        this.verificado = verificado;
+    
+    public String getCorreo() {
+        return usuario != null ? usuario.getCorreo() : null;
     }
-
-    // Métodos de utilidad
-    public void verificar() {
-        this.verificado = true;
+    
+    public String getTipo() {
+        return usuario != null ? usuario.getTipo() : null;
     }
-
-    public void desverificar() {
-        this.verificado = false;
-    }
-
+    
+    // Método toString
     @Override
     public String toString() {
         return "Restaurantero{" +
-                "id_restaurantero=" + id_restaurantero +
-                ", rfc='" + rfc + '\'' +
-                ", verificado=" + verificado +
+                "id_usuario=" + id_usuario +
+                ", usuario=" + (usuario != null ? usuario.getNombre() : "null") +
                 '}';
+    }
+    
+    // Métodos equals y hashCode basados en el ID
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Restaurantero restaurantero = (Restaurantero) obj;
+        return id_usuario != null && id_usuario.equals(restaurantero.id_usuario);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id_usuario != null ? id_usuario.hashCode() : 0;
     }
 }
