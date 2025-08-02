@@ -31,8 +31,16 @@ public class AppModule {
     
     public static Solicitud_registroRoutes initSolicitudRegistro() {
         Solicitud_registroRepository solicitudRepo = new Solicitud_registroRepository();
-        Solicitud_registroService solicitudService = new Solicitud_registroService(solicitudRepo);
+        RestauranteRepository restauranteRepo = new RestauranteRepository();
+        Solicitud_registroService solicitudService = new Solicitud_registroService(solicitudRepo, restauranteRepo);
         Solicitud_registroController solicitudController = new Solicitud_registroController(solicitudService);
         return new Solicitud_registroRoutes(solicitudController);
+    }
+    
+    public static Imagen_restauranteRoutes initImagenRestaurante() {
+        Imagen_restauranteRepository imagenRepo = new Imagen_restauranteRepository();
+        Imagen_restauranteService imagenService = new Imagen_restauranteService(imagenRepo);
+        Imagen_restauranteController imagenController = new Imagen_restauranteController(imagenService);
+        return new Imagen_restauranteRoutes(imagenController);
     }
 }

@@ -22,7 +22,7 @@ public class UsuarioService {
     }
     
     /**
-     * Crea un nuevo usuario
+     * Crea un nuevo usuario (siempre será restaurantero por defecto)
      * @param usuario Datos del usuario a crear
      * @return ID del usuario creado
      * @throws SQLException Si hay error en la base de datos
@@ -37,12 +37,23 @@ public class UsuarioService {
             throw new IllegalArgumentException("Ya existe un usuario con este email");
         }
         
+        // ✅ Por defecto, todos los usuarios nuevos son restauranteros
+        if (usuario.getTipo_usuario() == null || usuario.getTipo_usuario().trim().isEmpty()) {
+            usuario.setTipo_usuario("Restaurantero");
+        }
+        
         // Crear el usuario
         int userId = userRepo.save(usuario);
         
-        // Si es restaurantero, crear entrada en tabla restaurantero
-        if ("Restaurantero".equals(usuario.getTipo_usuario())) {
+        // ✅ SIEMPRE crear entrada en tabla restaurantero para nuevos usuarios
+        try {
             createRestauranteroEntry(userId, usuario);
+            System.out.println("✅ Usuario creado con ID: " + userId + " y registrado como restaurantero");
+        } catch (Exception e) {
+            System.err.println("❌ Error creando entrada de restaurantero para usuario " + userId + ": " + e.getMessage());
+            // Si falla la creación del restaurantero, eliminar el usuario para mantener consistencia
+            userRepo.delete(userId);
+            throw new RuntimeException("Error al crear restaurantero automáticamente: " + e.getMessage(), e);
         }
         
         return userId;
@@ -58,12 +69,12 @@ public class UsuarioService {
         Restaurantero restaurantero = new Restaurantero();
         restaurantero.setId_restaurantero(userId);
         
-        // Por defecto, asignar valores básicos
-        // El RFC se puede completar posteriormente
-        restaurantero.setRfc(""); // Se puede completar después
-        restaurantero.setVerificado(false); // Por defecto no verificado
+        // ✅ Por defecto, valores iniciales para nuevo restaurantero
+        restaurantero.setRfc(null); // Se completará en la solicitud de registro
+        restaurantero.setVerificado(false); // Se verificará cuando se apruebe la solicitud
         
-        restauranteroRepo.save(restaurantero);
+        int restauranteroId = restauranteroRepo.save(restaurantero);
+        System.out.println("🏪 Entrada de restaurantero creada con ID: " + restauranteroId);
     }
     
     /**
@@ -79,13 +90,7 @@ public class UsuarioService {
         
         return userRepo.findById(id);
     }
-    
-    /**
-     * Obtiene un usuario por email
-     * @param email Email del usuario
-     * @return Usuario encontrado o null si no existe
-     * @throws SQLException Si hay error en la base de datos
-     */
+
     public Usuario getUserByEmail(String email) throws SQLException {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("El email no puede estar vacío");

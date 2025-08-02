@@ -37,6 +37,6 @@ public class Main {
         AppModule.initUser().registerRoutes(app);
         AppModule.initRestaurante().registerRoutes(app);
         AppModule.initSolicitudRegistro().registerRoutes(app);
-
+        AppModule.initImagenRestaurante().registerRoutes(app);
     }
 }

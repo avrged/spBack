@@ -2,21 +2,28 @@ package org.sazonpt.service;
 
 import org.sazonpt.model.Solicitud_registro;
 import org.sazonpt.model.Solicitud_registro.EstadoSolicitud;
+import org.sazonpt.model.Imagen_restaurante;
+import org.sazonpt.model.Restaurante;
 import org.sazonpt.repository.Solicitud_registroRepository;
 import org.sazonpt.repository.Solicitud_registroRepository.SolicitudConRestaurantero;
+import org.sazonpt.repository.Imagen_restauranteRepository;
+import org.sazonpt.repository.RestauranteRepository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class Solicitud_registroService {
     
     private final Solicitud_registroRepository solicitudRepository;
+    private final RestauranteRepository restauranteRepository;
     
-    public Solicitud_registroService(Solicitud_registroRepository solicitudRepository) {
+    public Solicitud_registroService(Solicitud_registroRepository solicitudRepository, RestauranteRepository restauranteRepository) {
         this.solicitudRepository = solicitudRepository;
+        this.restauranteRepository = restauranteRepository;
     }
     
     public Solicitud_registro crearSolicitud(Solicitud_registro solicitud) {
@@ -101,8 +108,31 @@ public class Solicitud_registroService {
         if (!solicitud.estaPendiente()) {
             throw new IllegalStateException("Solo se pueden aprobar solicitudes en estado PENDIENTE");
         }
+
+        int restauranteId = 0;
         
-        // Aprobar la solicitud
+        // 1. Crear restaurante si hay datos_restaurante
+        if (solicitud.tieneDatosRestaurante()) {
+            try {
+                restauranteId = crearRestauranteDesdeJSON(solicitud, id_administrador);
+                System.out.println("✅ Restaurante creado con ID: " + restauranteId);
+            } catch (Exception e) {
+                System.err.println("❌ Error al crear restaurante para solicitud " + solicitudId + ": " + e.getMessage());
+                throw new RuntimeException("Error al crear restaurante: " + e.getMessage(), e);
+            }
+        }
+        
+        // 2. Crear imágenes del restaurante usando el ID real
+        if (solicitud.tieneDatosRestaurante() && restauranteId > 0) {
+            try {
+                crearImagenesDesdeJSON(solicitud, restauranteId);
+                System.out.println("✅ Imágenes creadas para restaurante ID: " + restauranteId);
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al crear imágenes para solicitud " + solicitudId + ": " + e.getMessage());
+                // No falla la aprobación si hay error con las imágenes
+            }
+        }
+
         solicitud.aprobar(id_administrador);
         
         return solicitudRepository.update(solicitud);
@@ -126,10 +156,7 @@ public class Solicitud_registroService {
         
         return solicitudRepository.update(solicitud);
     }
-    
-    /**
-     * Rechazar solicitud sin motivo específico
-     */
+
     public Solicitud_registro rechazarSolicitud(int solicitudId, int id_administrador) {
         return rechazarSolicitud(solicitudId, id_administrador, null);
     }
@@ -287,4 +314,163 @@ public class Solicitud_registroService {
             throw new RuntimeException("Error al parsear datos del restaurante desde JSON: " + e.getMessage(), e);
         }
     }
+    
+    /**
+     * ✅ CORREGIDO: Crear restaurante desde datos JSON con nombres de campos correctos
+     */
+    private int crearRestauranteDesdeJSON(Solicitud_registro solicitud, int id_administrador) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode datosRestaurante = objectMapper.readTree(solicitud.getDatos_restaurante());
+            
+            // Crear objeto Restaurante con datos del JSON
+            Restaurante restaurante = new Restaurante();
+            
+            // ✅ CORREGIR campos según el JSON correcto
+            restaurante.setNombre(datosRestaurante.get("nombre_restaurante").asText());
+            restaurante.setDireccion(datosRestaurante.get("direccion").asText());
+            restaurante.setTelefono(datosRestaurante.get("telefono").asText());
+            
+            // ✅ Horario desde el campo correcto del JSON
+            String horarioCompleto = datosRestaurante.has("horarios_cierre_apertura") ? 
+                datosRestaurante.get("horarios_cierre_apertura").asText() : 
+                "Lunes a Domingo de 09:00 AM a 09:00 PM";
+                
+            // Convertir a JSON estructurado para la BD
+            String horarioJson = String.format(
+                "{\"descripcion\":\"%s\"}", 
+                horarioCompleto
+            );
+            restaurante.setHorario(horarioJson);
+            
+            // ✅ Menu URL desde el JSON si existe
+            if (datosRestaurante.has("menu_restaurante") && !datosRestaurante.get("menu_restaurante").isNull()) {
+                restaurante.setMenu_url(datosRestaurante.get("menu_restaurante").asText());
+            }
+            
+            // ✅ CORREGIR: El restaurante debe crearse ya APROBADO porque viene de solicitud aprobada
+            // Foreign key
+            restaurante.setId_restaurantero(solicitud.getId_restaurantero());
+            
+            // ✅ APROBAR AUTOMÁTICAMENTE el restaurante al crearlo desde solicitud aprobada
+            restaurante.aprobar(id_administrador);
+            
+            // Crear el restaurante usando save() que devuelve el objeto con ID
+            Restaurante restauranteGuardado = restauranteRepository.save(restaurante);
+            int restauranteId = restauranteGuardado.getId_restaurante();
+            
+            System.out.println("🏪 Restaurante '" + restaurante.getNombre() + "' creado y APROBADO con ID: " + restauranteId);
+            return restauranteId;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error creando restaurante: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al crear restaurante desde solicitud", e);
+        }
+    }
+
+    /**
+     * ✅ DEPURACIÓN: Crear imágenes del restaurante desde el JSON de la solicitud
+     * Este método se ejecuta cuando se aprueba una solicitud
+     */
+    private void crearImagenesDesdeJSON(Solicitud_registro solicitud, int restauranteId) {
+        try {
+            System.out.println("🖼️ INICIANDO creación de imágenes para restaurante ID: " + restauranteId);
+            
+            // 1. Obtener JSON raw para debugging
+            String jsonRaw = solicitud.getDatos_restaurante();
+            System.out.println("📄 JSON raw: " + jsonRaw);
+            
+            // 2. Parsear datos del restaurante desde JSON
+            Map<String, Object> datosRestaurante = parsearDatosRestaurante(jsonRaw);
+            System.out.println("🔍 Datos parseados: " + datosRestaurante);
+            
+            // 3. Verificar que las claves de imagen existen
+            System.out.println("� Claves disponibles: " + datosRestaurante.keySet());
+            
+            // 4. Crear instancia del repositorio de imágenes
+            Imagen_restauranteRepository imagenRepository = new Imagen_restauranteRepository();
+            
+            // 5. Crear imagen principal
+            String imagenPrincipal = (String) datosRestaurante.get("imagen_principal");
+            System.out.println("🖼️ Imagen principal encontrada: " + imagenPrincipal);
+            if (imagenPrincipal != null && !imagenPrincipal.trim().isEmpty()) {
+                try {
+                    Imagen_restaurante principal = new Imagen_restaurante(
+                        restauranteId, 
+                        imagenPrincipal, 
+                        Imagen_restaurante.TipoImagen.PRINCIPAL
+                    );
+                    System.out.println("🔍 Objeto imagen principal creado: " + principal);
+                    principal.validar(); // Validar antes de guardar
+                    System.out.println("✅ Validación de imagen principal PASADA");
+                    Imagen_restaurante imagenGuardada = imagenRepository.save(principal);
+                    System.out.println("✅ Imagen principal GUARDADA con ID: " + imagenGuardada.getId_imagen());
+                } catch (Exception e) {
+                    System.err.println("❌ Error específico con imagen principal: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("⚠️ Imagen principal NO encontrada o vacía");
+            }
+            
+            // 6. Crear imagen secundaria
+            String imagenSecundaria = (String) datosRestaurante.get("imagen_secundaria");
+            System.out.println("🖼️ Imagen secundaria encontrada: " + imagenSecundaria);
+            if (imagenSecundaria != null && !imagenSecundaria.trim().isEmpty()) {
+                try {
+                    Imagen_restaurante secundaria = new Imagen_restaurante(
+                        restauranteId, 
+                        imagenSecundaria, 
+                        Imagen_restaurante.TipoImagen.SECUNDARIA
+                    );
+                    System.out.println("🔍 Objeto imagen secundaria creado: " + secundaria);
+                    secundaria.validar(); // Validar antes de guardar
+                    System.out.println("✅ Validación de imagen secundaria PASADA");
+                    Imagen_restaurante imagenGuardada = imagenRepository.save(secundaria);
+                    System.out.println("✅ Imagen secundaria GUARDADA con ID: " + imagenGuardada.getId_imagen());
+                } catch (Exception e) {
+                    System.err.println("❌ Error específico con imagen secundaria: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("⚠️ Imagen secundaria NO encontrada o vacía");
+            }
+            
+            // 7. Crear imagen de platillo
+            String imagenPlatillo = (String) datosRestaurante.get("imagen_platillo");
+            System.out.println("🖼️ Imagen platillo encontrada: " + imagenPlatillo);
+            if (imagenPlatillo != null && !imagenPlatillo.trim().isEmpty()) {
+                try {
+                    Imagen_restaurante platillo = new Imagen_restaurante(
+                        restauranteId, 
+                        imagenPlatillo, 
+                        Imagen_restaurante.TipoImagen.PLATILLO
+                    );
+                    System.out.println("🔍 Objeto imagen platillo creado: " + platillo);
+                    platillo.validar(); // Validar antes de guardar
+                    System.out.println("✅ Validación de imagen platillo PASADA");
+                    Imagen_restaurante imagenGuardada = imagenRepository.save(platillo);
+                    System.out.println("✅ Imagen platillo GUARDADA con ID: " + imagenGuardada.getId_imagen());
+                } catch (Exception e) {
+                    System.err.println("❌ Error específico con imagen platillo: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("⚠️ Imagen platillo NO encontrada o vacía");
+            }
+            
+            System.out.println("🏁 FINALIZADO proceso de creación de imágenes");
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error al crear imágenes desde JSON: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al crear imágenes del restaurante: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Método temporal para obtener el ID del restaurante
+     * NOTA: Ya no se necesita, se usa el ID real del restaurante creado
+     */
 }
