@@ -10,6 +10,7 @@ public class Usuario {
     private String telefono;
     private String avatar_url;
     private boolean activo;
+    private String tipo_usuario;    // Nuevo campo para el tipo de usuario
     private LocalDateTime creado_en;
     private LocalDateTime actualizado_en;
     private LocalDateTime eliminado_en;
@@ -82,6 +83,14 @@ public class Usuario {
     
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+    
+    public String getTipo_usuario() {
+        return tipo_usuario;
+    }
+    
+    public void setTipo_usuario(String tipo_usuario) {
+        this.tipo_usuario = tipo_usuario;
     }
     
     public LocalDateTime getCreado_en() {

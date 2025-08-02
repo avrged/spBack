@@ -4,7 +4,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.sazonpt.model.Usuario;
+import org.sazonpt.model.Restaurantero;
 import org.sazonpt.repository.UsuarioRepository;
+import org.sazonpt.repository.RestauranteroRepository;
 
 /**
  * Servicio para la gestión de usuarios
@@ -12,9 +14,11 @@ import org.sazonpt.repository.UsuarioRepository;
  */
 public class UsuarioService {
     private final UsuarioRepository userRepo;
+    private final RestauranteroRepository restauranteroRepo;
 
-    public UsuarioService(UsuarioRepository userRepo) {
+    public UsuarioService(UsuarioRepository userRepo, RestauranteroRepository restauranteroRepo) {
         this.userRepo = userRepo;
+        this.restauranteroRepo = restauranteroRepo;
     }
     
     /**
@@ -34,7 +38,32 @@ public class UsuarioService {
         }
         
         // Crear el usuario
-        return userRepo.save(usuario);
+        int userId = userRepo.save(usuario);
+        
+        // Si es restaurantero, crear entrada en tabla restaurantero
+        if ("Restaurantero".equals(usuario.getTipo_usuario())) {
+            createRestauranteroEntry(userId, usuario);
+        }
+        
+        return userId;
+    }
+    
+    /**
+     * Crea una entrada en la tabla restaurantero para un usuario
+     * @param userId ID del usuario creado
+     * @param usuario Datos del usuario para extraer información del restaurantero
+     * @throws SQLException Si hay error en la base de datos
+     */
+    private void createRestauranteroEntry(int userId, Usuario usuario) throws SQLException {
+        Restaurantero restaurantero = new Restaurantero();
+        restaurantero.setId_restaurantero(userId);
+        
+        // Por defecto, asignar valores básicos
+        // El RFC se puede completar posteriormente
+        restaurantero.setRfc(""); // Se puede completar después
+        restaurantero.setVerificado(false); // Por defecto no verificado
+        
+        restauranteroRepo.save(restaurantero);
     }
     
     /**

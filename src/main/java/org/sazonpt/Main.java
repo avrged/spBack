@@ -35,6 +35,8 @@ public class Main {
         // Inicializar y registrar rutas de los módulos
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
-        
+        AppModule.initRestaurante().registerRoutes(app);
+        AppModule.initSolicitudRegistro().registerRoutes(app);
+
     }
 }
