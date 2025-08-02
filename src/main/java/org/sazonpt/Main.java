@@ -32,9 +32,11 @@ public class Main {
 
         app.get("/uploads/*", StaticFileHandler::handleStaticFile);
 
+        // Inicializar y registrar rutas de los módulos
         AppModule.initAdmin().registerRoutes(app);
         AppModule.initUser().registerRoutes(app);
-        AppModule.initEstadistica().registerRoutes(app);
+        AppModule.initRestaurante().registerRoutes(app);
         AppModule.initSolicitudRegistro().registerRoutes(app);
+        AppModule.initImagenRestaurante().registerRoutes(app);
     }
 }

@@ -1,160 +1,176 @@
 package org.sazonpt.model;
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 public class Solicitud_registro {
+    
     private int id_solicitud;
-    private LocalDate fecha;
-    private String estado;
-    private String restaurante;
-    private String correo;
-    private String direccion;
-    private String imagen1;
-    private String imagen2;
-    private String imagen3;
-    private String comprobante;
-    private String menu;
-    private String propietario;
-    private String numero;
-    private String horario;
-    private String facebook;
-    private String instagram;
-    private String etiqueta1;
-    private String etiqueta2;
-    private String etiqueta3;
-
+    private int id_restaurantero;
+    private EstadoSolicitud estado;
+    private String datos_restaurante; // JSON como String
+    private Integer revisado_por;
+    private LocalDateTime revisado_en;
+    private LocalDateTime creado_en;
+    
+    public enum EstadoSolicitud {
+        PENDIENTE("pendiente"),
+        APROBADO("aprobado"),
+        RECHAZADO("rechazado");
+        
+        private final String valor;
+        
+        EstadoSolicitud(String valor) {
+            this.valor = valor;
+        }
+        
+        public String getValor() {
+            return valor;
+        }
+        
+        public static EstadoSolicitud fromValor(String valor) {
+            for (EstadoSolicitud estado : EstadoSolicitud.values()) {
+                if (estado.valor.equals(valor)) {
+                    return estado;
+                }
+            }
+            throw new IllegalArgumentException("Estado de solicitud no válido: " + valor);
+        }
+    }
+    
     public Solicitud_registro() {
-        this.estado = "pendiente";
-        this.propietario = "";
-        this.numero = "";
-        this.horario = "";
-        this.facebook = "";
-        this.instagram = "";
-        this.menu = "";
-        this.etiqueta1 = "";
-        this.etiqueta2 = "";
-        this.etiqueta3 = "";
+        this.estado = EstadoSolicitud.PENDIENTE;
+        this.creado_en = LocalDateTime.now();
     }
-
-    public Solicitud_registro(LocalDate fecha, String restaurante, String correo, String direccion, String imagen1, String comprobante) {
-        this.fecha = fecha;
-        this.estado = "pendiente";
-        this.restaurante = restaurante;
-        this.correo = correo;
-        this.direccion = direccion;
-        this.imagen1 = imagen1;
-        this.comprobante = comprobante;
-        this.menu = "";
-        this.facebook = "";
-        this.instagram = "";
-        this.etiqueta1 = "";
-        this.etiqueta2 = "";
-        this.etiqueta3 = "";
+    
+    public Solicitud_registro(int id_restaurantero) {
+        this();
+        this.id_restaurantero = id_restaurantero;
     }
-
-    public Solicitud_registro(int id_solicitud, LocalDate fecha, String estado, String restaurante, String correo, String direccion, String imagen1, String imagen2, String imagen3, String menu, String comprobante, String propietario, String numero, String horario, String facebook, String instagram, String etiqueta1, String etiqueta2, String etiqueta3){
-        this.id_solicitud = id_solicitud;
-        this.fecha = fecha;
-        this.estado = estado;
-        this.restaurante = restaurante;
-        this.correo = correo;
-        this.direccion = direccion;
-        this.imagen1 = imagen1;
-        this.imagen2 = imagen2;
-        this.imagen3 = imagen3;
-        this.menu = menu;
-        this.comprobante = comprobante;
-        this.propietario = propietario;
-        this.numero = numero;
-        this.horario = horario;
-        this.facebook = facebook;
-        this.instagram = instagram;
-        this.etiqueta1 = etiqueta1;
-        this.etiqueta2 = etiqueta2;
-        this.etiqueta3 = etiqueta3;
+    
+    // Constructor completo con datos del restaurante
+    public Solicitud_registro(int id_restaurantero, String datos_restaurante) {
+        this(id_restaurantero);
+        this.datos_restaurante = datos_restaurante;
     }
-
-    public String getFacebook() { return facebook; }
-    public String getInstagram() { return instagram; }
-    public String getMenu() { return menu; }
-    public int getId_solicitud(){return id_solicitud;}
-    public String getEtiqueta1() { return etiqueta1; }
-    public String getEtiqueta2() { return etiqueta2; }
-    public String getEtiqueta3() { return etiqueta3; }
-    public LocalDate getFecha(){return fecha;}
-    public String getEstado(){return estado;}
-    public String getRestaurante(){return restaurante;}
-    public String getCorreo(){return correo;}
-    public String getDireccion(){return direccion;}
-    public String getImagen1(){return imagen1;}
-    public String getImagen2(){return imagen2;}
-    public String getImagen3(){return imagen3;}
-    public String getComprobante(){return comprobante;}
-    public String getPropietario(){return propietario;}
-    public String getNumero(){return numero;}
-    public String getHorario(){return horario;}
-
-    public void setFacebook(String facebook) { this.facebook = facebook; }
-    public void setInstagram(String instagram) { this.instagram = instagram; }
-    public void setMenu(String menu) { this.menu = menu; }
+    
+    public int getId_solicitud() {
+        return id_solicitud;
+    }
+    
     public void setId_solicitud(int id_solicitud) {
         this.id_solicitud = id_solicitud;
     }
-
-    public void setEtiqueta1(String etiqueta1) {
-        this.etiqueta1 = etiqueta1;
+    
+    public int getId_restaurantero() {
+        return id_restaurantero;
     }
-    public void setEtiqueta2(String etiqueta2) {
-        this.etiqueta2 = etiqueta2;
+    
+    public void setId_restaurantero(int id_restaurantero) {
+        this.id_restaurantero = id_restaurantero;
     }
-    public void setEtiqueta3(String etiqueta3) {
-        this.etiqueta3 = etiqueta3;
+    
+    public EstadoSolicitud getEstado() {
+        return estado;
     }
-
-    public void setEstado(String estado) {
+    
+    public void setEstado(EstadoSolicitud estado) {
         this.estado = estado;
     }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
+    
+    public String getDatos_restaurante() {
+        return datos_restaurante;
+    }
+    
+    public void setDatos_restaurante(String datos_restaurante) {
+        this.datos_restaurante = datos_restaurante;
+    }
+    
+    public Integer getRevisado_por() {
+        return revisado_por;
+    }
+    
+    public void setRevisado_por(Integer revisado_por) {
+        this.revisado_por = revisado_por;
+    }
+    
+    public LocalDateTime getRevisado_en() {
+        return revisado_en;
+    }
+    
+    public void setRevisado_en(LocalDateTime revisado_en) {
+        this.revisado_en = revisado_en;
+    }
+    
+    public LocalDateTime getCreado_en() {
+        return creado_en;
+    }
+    
+    public void setCreado_en(LocalDateTime creado_en) {
+        this.creado_en = creado_en;
+    }
+    
+    // Métodos de utilidad
+    public boolean estaPendiente() {
+        return estado == EstadoSolicitud.PENDIENTE;
+    }
+    
+    public boolean estaAprobado() {
+        return estado == EstadoSolicitud.APROBADO;
+    }
+    
+    public boolean estaRechazado() {
+        return estado == EstadoSolicitud.RECHAZADO;
+    }
+    
+    public boolean hasSidoRevisado() {
+        return revisado_por != null && revisado_en != null;
     }
 
-    public void setRestaurante(String restaurante) {
-        this.restaurante = restaurante;
+    public void aprobar(int adminId) {
+        this.estado = EstadoSolicitud.APROBADO;
+        this.revisado_por = adminId;
+        this.revisado_en = LocalDateTime.now();
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
+    public void rechazar(int adminId, String motivo) {
+        this.estado = EstadoSolicitud.RECHAZADO;
+        this.revisado_por = adminId;
+        this.revisado_en = LocalDateTime.now();
+        // El motivo se almacena en datos_restaurante si es necesario
     }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
+    
+    public void rechazar(int adminId) {
+        rechazar(adminId, null);
     }
-
-    public void setImagen1(String imagen1) {
-        this.imagen1 = imagen1;
+    
+    // NUEVO: Métodos para manejar JSON
+    public boolean tieneDatosRestaurante() {
+        return datos_restaurante != null && !datos_restaurante.trim().isEmpty();
     }
-
-    public void setImagen2(String imagen2) {
-        this.imagen2 = imagen2;
+    
+    @Override
+    public String toString() {
+        return "Solicitud_registro{" +
+                "id_solicitud=" + id_solicitud +
+                ", id_restaurantero=" + id_restaurantero +
+                ", estado=" + estado +
+                ", revisado_por=" + revisado_por +
+                ", creado_en=" + creado_en +
+                ", tieneDatos=" + tieneDatosRestaurante() +
+                '}';
     }
-
-    public void setImagen3(String imagen3) {
-        this.imagen3 = imagen3;
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Solicitud_registro that = (Solicitud_registro) obj;
+        return id_solicitud == that.id_solicitud;
     }
-
-    public void setComprobante(String comprobante) {
-        this.comprobante = comprobante;
-    }
-
-    public void setPropietario(String propietario) {
-        this.propietario = propietario;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    public void setHorario(String horario) {
-        this.horario = horario;
+    
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id_solicitud);
     }
 }

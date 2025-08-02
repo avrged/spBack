@@ -1,9 +1,6 @@
 package org.sazonpt.repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,205 +8,320 @@ import org.sazonpt.config.DBConfig;
 import org.sazonpt.model.Usuario;
 
 public class UsuarioRepository {
-    public Usuario findByCorreo(String correo) throws SQLException {
-        String query = "SELECT * FROM usuario WHERE correo = ?;";
-        Usuario user = null;
-        try(Connection conn = DBConfig.getDataSource().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setString(1, correo);
-            try(ResultSet rs = stmt.executeQuery()){
-                if(rs.next()){
-                    user = mapResulsetToUser(rs);
+
+    public int save(Usuario usuario) throws SQLException {
+        String query = "INSERT INTO usuario (email, password_hash, nombre, telefono, avatar_url, activo) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            
+            stmt.setString(1, usuario.getEmail());
+            stmt.setString(2, usuario.getPassword_hash());
+            stmt.setString(3, usuario.getNombre());
+            stmt.setString(4, usuario.getTelefono());
+            stmt.setString(5, usuario.getAvatar_url());
+            // Asegurar que siempre sea true para nuevos usuarios
+            stmt.setBoolean(6, true);
+            
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Error al crear el usuario");
+            }
+            
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new SQLException("No se pudo obtener el ID del usuario creado");
                 }
             }
-        } catch(SQLException e){
-            throw new SQLException("Error al buscar usuario por correo: "+e.getMessage());
+            
+        } catch (SQLException e) {
+            throw new SQLException("Error al guardar el usuario: " + e.getMessage());
         }
-        return user;
     }
-    public int save(Usuario user) throws SQLException {
-        if (findByCorreo(user.getCorreo()) != null) {
-            throw new SQLException("Ya existe un usuario con ese correo");
-        }
-        String query = "INSERT INTO usuario(nombre, correo, contrasena, tipo, status) VALUES (?, ?, ?, ?, ?);";
-        int id_usuario = -1;
-        System.out.println("[UsuarioRepository.save] Recibido:");
-        System.out.println("nombre: " + user.getNombre());
-        System.out.println("correo: " + user.getCorreo());
-        System.out.println("contrasena: " + user.getContrasena());
-        System.out.println("tipo: " + user.getTipo());
-        System.out.println("status: " + user.getStatus());
-        try(Connection conn = DBConfig.getDataSource().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS)){
 
-            stmt.setString(1, user.getNombre());
-            stmt.setString(2, user.getCorreo());
-            stmt.setString(3, user.getContrasena());
-            stmt.setString(4, user.getTipo());
-            stmt.setString(5, user.getStatus());
-            stmt.executeUpdate();
-
-            try(ResultSet generatedKeys = stmt.getGeneratedKeys()){
-                if(generatedKeys.next()){
-                    id_usuario = generatedKeys.getInt(1);
+    public Usuario findById(int id) throws SQLException {
+        String query = """
+            SELECT id_usuario, email, password_hash, nombre, telefono, avatar_url, 
+                   activo, creado_en, actualizado_en, eliminado_en
+            FROM usuario 
+            WHERE id_usuario = ? AND eliminado_en IS NULL
+        """;
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setInt(1, id);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToUsuario(rs);
                 }
-            } catch(SQLException e){
-                System.out.println("[UsuarioRepository.save] Error al obtener el ID generado: " + e.getMessage());
-                throw new SQLException("Error al crear el ID del usuario creado: " + e.getMessage());
             }
-
-        } catch(SQLException e){
-            System.out.println("[UsuarioRepository.save] Error SQL: " + e.getMessage());
-            throw new SQLException("Error al crear el usuario: "+e.getMessage());
+        } catch (SQLException e) {
+            throw new SQLException("Error al buscar el usuario: " + e.getMessage());
         }
-        System.out.println("[UsuarioRepository.save] id_usuario generado: " + id_usuario);
-        return id_usuario;
+        
+        return null;
     }
 
-    public Usuario findByIdUser(int idUser) throws SQLException {
-        String query = "SELECT * FROM usuario WHERE id_usuario= ?;";
-        Usuario user = null;
-
-        try(Connection conn = DBConfig.getDataSource().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)){
-                stmt.setInt(1, idUser);
-
-                try(ResultSet rs = stmt.executeQuery()){
-                    if(rs.next()){
-                        user = mapResulsetToUser(rs);
-                    }
+    public Usuario findByEmail(String email) throws SQLException {
+        String query = """
+            SELECT id_usuario, email, password_hash, nombre, telefono, avatar_url, 
+                   activo, creado_en, actualizado_en, eliminado_en
+            FROM usuario 
+            WHERE email = ? AND eliminado_en IS NULL
+        """;
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setString(1, email);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToUsuario(rs);
                 }
-        } catch(SQLException e){
-            throw new SQLException("Error al buscar el usuario: "+e.getMessage());
-        } 
-        return user;
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error al buscar el usuario por email: " + e.getMessage());
+        }
+        
+        return null;
     }
 
     public List<Usuario> findAll() throws SQLException {
-        List<Usuario> users = new ArrayList<>();
-        String query = "SELECT * FROM usuario";
+        List<Usuario> usuarios = new ArrayList<>();
+        String query = """
+            SELECT id_usuario, email, password_hash, nombre, telefono, avatar_url, 
+                   activo, creado_en, actualizado_en, eliminado_en
+            FROM usuario 
+            WHERE activo = TRUE AND eliminado_en IS NULL
+            ORDER BY nombre ASC
+        """;
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                usuarios.add(mapResultSetToUsuario(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error al listar los usuarios: " + e.getMessage());
+        }
+
+        return usuarios;
+    }
+
+    public boolean update(Usuario usuario) throws SQLException {
+        String query = """
+            UPDATE usuario 
+            SET email = ?, nombre = ?, telefono = ?, avatar_url = ?, actualizado_en = CURRENT_TIMESTAMP 
+            WHERE id_usuario = ? AND activo = TRUE
+        """;
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setString(1, usuario.getEmail());
+            stmt.setString(2, usuario.getNombre());
+            stmt.setString(3, usuario.getTelefono());
+            stmt.setString(4, usuario.getAvatar_url());
+            stmt.setInt(5, usuario.getId_usuario());
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            throw new SQLException("Error al actualizar el usuario: " + e.getMessage());
+        }
+    }
+
+    public boolean delete(int id) throws SQLException {
+        String query = "DELETE FROM usuario WHERE id_usuario = ?";
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            throw new SQLException("Error al eliminar el usuario: " + e.getMessage());
+        }
+    }
+
+    public boolean softDelete(int id) throws SQLException {
+        String query = """
+            UPDATE usuario 
+            SET activo = FALSE, eliminado_en = CURRENT_TIMESTAMP, actualizado_en = CURRENT_TIMESTAMP 
+            WHERE id_usuario = ?
+        """;
+        
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            throw new SQLException("Error al marcar usuario como eliminado: " + e.getMessage());
+        }
+    }
+
+    public int count() throws SQLException {
+        String query = "SELECT COUNT(*) AS total FROM usuario WHERE activo = TRUE AND eliminado_en IS NULL";
         
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
             
-            while (rs.next()) {
-                users.add(mapResulsetToUser(rs));
+            if (rs.next()) {
+                return rs.getInt("total");
             }
         } catch (SQLException e) {
-            throw new SQLException("Error al listar los usuarios: " + e.getMessage());
+            throw new SQLException("Error al contar usuarios: " + e.getMessage());
         }
         
-        return users;
+        return 0;
     }
 
-    public void UpdateUser(Usuario user) throws SQLException{
-        String query = "UPDATE usuario SET nombre= ?, correo= ?, contrasena= ?, tipo= ?, status= ? WHERE id_usuario= ?;";
-        try(Connection conn = DBConfig.getDataSource().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)){
+    public List<Object[]> findAllWithRoles() throws SQLException {
+        List<Object[]> usuarios = new ArrayList<>();
+        String query = """
+            SELECT 
+                u.id_usuario, u.email, u.nombre, u.telefono, u.activo,
+                a.nivel_permiso,
+                r.rfc, r.verificado,
+                CASE 
+                    WHEN a.id_administrador IS NOT NULL THEN 'Administrador'
+                    WHEN r.id_restaurantero IS NOT NULL THEN 'Restaurantero'
+                    ELSE 'Usuario'
+                END AS tipo_usuario
+            FROM usuario u
+            LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
+            LEFT JOIN restaurantero r ON u.id_usuario = r.id_restaurantero
+            WHERE u.activo = TRUE AND u.eliminado_en IS NULL
+            ORDER BY u.nombre ASC
+        """;
 
-            stmt.setString(1, user.getNombre());
-            stmt.setString(2, user.getCorreo());
-            stmt.setString(3, user.getContrasena());
-            stmt.setString(4, user.getTipo());
-            stmt.setString(5, user.getStatus());
-            stmt.setInt(6, user.getId_usuario());
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
 
-            stmt.executeUpdate();
-        } catch(SQLException e){
-            throw new SQLException("Error al actualizar el usuario: "+e.getMessage());
+            while (rs.next()) {
+                Object[] userData = {
+                    rs.getInt("id_usuario"),
+                    rs.getString("email"),
+                    rs.getString("nombre"),
+                    rs.getString("telefono"),
+                    rs.getBoolean("activo"),
+                    rs.getString("nivel_permiso"),
+                    rs.getString("rfc"),
+                    rs.getBoolean("verificado"),
+                    rs.getString("tipo_usuario")
+                };
+                usuarios.add(userData);
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error al listar usuarios con roles: " + e.getMessage());
         }
+
+        return usuarios;
     }
 
-    public void deleteUser(int idUser) throws SQLException{
-        Connection conn = null;
-        try {
-            conn = DBConfig.getDataSource().getConnection();
-            conn.setAutoCommit(false);
-            
-            String queryTipo = "SELECT tipo FROM usuario WHERE id_usuario = ?";
-            PreparedStatement stmtTipo = conn.prepareStatement(queryTipo);
-            stmtTipo.setInt(1, idUser);
-            ResultSet rs = stmtTipo.executeQuery();
-            
-            String tipoUsuario = null;
-            if (rs.next()) {
-                tipoUsuario = rs.getString("tipo");
-            } else {
-                throw new SQLException("No se encontró el usuario con ID: " + idUser);
-            }
-            
-            System.out.println("Eliminando usuario ID: " + idUser + ", Tipo: " + tipoUsuario);
-
-            if ("administrador".equals(tipoUsuario)) {
-                String queryAdmin = "DELETE FROM administrador WHERE id_usuario = ?";
-                PreparedStatement stmtAdmin = conn.prepareStatement(queryAdmin);
-                stmtAdmin.setInt(1, idUser);
-                int adminRows = stmtAdmin.executeUpdate();
-                System.out.println("Filas eliminadas de administrador: " + adminRows);
-            } else if ("restaurantero".equals(tipoUsuario)) {
-                String queryRest = "DELETE FROM restaurantero WHERE id_usuario = ?";
-                PreparedStatement stmtRest = conn.prepareStatement(queryRest);
-                stmtRest.setInt(1, idUser);
-                int restRows = stmtRest.executeUpdate();
-                System.out.println("Filas eliminadas de restaurantero: " + restRows);
-            }
-
-            String queryUsuario = "DELETE FROM usuario WHERE id_usuario = ?";
-            PreparedStatement stmtUsuario = conn.prepareStatement(queryUsuario);
-            stmtUsuario.setInt(1, idUser);
-            int rowsAffected = stmtUsuario.executeUpdate();
-            
-            System.out.println("Query executed: " + queryUsuario);
-            System.out.println("User ID: " + idUser);
-            System.out.println("Rows affected by delete: " + rowsAffected);
-            
-            if (rowsAffected == 0) {
-                throw new SQLException("No se pudo eliminar el usuario con ID: " + idUser);
-            }
-            
-            conn.commit();
-            
-        } catch(SQLException e){
-            if (conn != null) {
-                conn.rollback();
-            }
-            throw new SQLException("Error al eliminar el usuario: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                conn.setAutoCommit(true);
-                conn.close();
-            }
+    private Usuario mapResultSetToUsuario(ResultSet rs) throws SQLException {
+        Usuario usuario = new Usuario();
+        
+        usuario.setId_usuario(rs.getInt("id_usuario"));
+        usuario.setEmail(rs.getString("email"));
+        usuario.setPassword_hash(rs.getString("password_hash"));
+        usuario.setNombre(rs.getString("nombre"));
+        usuario.setTelefono(rs.getString("telefono"));
+        usuario.setAvatar_url(rs.getString("avatar_url"));
+        usuario.setActivo(rs.getBoolean("activo"));
+        
+        // Mapear timestamps
+        Timestamp creadoEn = rs.getTimestamp("creado_en");
+        if (creadoEn != null) {
+            usuario.setCreado_en(creadoEn.toLocalDateTime());
         }
+        
+        Timestamp actualizadoEn = rs.getTimestamp("actualizado_en");
+        if (actualizadoEn != null) {
+            usuario.setActualizado_en(actualizadoEn.toLocalDateTime());
+        }
+        
+        Timestamp eliminadoEn = rs.getTimestamp("eliminado_en");
+        if (eliminadoEn != null) {
+            usuario.setEliminado_en(eliminadoEn.toLocalDateTime());
+        }
+        
+        return usuario;
     }
+    
+    /**
+     * Obtiene la información completa de un usuario incluyendo su tipo
+     * @param email Email del usuario
+     * @return Información completa del usuario o null si no existe
+     * @throws SQLException Si hay error en la base de datos
+     */
+    public Object[] findUserWithRoleByEmail(String email) throws SQLException {
+        String query = """
+            SELECT 
+                u.id_usuario,
+                u.email,
+                u.nombre,
+                u.telefono,
+                u.avatar_url,
+                u.activo,
+                u.creado_en,
+                u.actualizado_en,
+                a.nivel_permiso,
+                r.rfc,
+                r.verificado,
+                CASE 
+                    WHEN a.id_administrador IS NOT NULL THEN 'Administrador'
+                    WHEN r.id_restaurantero IS NOT NULL THEN 'Restaurantero'
+                    ELSE 'Usuario'
+                END AS tipo_usuario
+            FROM usuario u
+            LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
+            LEFT JOIN restaurantero r ON u.id_usuario = r.id_restaurantero
+            WHERE u.email = ? AND u.activo = TRUE AND u.eliminado_en IS NULL
+        """;
 
-    public Usuario findByCorreoAndContrasenaAndRol(String correo, String contrasena, String rol) throws SQLException {
-        String query = "SELECT * FROM usuario WHERE correo = ? AND contrasena = ? AND tipo = ?;";
-        Usuario user = null;
-        try(Connection conn = DBConfig.getDataSource().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setString(1, correo);
-            stmt.setString(2, contrasena);
-            stmt.setString(3, rol);
-            try(ResultSet rs = stmt.executeQuery()){
-                if(rs.next()){
-                    user = mapResulsetToUser(rs);
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setString(1, email.toLowerCase());
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Object[]{
+                        rs.getInt("id_usuario"),
+                        rs.getString("email"),
+                        rs.getString("nombre"),
+                        rs.getString("telefono"),
+                        rs.getString("avatar_url"),
+                        rs.getBoolean("activo"),
+                        rs.getTimestamp("creado_en"),
+                        rs.getTimestamp("actualizado_en"),
+                        rs.getString("nivel_permiso"),
+                        rs.getString("rfc"),
+                        rs.getBoolean("verificado"),
+                        rs.getString("tipo_usuario")
+                    };
                 }
             }
-        } catch(SQLException e){
-            throw new SQLException("Error al buscar el usuario: "+e.getMessage());
         }
-        return user;
-    }
 
-    private Usuario mapResulsetToUser(ResultSet rs) throws SQLException {
-        return new Usuario(
-            rs.getInt("id_usuario"),
-            rs.getString("nombre"),
-            rs.getString("correo"),
-            rs.getString("contrasena"),
-            rs.getString("tipo"),
-            rs.getString("status")
-        );
+        return null;
     }
 }
