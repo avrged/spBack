@@ -51,9 +51,6 @@ public class Revision_solicitudService {
 
     public Revision_solicitud crearRevision(Revision_solicitud revision) {
         // Validaciones
-        if (revision.getRevision_solicitudcol() == null || revision.getRevision_solicitudcol().trim().isEmpty()) {
-            throw new IllegalArgumentException("El contenido de la revisión es obligatorio");
-        }
         if (revision.getId_solicitud() <= 0) {
             throw new IllegalArgumentException("ID de solicitud inválido");
         }
@@ -102,12 +99,6 @@ public class Revision_solicitudService {
                 throw new IllegalArgumentException("La revisión de solicitud no existe");
             }
 
-            // Validaciones
-            if (revisionActualizada.getRevision_solicitudcol() == null || 
-                revisionActualizada.getRevision_solicitudcol().trim().isEmpty()) {
-                throw new IllegalArgumentException("El contenido de la revisión es obligatorio");
-            }
-
             // Establecer fecha actual si no se proporciona
             if (revisionActualizada.getFecha() == null || revisionActualizada.getFecha().trim().isEmpty()) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -142,13 +133,30 @@ public class Revision_solicitudService {
     }
 
     public Revision_solicitud crearRevisionPorAdministrador(int idSolicitud, int idRestaurantero, 
-                                                           int idAdministrador, String contenidoRevision) {
+                                                           int idAdministrador) {
         Revision_solicitud revision = new Revision_solicitud();
         revision.setId_solicitud(idSolicitud);
         revision.setId_restaurantero(idRestaurantero);
         revision.setId_administrador(idAdministrador);
-        revision.setRevision_solicitudcol(contenidoRevision);
         
         return crearRevision(revision);
+    }
+
+    public Revision_solicitud aprobarSolicitud(int idSolicitud, int idRestaurantero, int idAdministrador) {
+        try {
+            // Crear la revisión que registra la aprobación
+            Revision_solicitud revision = crearRevisionPorAdministrador(idSolicitud, idRestaurantero, idAdministrador);
+            
+            // Actualizar el estado de la solicitud a "aprobado"
+            boolean estadoActualizado = revisionRepository.actualizarEstadoSolicitud(idSolicitud, "aprobado");
+            
+            if (!estadoActualizado) {
+                throw new RuntimeException("Error al actualizar el estado de la solicitud");
+            }
+            
+            return revision;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al aprobar la solicitud: " + e.getMessage(), e);
+        }
     }
 }

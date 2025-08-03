@@ -30,6 +30,13 @@ public class Revision_solicitudRoutes {
         app.post("/revisiones/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}/administrador/{idAdministrador}", 
                 revisionController::crearRevisionRapida);
         
+        // Ruta para aprobar solicitud (con parámetros en URL)
+        app.post("/revisiones/aprobar/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}/administrador/{idAdministrador}", 
+                revisionController::aprobarSolicitud);
+        
+        // Ruta para aprobar solicitud (con JSON en body)
+        app.post("/revisiones-solicitud/aprobar", revisionController::aprobarSolicitudJSON);
+        
         // Ruta para eliminar revisión con todos los IDs
         app.delete("/revisiones/{id}/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}/administrador/{idAdministrador}", 
                   revisionController::eliminarRevision);

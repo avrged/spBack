@@ -158,21 +158,8 @@ public class Revision_solicitudController {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             int idAdministrador = Integer.parseInt(ctx.pathParam("idAdministrador"));
             
-            @SuppressWarnings("unchecked")
-            Map<String, Object> requestBody = objectMapper.readValue(ctx.body(), Map.class);
-            String contenidoRevision = (String) requestBody.get("contenido");
-            
-            if (contenidoRevision == null || contenidoRevision.trim().isEmpty()) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "El contenido de la revisión es obligatorio");
-                
-                ctx.status(400).json(response);
-                return;
-            }
-            
             Revision_solicitud revisionCreada = revisionService.crearRevisionPorAdministrador(
-                idSolicitud, idRestaurantero, idAdministrador, contenidoRevision);
+                idSolicitud, idRestaurantero, idAdministrador);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -275,6 +262,79 @@ public class Revision_solicitudController {
             response.put("success", false);
             response.put("message", "Error al eliminar la revisión: " + e.getMessage());
             
+            ctx.status(500).json(response);
+        }
+    }
+
+    public void aprobarSolicitud(Context ctx) {
+        try {
+            int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            int idAdministrador = Integer.parseInt(ctx.pathParam("idAdministrador"));
+
+            Revision_solicitud revision = revisionService.aprobarSolicitud(idSolicitud, idRestaurantero, idAdministrador);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", revision);
+            response.put("message", "Solicitud aprobada correctamente");
+
+            ctx.status(200).json(response);
+        } catch (NumberFormatException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "IDs inválidos");
+
+            ctx.status(400).json(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+
+            ctx.status(400).json(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al aprobar la solicitud: " + e.getMessage());
+
+            ctx.status(500).json(response);
+        }
+    }
+
+    public void aprobarSolicitudJSON(Context ctx) {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> requestBody = objectMapper.readValue(ctx.body(), Map.class);
+            
+            int idSolicitud = (Integer) requestBody.get("idSolicitud");
+            int idRestaurantero = (Integer) requestBody.get("idRestaurantero");
+            int idAdministrador = (Integer) requestBody.get("idAdministrador");
+
+            Revision_solicitud revision = revisionService.aprobarSolicitud(idSolicitud, idRestaurantero, idAdministrador);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", revision);
+            response.put("message", "Solicitud aprobada correctamente");
+
+            ctx.status(200).json(response);
+        } catch (ClassCastException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Formato de datos inválido. Esperados: idSolicitud, idRestaurantero, idAdministrador");
+
+            ctx.status(400).json(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+
+            ctx.status(400).json(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al aprobar la solicitud: " + e.getMessage());
+
             ctx.status(500).json(response);
         }
     }
