@@ -1,21 +1,40 @@
 package org.sazonpt.di;
 
 import org.sazonpt.controller.AdministradorController;
+import org.sazonpt.controller.ComprobanteController;
+import org.sazonpt.controller.ImagenController;
+import org.sazonpt.controller.MenuController;
+import org.sazonpt.controller.RegistroRestauranteController;
+import org.sazonpt.controller.RestauranteController;
 import org.sazonpt.controller.RestauranteroController;
 import org.sazonpt.controller.Revision_solicitudController;
 import org.sazonpt.controller.Solicitud_registroController;
 import org.sazonpt.controller.UsuarioController;
 import org.sazonpt.repository.AdministradorRepository;
+import org.sazonpt.repository.ComprobanteRepository;
+import org.sazonpt.repository.ImagenRepository;
+import org.sazonpt.repository.MenuRepository;
+import org.sazonpt.repository.RestauranteRepository;
 import org.sazonpt.repository.RestauranteroRepository;
 import org.sazonpt.repository.Revision_solicitudRepository;
 import org.sazonpt.repository.Solicitud_registroRepository;
 import org.sazonpt.repository.UsuarioRepository;
 import org.sazonpt.routes.AdministradorRoutes;
+import org.sazonpt.routes.ComprobanteRoutes;
+import org.sazonpt.routes.ImagenRoutes;
+import org.sazonpt.routes.MenuRoutes;
+import org.sazonpt.routes.RegistroRestauranteRoutes;
+import org.sazonpt.routes.RestauranteRoutes;
 import org.sazonpt.routes.RestauranteroRoutes;
 import org.sazonpt.routes.Revision_solicitudRoutes;
 import org.sazonpt.routes.Solicitud_registroRoutes;
 import org.sazonpt.routes.UsuarioRoutes;
 import org.sazonpt.service.AdministradorService;
+import org.sazonpt.service.ComprobanteService;
+import org.sazonpt.service.ImagenService;
+import org.sazonpt.service.MenuService;
+import org.sazonpt.service.RegistroRestauranteService;
+import org.sazonpt.service.RestauranteService;
 import org.sazonpt.service.RestauranteroService;
 import org.sazonpt.service.Revision_solicitudService;
 import org.sazonpt.service.Solicitud_registroService;
@@ -60,6 +79,14 @@ public class AppModule {
         return new Revision_solicitudRoutes(revisionController);
     }
     
+    public static RestauranteRoutes initRestaurante() {
+        Solicitud_registroRepository solicitudRepository = new Solicitud_registroRepository();
+        RestauranteRepository restauranteRepository = new RestauranteRepository();
+        RestauranteService restauranteService = new RestauranteService(restauranteRepository, solicitudRepository);
+        RestauranteController restauranteController = new RestauranteController(restauranteService);
+        return new RestauranteRoutes(restauranteController);
+    }
+    
     // Método para obtener solo el controller de usuario si se necesita
     public static UsuarioController getUsuarioController() {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
@@ -81,6 +108,52 @@ public class AppModule {
         RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
         RestauranteroService restauranteroService = new RestauranteroService(restauranteroRepository, usuarioRepository);
         return new RestauranteroController(restauranteroService);
+    }
+    
+    public static ImagenRoutes initImagen() {
+        ImagenRepository imagenRepository = new ImagenRepository();
+        ImagenService imagenService = new ImagenService(imagenRepository);
+        ImagenController imagenController = new ImagenController(imagenService);
+        return new ImagenRoutes(imagenController);
+    }
+    
+    public static ComprobanteRoutes initComprobante() {
+        ComprobanteRepository comprobanteRepository = new ComprobanteRepository();
+        ComprobanteService comprobanteService = new ComprobanteService(comprobanteRepository);
+        ComprobanteController comprobanteController = new ComprobanteController(comprobanteService);
+        return new ComprobanteRoutes(comprobanteController);
+    }
+    
+    public static MenuRoutes initMenu() {
+        MenuRepository menuRepository = new MenuRepository();
+        MenuService menuService = new MenuService(menuRepository);
+        MenuController menuController = new MenuController(menuService);
+        return new MenuRoutes(menuController);
+    }
+    
+    public static RegistroRestauranteRoutes initRegistroRestaurante() {
+        // Inicializar todos los repositorios necesarios
+        Solicitud_registroRepository solicitudRepository = new Solicitud_registroRepository();
+        RestauranteRepository restauranteRepository = new RestauranteRepository();
+        ImagenRepository imagenRepository = new ImagenRepository();
+        ComprobanteRepository comprobanteRepository = new ComprobanteRepository();
+        MenuRepository menuRepository = new MenuRepository();
+        RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
+        
+        // Crear el servicio con todas las dependencias
+        RegistroRestauranteService registroService = new RegistroRestauranteService(
+            solicitudRepository,
+            restauranteRepository,
+            imagenRepository,
+            comprobanteRepository,
+            menuRepository,
+            restauranteroRepository
+        );
+        
+        // Crear el controlador
+        RegistroRestauranteController registroController = new RegistroRestauranteController(registroService);
+        
+        return new RegistroRestauranteRoutes(registroController);
     }
     
     // Método para obtener solo el service de usuario si se necesita

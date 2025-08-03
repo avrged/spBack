@@ -50,6 +50,21 @@ public class Main {
         
         // Registrar rutas de revisiones de solicitud
         AppModule.initRevisionSolicitud().register(app);
+        
+        // Registrar rutas de restaurantes
+        AppModule.initRestaurante().register(app);
+        
+        // Registrar rutas de imágenes
+        AppModule.initImagen().register(app);
+        
+        // Registrar rutas de comprobantes
+        AppModule.initComprobante().register(app);
+        
+        // Registrar rutas de menús
+        AppModule.initMenu().register(app);
+        
+        // Registrar rutas de registro de restaurante
+        AppModule.initRegistroRestaurante().registerRoutes(app);
 
         // Manejo de archivos estáticos
         app.get("/uploads/*", StaticFileHandler::handleStaticFile);
