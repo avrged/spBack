@@ -3,6 +3,7 @@ package org.sazonpt.service;
 import org.sazonpt.model.*;
 import org.sazonpt.model.dto.RegistroRestauranteDTO;
 import org.sazonpt.repository.*;
+import org.sazonpt.util.UrlBuilder;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -120,7 +121,7 @@ public class RegistroRestauranteService {
         // Imagen principal
         if (datos.getImagenPrincipal() != null && !datos.getImagenPrincipal().trim().isEmpty()) {
             Imagen imagenPrincipal = new Imagen(
-                "/uploads/images/" + datos.getImagenPrincipal(), // Prefijo más corto
+                UrlBuilder.buildImageUrl(datos.getImagenPrincipal()), // URL completa
                 LocalDateTime.now(),
                 idRestaurante,
                 idSolicitud,
@@ -133,7 +134,7 @@ public class RegistroRestauranteService {
         // Imagen secundaria
         if (datos.getImagenSecundaria() != null && !datos.getImagenSecundaria().trim().isEmpty()) {
             Imagen imagenSecundaria = new Imagen(
-                "/uploads/images/" + datos.getImagenSecundaria(),
+                UrlBuilder.buildImageUrl(datos.getImagenSecundaria()), // URL completa
                 LocalDateTime.now(),
                 idRestaurante,
                 idSolicitud,
@@ -146,7 +147,7 @@ public class RegistroRestauranteService {
         // Imagen de platillo
         if (datos.getImagenPlatillo() != null && !datos.getImagenPlatillo().trim().isEmpty()) {
             Imagen imagenPlatillo = new Imagen(
-                "/uploads/images/" + datos.getImagenPlatillo(),
+                UrlBuilder.buildImageUrl(datos.getImagenPlatillo()), // URL completa
                 LocalDateTime.now(),
                 idRestaurante,
                 idSolicitud,
@@ -167,7 +168,7 @@ public class RegistroRestauranteService {
         if (datos.getComprobanteDomicilio() != null && !datos.getComprobanteDomicilio().trim().isEmpty()) {
             Comprobante comprobanteDomicilio = new Comprobante(
                 "comprobante_domicilio",
-                "/uploads/docs/" + datos.getComprobanteDomicilio(), // Ruta más corta
+                UrlBuilder.buildDocumentUrl(datos.getComprobanteDomicilio()), // URL completa
                 LocalDateTime.now(),
                 idRestaurante,
                 idSolicitud,
@@ -185,9 +186,10 @@ public class RegistroRestauranteService {
                            int idSolicitud, int idRestaurantero) throws SQLException {
         
         if (datos.getMenuRestaurante() != null && !datos.getMenuRestaurante().trim().isEmpty()) {
+            String rutaMenu = UrlBuilder.buildMenuUrl(datos.getMenuRestaurante()); // URL completa
             Menu menu = new Menu(
-                "/uploads/menus/" + datos.getMenuRestaurante(), // ruta_archivo
-                "/uploads/menus/" + datos.getMenuRestaurante(), // ruta_menu (mismo archivo)
+                rutaMenu, // ruta_archivo
+                rutaMenu, // ruta_menu (mismo archivo)
                 "activo",
                 idRestaurante,
                 idSolicitud,

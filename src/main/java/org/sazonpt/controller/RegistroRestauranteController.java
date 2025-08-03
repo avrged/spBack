@@ -1,11 +1,16 @@
 package org.sazonpt.controller;
 
 import io.javalin.http.Context;
+import io.javalin.http.UploadedFile;
 import org.sazonpt.model.dto.RegistroRestauranteDTO;
 import org.sazonpt.service.RegistroRestauranteService;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
 
 public class RegistroRestauranteController {
     
@@ -113,12 +118,17 @@ public class RegistroRestauranteController {
     private RegistroRestauranteDTO extraerDatos(Context ctx) {
         String contentType = ctx.header("Content-Type");
         
+        // Si contiene multipart/form-data, manejar archivos
+        if (contentType != null && contentType.contains("multipart/form-data")) {
+            return extraerDatosConArchivos(ctx);
+        }
+        
         // Si es JSON, parsear como JSON
         if (contentType != null && contentType.contains("application/json")) {
             return ctx.bodyAsClass(RegistroRestauranteDTO.class);
         }
         
-        // Si es form data, parsear como formulario
+        // Si es form data simple, parsear como formulario
         return extraerDatosFormulario(ctx);
     }
     
@@ -154,6 +164,101 @@ public class RegistroRestauranteController {
         }
         
         return datos;
+    }
+    
+    private RegistroRestauranteDTO extraerDatosConArchivos(Context ctx) {
+        RegistroRestauranteDTO datos = new RegistroRestauranteDTO();
+        
+        // Extraer datos de texto del formulario
+        datos.setNombreRestaurante(ctx.formParam("nombreRestaurante"));
+        datos.setPropietario(ctx.formParam("propietario"));
+        datos.setCorreoElectronico(ctx.formParam("correoElectronico"));
+        datos.setNumeroCelular(ctx.formParam("numeroCelular"));
+        datos.setFacebook(ctx.formParam("facebook"));
+        datos.setInstagram(ctx.formParam("instagram"));
+        datos.setDireccion(ctx.formParam("direccion"));
+        datos.setHorarios(ctx.formParam("horarios"));
+        
+        // Convertir IDs
+        String idRestaurantero = ctx.formParam("idRestaurantero");
+        String idZona = ctx.formParam("idZona");
+        
+        if (idRestaurantero != null && !idRestaurantero.trim().isEmpty()) {
+            datos.setIdRestaurantero(Integer.parseInt(idRestaurantero));
+        }
+        if (idZona != null && !idZona.trim().isEmpty()) {
+            datos.setIdZona(Integer.parseInt(idZona));
+        }
+        
+        // Procesar archivos subidos
+        datos.setImagenPrincipal(procesarArchivo(ctx, "imagenPrincipal", "images"));
+        datos.setImagenSecundaria(procesarArchivo(ctx, "imagenSecundaria", "images"));
+        datos.setImagenPlatillo(procesarArchivo(ctx, "imagenPlatillo", "images"));
+        datos.setComprobanteDomicilio(procesarArchivo(ctx, "comprobanteDomicilio", "documents"));
+        datos.setMenuRestaurante(procesarArchivo(ctx, "menuRestaurante", "menus"));
+        
+        return datos;
+    }
+    
+    private String procesarArchivo(Context ctx, String fieldName, String folder) {
+        UploadedFile uploadedFile = ctx.uploadedFile(fieldName);
+        
+        if (uploadedFile == null) {
+            return null; // Campo opcional
+        }
+        
+        try {
+            // Validar archivo
+            String originalName = uploadedFile.filename();
+            if (originalName == null || originalName.trim().isEmpty()) {
+                throw new RuntimeException("El archivo " + fieldName + " debe tener un nombre válido");
+            }
+            
+            // Obtener extensión
+            String extension = "";
+            int lastDotIndex = originalName.lastIndexOf('.');
+            if (lastDotIndex > 0) {
+                extension = originalName.substring(lastDotIndex);
+            }
+            
+            // Validar extensiones según tipo
+            if (!esExtensionValida(folder, extension)) {
+                throw new RuntimeException("Tipo de archivo no válido para " + fieldName + ": " + extension);
+            }
+            
+            // Generar nombre único
+            String uniqueName = UUID.randomUUID().toString() + extension;
+            
+            // Crear directorio si no existe
+            File dir = new File("./uploads/" + folder);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            
+            // Guardar archivo
+            File file = new File(dir, uniqueName);
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(uploadedFile.content().readAllBytes());
+            }
+            
+            // CORRECCIÓN: Devolver solo el nombre del archivo único
+            // No incluir la carpeta aquí, se manejará en el servicio
+            return uniqueName;
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Error al procesar archivo " + fieldName + ": " + e.getMessage());
+        }
+    }
+    
+    private boolean esExtensionValida(String folder, String extension) {
+        extension = extension.toLowerCase();
+        
+        return switch (folder) {
+            case "images" -> extension.matches("\\.(jpg|jpeg|png|gif|webp)");
+            case "documents" -> extension.matches("\\.(pdf|doc|docx|txt)");
+            case "menus" -> extension.matches("\\.(pdf|jpg|jpeg|png)");
+            default -> false;
+        };
     }
     
     private String validarDatos(RegistroRestauranteDTO datos) {

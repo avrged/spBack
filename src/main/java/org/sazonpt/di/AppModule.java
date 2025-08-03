@@ -2,6 +2,7 @@ package org.sazonpt.di;
 
 import org.sazonpt.controller.AdministradorController;
 import org.sazonpt.controller.ComprobanteController;
+import org.sazonpt.controller.FileUploadController;
 import org.sazonpt.controller.ImagenController;
 import org.sazonpt.controller.MenuController;
 import org.sazonpt.controller.RegistroRestauranteController;
@@ -21,6 +22,7 @@ import org.sazonpt.repository.Solicitud_registroRepository;
 import org.sazonpt.repository.UsuarioRepository;
 import org.sazonpt.routes.AdministradorRoutes;
 import org.sazonpt.routes.ComprobanteRoutes;
+import org.sazonpt.routes.FileUploadRoutes;
 import org.sazonpt.routes.ImagenRoutes;
 import org.sazonpt.routes.MenuRoutes;
 import org.sazonpt.routes.RegistroRestauranteRoutes;
@@ -174,5 +176,10 @@ public class AppModule {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
         return new RestauranteroService(restauranteroRepository, usuarioRepository);
+    }
+    
+    public static FileUploadRoutes initFileUpload() {
+        FileUploadController fileUploadController = new FileUploadController();
+        return new FileUploadRoutes(fileUploadController);
     }
 }
