@@ -6,7 +6,9 @@ import org.sazonpt.repository.RestauranteRepository;
 import org.sazonpt.repository.Solicitud_registroRepository;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class RestauranteService {
@@ -206,6 +208,29 @@ public class RestauranteService {
             return restauranteRepository.updateByRestaurantero(idRestaurantero, restaurante);
         } catch (SQLException e) {
             throw new RuntimeException("Error al actualizar el restaurante: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Actualiza campos específicos de un restaurante
+     */
+    public boolean actualizarCamposEspecificos(int idRestaurante, Map<String, String> campos) {
+        if (campos.isEmpty()) {
+            throw new IllegalArgumentException("Debe especificar al menos un campo para actualizar");
+        }
+
+        // Validar campos permitidos
+        List<String> camposPermitidos = Arrays.asList("horario", "telefono", "etiquetas", "direccion", "facebook", "instagram");
+        for (String campo : campos.keySet()) {
+            if (!camposPermitidos.contains(campo)) {
+                throw new IllegalArgumentException("Campo no permitido: " + campo);
+            }
+        }
+
+        try {
+            return restauranteRepository.actualizarCamposEspecificos(idRestaurante, campos);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar los campos del restaurante: " + e.getMessage(), e);
         }
     }
 }

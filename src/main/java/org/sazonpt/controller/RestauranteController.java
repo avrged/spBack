@@ -242,4 +242,71 @@ public class RestauranteController {
             ctx.status(500).json(response);
         }
     }
+
+    /**
+     * Actualiza campos específicos de un restaurante
+     * PUT /restaurantes/{id}/campos
+     */
+    public void actualizarCamposEspecificos(Context ctx) {
+        try {
+            int idRestaurante = Integer.parseInt(ctx.pathParam("id"));
+            
+            @SuppressWarnings("unchecked")
+            Map<String, Object> body = ctx.bodyAsClass(Map.class);
+            Map<String, String> campos = new HashMap<>();
+            
+            // Procesar solo los campos permitidos
+            String[] camposPermitidos = {"horario", "telefono", "etiquetas", "direccion", "facebook", "instagram"};
+            
+            for (String campo : camposPermitidos) {
+                if (body.containsKey(campo) && body.get(campo) != null) {
+                    campos.put(campo, body.get(campo).toString());
+                }
+            }
+            
+            if (campos.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "No se proporcionaron campos válidos para actualizar");
+                
+                ctx.status(400).json(response);
+                return;
+            }
+            
+            boolean actualizado = restauranteService.actualizarCamposEspecificos(idRestaurante, campos);
+            
+            Map<String, Object> response = new HashMap<>();
+            if (actualizado) {
+                response.put("success", true);
+                response.put("message", "Campos del restaurante actualizados correctamente");
+                response.put("campos_actualizados", campos.keySet());
+                
+                ctx.status(200).json(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "No se pudo actualizar el restaurante");
+                
+                ctx.status(404).json(response);
+            }
+            
+        } catch (NumberFormatException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "ID de restaurante inválido");
+            
+            ctx.status(400).json(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            
+            ctx.status(400).json(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al actualizar el restaurante: " + e.getMessage());
+            
+            ctx.status(500).json(response);
+        }
+    }
 }

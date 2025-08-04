@@ -6,6 +6,7 @@ import org.sazonpt.model.Restaurante;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class RestauranteRepository {
@@ -291,6 +292,59 @@ public class RestauranteRepository {
             stmt.setInt(1, idZona);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
+        }
+    }
+
+    /**
+     * Actualiza campos específicos de un restaurante
+     */
+    public boolean actualizarCamposEspecificos(int idRestaurante, Map<String, String> campos) throws SQLException {
+        if (campos.isEmpty()) {
+            return false;
+        }
+
+        // Construir la consulta dinámicamente
+        StringBuilder sql = new StringBuilder("UPDATE restaurante SET ");
+        List<String> sets = new ArrayList<>();
+        List<String> valores = new ArrayList<>();
+
+        if (campos.containsKey("horario")) {
+            sets.add("horario = ?");
+            valores.add(campos.get("horario"));
+        }
+        if (campos.containsKey("telefono")) {
+            sets.add("telefono = ?");
+            valores.add(campos.get("telefono"));
+        }
+        if (campos.containsKey("etiquetas")) {
+            sets.add("etiquetas = ?");
+            valores.add(campos.get("etiquetas"));
+        }
+        if (campos.containsKey("direccion")) {
+            sets.add("direccion = ?");
+            valores.add(campos.get("direccion"));
+        }
+        if (campos.containsKey("facebook")) {
+            sets.add("facebook = ?");
+            valores.add(campos.get("facebook"));
+        }
+        if (campos.containsKey("instagram")) {
+            sets.add("instagram = ?");
+            valores.add(campos.get("instagram"));
+        }
+
+        sql.append(String.join(", ", sets));
+        sql.append(" WHERE id_restaurante = ?");
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < valores.size(); i++) {
+                stmt.setString(i + 1, valores.get(i));
+            }
+            stmt.setInt(valores.size() + 1, idRestaurante);
+
+            return stmt.executeUpdate() > 0;
         }
     }
 }
