@@ -171,12 +171,37 @@ public class Solicitud_registroController {
     public void aprobarSolicitud(Context ctx) {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            boolean aprobada = solicitudService.aprobarSolicitud(id);
+            
+            // Obtener datos del body
+            @SuppressWarnings("unchecked")
+            Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
+            int idAdministrador = (Integer) requestBody.get("id_administrador");
+            
+            // Obtener la solicitud para obtener el id_restaurantero
+            Optional<Solicitud_registro> solicitudOpt = solicitudService.obtenerSolicitudPorId(id);
+            if (solicitudOpt.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Solicitud no encontrada");
+                ctx.status(404).json(response);
+                return;
+            }
+            
+            Solicitud_registro solicitud = solicitudOpt.get();
+            
+            // Aprobar la solicitud y crear la revisión
+            boolean aprobada = solicitudService.aprobarSolicitudConRevision(id, solicitud.getId_restaurantero(), idAdministrador);
             
             if (aprobada) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("message", "Solicitud aprobada correctamente");
+                response.put("data", Map.of(
+                    "id_solicitud", id,
+                    "id_restaurantero", solicitud.getId_restaurantero(),
+                    "id_administrador", idAdministrador,
+                    "estado", "aprobada"
+                ));
                 
                 ctx.status(200).json(response);
             } else {
@@ -204,12 +229,39 @@ public class Solicitud_registroController {
     public void rechazarSolicitud(Context ctx) {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            boolean rechazada = solicitudService.rechazarSolicitud(id);
+            
+            // Obtener datos del body
+            @SuppressWarnings("unchecked")
+            Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
+            int idAdministrador = (Integer) requestBody.get("id_administrador");
+            String motivoRechazo = (String) requestBody.getOrDefault("motivo_rechazo", "");
+            
+            // Obtener la solicitud para obtener el id_restaurantero
+            Optional<Solicitud_registro> solicitudOpt = solicitudService.obtenerSolicitudPorId(id);
+            if (solicitudOpt.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Solicitud no encontrada");
+                ctx.status(404).json(response);
+                return;
+            }
+            
+            Solicitud_registro solicitud = solicitudOpt.get();
+            
+            // Rechazar la solicitud y crear la revisión
+            boolean rechazada = solicitudService.rechazarSolicitudConRevision(id, solicitud.getId_restaurantero(), idAdministrador, motivoRechazo);
             
             if (rechazada) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("message", "Solicitud rechazada correctamente");
+                response.put("data", Map.of(
+                    "id_solicitud", id,
+                    "id_restaurantero", solicitud.getId_restaurantero(),
+                    "id_administrador", idAdministrador,
+                    "estado", "rechazada",
+                    "motivo_rechazo", motivoRechazo
+                ));
                 
                 ctx.status(200).json(response);
             } else {
@@ -272,17 +324,40 @@ public class Solicitud_registroController {
     public void aprobarPorRestaurantero(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            
+            // Obtener datos del body
+            @SuppressWarnings("unchecked")
+            Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
+            int idAdministrador = (Integer) requestBody.get("id_administrador");
+            
             var solicitudes = solicitudService.obtenerSolicitudesPorRestaurantero(idRestaurantero);
             var solicitudPendiente = solicitudes.stream()
                 .filter(s -> "pendiente".equalsIgnoreCase(s.getEstado()))
                 .findFirst();
+                
             if (solicitudPendiente.isEmpty()) {
                 ctx.status(404).json(Map.of("success", false, "message", "No hay solicitud pendiente para este restaurantero"));
                 return;
             }
-            boolean ok = solicitudService.cambiarEstadoSolicitud(solicitudPendiente.get().getId_solicitud(), "aprobado");
+            
+            // Aprobar con revisión
+            boolean ok = solicitudService.aprobarSolicitudConRevision(
+                solicitudPendiente.get().getId_solicitud(), 
+                idRestaurantero, 
+                idAdministrador
+            );
+            
             if (ok) {
-                ctx.json(Map.of("success", true, "message", "Solicitud aprobada correctamente"));
+                ctx.json(Map.of(
+                    "success", true, 
+                    "message", "Solicitud aprobada correctamente",
+                    "data", Map.of(
+                        "id_solicitud", solicitudPendiente.get().getId_solicitud(),
+                        "id_restaurantero", idRestaurantero,
+                        "id_administrador", idAdministrador,
+                        "estado", "aprobada"
+                    )
+                ));
             } else {
                 ctx.status(500).json(Map.of("success", false, "message", "No se pudo aprobar la solicitud"));
             }

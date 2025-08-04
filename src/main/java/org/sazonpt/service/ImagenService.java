@@ -239,4 +239,32 @@ public class ImagenService {
             throw new RuntimeException("Error al eliminar la imagen: " + e.getMessage(), e);
         }
     }
+
+    // Método súper simplificado - solo necesita el ID de la imagen
+    public boolean actualizarImagenSimplificado(int idImagen, Imagen imagenActualizada) {
+        try {
+            // Buscar la imagen en toda la base de datos
+            List<Imagen> todasImagenes = imagenRepository.findAll();
+            Optional<Imagen> imagenExistenteOpt = todasImagenes.stream()
+                    .filter(imagen -> imagen.getId_imagen() == idImagen)
+                    .findFirst();
+            
+            if (imagenExistenteOpt.isEmpty()) {
+                return false; // Imagen no encontrada
+            }
+            
+            Imagen imagenExistente = imagenExistenteOpt.get();
+            
+            // Actualizar solo los campos proporcionados, manteniendo la estructura de clave primaria
+            if (imagenActualizada.getRuta_imagen() != null && !imagenActualizada.getRuta_imagen().trim().isEmpty()) {
+                imagenExistente.setRuta_imagen(imagenActualizada.getRuta_imagen());
+                // Actualizar fecha de subida cuando se cambia la imagen
+                imagenExistente.setFecha_subida(LocalDateTime.now());
+            }
+
+            return imagenRepository.update(imagenExistente);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar la imagen: " + e.getMessage(), e);
+        }
+    }
 }

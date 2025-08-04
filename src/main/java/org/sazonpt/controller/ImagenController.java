@@ -515,4 +515,72 @@ public class ImagenController {
             ));
         }
     }
+
+    // Método súper simplificado - solo necesita el ID de la imagen
+    public void actualizarImagenSimplificado(Context ctx) {
+        try {
+            int idImagen = Integer.parseInt(ctx.pathParam("idImagen"));
+            
+            Imagen imagenActualizada = new Imagen();
+            String nuevaRutaImagen = null;
+            
+            // Detectar si es form-data o JSON
+            String contentType = ctx.header("Content-Type");
+            
+            if (contentType != null && contentType.contains("multipart/form-data")) {
+                // Verificar si hay un archivo subido
+                if (!ctx.uploadedFiles().isEmpty()) {
+                    // Procesar archivo de imagen subido
+                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    
+                    try {
+                        // Guardar el archivo de imagen
+                        nuevaRutaImagen = guardarArchivoImagen(uploadedFile);
+                        imagenActualizada.setRuta_imagen(nuevaRutaImagen);
+                    } catch (Exception e) {
+                        ctx.status(500).json(Map.of(
+                            "success", false,
+                            "message", "Error al guardar el archivo de imagen: " + e.getMessage()
+                        ));
+                        return;
+                    }
+                } else {
+                    // Procesar form-data con ruta de texto
+                    String rutaImagen = ctx.formParam("ruta_imagen");
+                    
+                    if (rutaImagen != null && !rutaImagen.trim().isEmpty()) {
+                        imagenActualizada.setRuta_imagen(rutaImagen);
+                    }
+                }
+            } else {
+                // Procesar JSON
+                imagenActualizada = ctx.bodyAsClass(Imagen.class);
+            }
+            
+            boolean actualizado = imagenService.actualizarImagenSimplificado(idImagen, imagenActualizada);
+            
+            if (actualizado) {
+                ctx.json(Map.of(
+                    "success", true,
+                    "message", "Imagen actualizada correctamente",
+                    "nueva_ruta", nuevaRutaImagen != null ? nuevaRutaImagen : "Imagen actualizada"
+                ));
+            } else {
+                ctx.status(404).json(Map.of(
+                    "success", false,
+                    "message", "No se pudo actualizar la imagen. Verifica que la imagen exista"
+                ));
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of(
+                "success", false,
+                "message", "ID de imagen inválido"
+            ));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of(
+                "success", false,
+                "message", "Error al actualizar la imagen: " + e.getMessage()
+            ));
+        }
+    }
 }

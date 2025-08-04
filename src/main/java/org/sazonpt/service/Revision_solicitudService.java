@@ -5,7 +5,6 @@ import org.sazonpt.repository.Revision_solicitudRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,6 +53,9 @@ public class Revision_solicitudService {
         if (revision.getId_solicitud() <= 0) {
             throw new IllegalArgumentException("ID de solicitud inválido");
         }
+        if (revision.getId_restaurantero() <= 0) {
+            throw new IllegalArgumentException("ID de restaurantero inválido");
+        }
         if (revision.getId_administrador() <= 0) {
             throw new IllegalArgumentException("ID de administrador inválido");
         }
@@ -77,9 +79,8 @@ public class Revision_solicitudService {
         }
 
         // Establecer fecha actual si no se proporciona
-        if (revision.getFecha() == null || revision.getFecha().trim().isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            revision.setFecha(LocalDateTime.now().format(formatter));
+        if (revision.getFecha() == null) {
+            revision.setFecha(LocalDateTime.now());
         }
 
         try {
@@ -97,9 +98,8 @@ public class Revision_solicitudService {
             }
 
             // Establecer fecha actual si no se proporciona
-            if (revisionActualizada.getFecha() == null || revisionActualizada.getFecha().trim().isEmpty()) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                revisionActualizada.setFecha(LocalDateTime.now().format(formatter));
+            if (revisionActualizada.getFecha() == null) {
+                revisionActualizada.setFecha(LocalDateTime.now());
             }
 
             revisionActualizada.setId_revision(id);
@@ -129,18 +129,19 @@ public class Revision_solicitudService {
         }
     }
 
-    public Revision_solicitud crearRevisionPorAdministrador(int idSolicitud, int idAdministrador) {
+    public Revision_solicitud crearRevisionPorAdministrador(int idSolicitud, int idRestaurantero, int idAdministrador) {
         Revision_solicitud revision = new Revision_solicitud();
         revision.setId_solicitud(idSolicitud);
+        revision.setId_restaurantero(idRestaurantero);
         revision.setId_administrador(idAdministrador);
         
         return crearRevision(revision);
     }
 
-    public Revision_solicitud aprobarSolicitud(int idSolicitud, int idAdministrador) {
+    public Revision_solicitud aprobarSolicitud(int idSolicitud, int idRestaurantero, int idAdministrador) {
         try {
             // Crear la revisión que registra la aprobación
-            Revision_solicitud revision = crearRevisionPorAdministrador(idSolicitud, idAdministrador);
+            Revision_solicitud revision = crearRevisionPorAdministrador(idSolicitud, idRestaurantero, idAdministrador);
             
             // Actualizar el estado de la solicitud a "aprobado"
             boolean estadoActualizado = revisionRepository.actualizarEstadoSolicitud(idSolicitud, "aprobado");

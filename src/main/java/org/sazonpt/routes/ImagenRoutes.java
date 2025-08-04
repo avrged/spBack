@@ -31,6 +31,10 @@ public class ImagenRoutes {
         app.put("/imagenes/{idImagen}/restaurantero/{idRestaurantero}", 
                imagenController::actualizarImagenPorRestaurantero);
         
+        // Actualizar imagen de forma simplificada (solo requiere ID de la imagen)
+        app.put("/imagenes/{idImagen}", 
+               imagenController::actualizarImagenSimplificado);
+        
         // este es el bueno
         app.put("/imagenes/restaurantero/{idRestaurantero}", 
                imagenController::actualizarImagenesRestaurantero);
