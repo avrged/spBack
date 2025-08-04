@@ -50,6 +50,10 @@ public class MenuRoutes {
         app.put("/menus/{idMenu}/{idRestaurante}/{idSolicitud}/{idRestaurantero}", 
                menuController::actualizarMenu);
         
+        // Actualizar menú simplificado (soporta JSON y form-data con PDF)
+        app.put("/menus/{idMenu}", 
+               menuController::actualizarMenuSimplificado);
+        
         // Cambiar estado del menú
         app.put("/menus/{idMenu}/{idRestaurante}/{idSolicitud}/{idRestaurantero}/estado", 
                menuController::cambiarEstadoMenu);

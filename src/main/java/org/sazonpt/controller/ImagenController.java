@@ -313,16 +313,34 @@ public class ImagenController {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             
             Imagen imagenActualizada = new Imagen();
+            String nuevaRutaImagen = null;
             
             // Detectar si es form-data o JSON
             String contentType = ctx.header("Content-Type");
             
             if (contentType != null && contentType.contains("multipart/form-data")) {
-                // Procesar form-data
-                String rutaImagen = ctx.formParam("ruta_imagen");
-                
-                if (rutaImagen != null && !rutaImagen.trim().isEmpty()) {
-                    imagenActualizada.setRuta_imagen(rutaImagen);
+                // Verificar si hay un archivo subido
+                if (!ctx.uploadedFiles().isEmpty()) {
+                    // Procesar archivo subido
+                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    
+                    try {
+                        // Guardar el archivo
+                        nuevaRutaImagen = guardarArchivoImagen(uploadedFile);
+                        imagenActualizada.setRuta_imagen(nuevaRutaImagen);
+                    } catch (Exception e) {
+                        ctx.status(500).json(Map.of(
+                            "success", false,
+                            "message", "Error al guardar el archivo: " + e.getMessage()
+                        ));
+                        return;
+                    }
+                } else {
+                    // Procesar form-data con ruta de texto
+                    String rutaImagen = ctx.formParam("ruta_imagen");
+                    if (rutaImagen != null && !rutaImagen.trim().isEmpty()) {
+                        imagenActualizada.setRuta_imagen(rutaImagen);
+                    }
                 }
             } else {
                 // Procesar JSON
@@ -334,7 +352,8 @@ public class ImagenController {
             if (actualizada) {
                 ctx.json(Map.of(
                     "success", true,
-                    "message", "Imagen actualizada correctamente"
+                    "message", "Imagen actualizada correctamente",
+                    "nueva_ruta", nuevaRutaImagen != null ? nuevaRutaImagen : "URL actualizada desde form-data"
                 ));
             } else {
                 ctx.status(404).json(Map.of(
@@ -358,6 +377,44 @@ public class ImagenController {
                 "message", "Error al actualizar la imagen: " + e.getMessage()
             ));
         }
+    }
+
+    private String guardarArchivoImagen(io.javalin.http.UploadedFile uploadedFile) throws Exception {
+        // Validaciones
+        String originalName = uploadedFile.filename();
+        if (originalName == null || originalName.trim().isEmpty()) {
+            throw new IllegalArgumentException("El archivo debe tener un nombre válido");
+        }
+
+        // Obtener extensión
+        String extension = "";
+        int lastDotIndex = originalName.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+            extension = originalName.substring(lastDotIndex);
+        }
+
+        // Validar extensiones de imagen
+        if (!extension.toLowerCase().matches("\\.(jpg|jpeg|png|gif|webp)")) {
+            throw new IllegalArgumentException("Solo se permiten archivos de imagen (jpg, jpeg, png, gif, webp)");
+        }
+
+        // Generar nombre único
+        String uniqueFileName = System.currentTimeMillis() + "_" + 
+                               Math.abs(originalName.hashCode()) + extension;
+
+        // Crear directorio si no existe
+        java.io.File uploadDir = new java.io.File("./uploads/images");
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // Guardar archivo
+        java.io.File destinationFile = new java.io.File(uploadDir, uniqueFileName);
+        java.nio.file.Files.copy(uploadedFile.content(), destinationFile.toPath(), 
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+        // Retornar URL completa
+        return "http://localhost:7070/uploads/images/" + uniqueFileName;
     }
 
     public void eliminarImagenPorRestaurantero(Context ctx) {

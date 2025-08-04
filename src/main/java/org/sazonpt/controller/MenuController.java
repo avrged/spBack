@@ -456,4 +456,207 @@ public class MenuController {
             ));
         }
     }
+
+    // Método simplificado para actualizar menú con archivo PDF
+    public void actualizarMenuPorRestaurantero(Context ctx) {
+        try {
+            int idMenu = Integer.parseInt(ctx.pathParam("idMenu"));
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            
+            Menu menuActualizado = new Menu();
+            String nuevaRutaMenu = null;
+            
+            // Detectar si es form-data o JSON
+            String contentType = ctx.header("Content-Type");
+            
+            if (contentType != null && contentType.contains("multipart/form-data")) {
+                // Verificar si hay un archivo subido
+                if (!ctx.uploadedFiles().isEmpty()) {
+                    // Procesar archivo PDF subido
+                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    
+                    try {
+                        // Guardar el archivo PDF
+                        nuevaRutaMenu = guardarArchivoPDF(uploadedFile);
+                        menuActualizado.setRuta_archivo(nuevaRutaMenu);
+                        menuActualizado.setRuta_menu(nuevaRutaMenu); // Actualizar ambos campos
+                    } catch (Exception e) {
+                        ctx.status(500).json(Map.of(
+                            "success", false,
+                            "message", "Error al guardar el archivo PDF: " + e.getMessage()
+                        ));
+                        return;
+                    }
+                } else {
+                    // Procesar form-data con ruta de texto
+                    String rutaArchivo = ctx.formParam("ruta_archivo");
+                    String rutaMenu = ctx.formParam("ruta_menu");
+                    String estado = ctx.formParam("estado");
+                    
+                    if (rutaArchivo != null && !rutaArchivo.trim().isEmpty()) {
+                        menuActualizado.setRuta_archivo(rutaArchivo);
+                    }
+                    if (rutaMenu != null && !rutaMenu.trim().isEmpty()) {
+                        menuActualizado.setRuta_menu(rutaMenu);
+                    }
+                    if (estado != null && !estado.trim().isEmpty()) {
+                        menuActualizado.setEstado(estado);
+                    }
+                }
+            } else {
+                // Procesar JSON
+                menuActualizado = ctx.bodyAsClass(Menu.class);
+            }
+            
+            boolean actualizado = menuService.actualizarMenuPorRestaurantero(idMenu, idRestaurantero, menuActualizado);
+            
+            if (actualizado) {
+                ctx.json(Map.of(
+                    "success", true,
+                    "message", "Menú actualizado correctamente",
+                    "nueva_ruta", nuevaRutaMenu != null ? nuevaRutaMenu : "Menú actualizado desde form-data"
+                ));
+            } else {
+                ctx.status(404).json(Map.of(
+                    "success", false,
+                    "message", "No se pudo actualizar el menú. Verifica que el menú pertenezca al restaurantero"
+                ));
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of(
+                "success", false,
+                "message", "IDs inválidos"
+            ));
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).json(Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of(
+                "success", false,
+                "message", "Error al actualizar el menú: " + e.getMessage()
+            ));
+        }
+    }
+
+    // Método súper simplificado - solo necesita el ID del menú
+    public void actualizarMenuSimplificado(Context ctx) {
+        try {
+            int idMenu = Integer.parseInt(ctx.pathParam("idMenu"));
+            
+            Menu menuActualizado = new Menu();
+            String nuevaRutaMenu = null;
+            
+            // Detectar si es form-data o JSON
+            String contentType = ctx.header("Content-Type");
+            
+            if (contentType != null && contentType.contains("multipart/form-data")) {
+                // Verificar si hay un archivo subido
+                if (!ctx.uploadedFiles().isEmpty()) {
+                    // Procesar archivo PDF subido
+                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    
+                    try {
+                        // Guardar el archivo PDF
+                        nuevaRutaMenu = guardarArchivoPDF(uploadedFile);
+                        menuActualizado.setRuta_archivo(nuevaRutaMenu);
+                        menuActualizado.setRuta_menu(nuevaRutaMenu); // Actualizar ambos campos
+                    } catch (Exception e) {
+                        ctx.status(500).json(Map.of(
+                            "success", false,
+                            "message", "Error al guardar el archivo PDF: " + e.getMessage()
+                        ));
+                        return;
+                    }
+                } else {
+                    // Procesar form-data con ruta de texto
+                    String rutaArchivo = ctx.formParam("ruta_archivo");
+                    String rutaMenu = ctx.formParam("ruta_menu");
+                    String estado = ctx.formParam("estado");
+                    
+                    if (rutaArchivo != null && !rutaArchivo.trim().isEmpty()) {
+                        menuActualizado.setRuta_archivo(rutaArchivo);
+                    }
+                    if (rutaMenu != null && !rutaMenu.trim().isEmpty()) {
+                        menuActualizado.setRuta_menu(rutaMenu);
+                    }
+                    if (estado != null && !estado.trim().isEmpty()) {
+                        menuActualizado.setEstado(estado);
+                    }
+                }
+            } else {
+                // Procesar JSON
+                menuActualizado = ctx.bodyAsClass(Menu.class);
+            }
+            
+            boolean actualizado = menuService.actualizarMenuSimplificado(idMenu, menuActualizado);
+            
+            if (actualizado) {
+                ctx.json(Map.of(
+                    "success", true,
+                    "message", "Menú actualizado correctamente",
+                    "nueva_ruta", nuevaRutaMenu != null ? nuevaRutaMenu : "Menú actualizado"
+                ));
+            } else {
+                ctx.status(404).json(Map.of(
+                    "success", false,
+                    "message", "No se pudo actualizar el menú. Verifica que el menú exista"
+                ));
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of(
+                "success", false,
+                "message", "ID de menú inválido"
+            ));
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).json(Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of(
+                "success", false,
+                "message", "Error al actualizar el menú: " + e.getMessage()
+            ));
+        }
+    }
+
+    private String guardarArchivoPDF(io.javalin.http.UploadedFile uploadedFile) throws Exception {
+        // Validaciones
+        String originalName = uploadedFile.filename();
+        if (originalName == null || originalName.trim().isEmpty()) {
+            throw new IllegalArgumentException("El archivo debe tener un nombre válido");
+        }
+
+        // Obtener extensión
+        String extension = "";
+        int lastDotIndex = originalName.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+            extension = originalName.substring(lastDotIndex);
+        }
+
+        // Validar extensiones de PDF
+        if (!extension.toLowerCase().equals(".pdf")) {
+            throw new IllegalArgumentException("Solo se permiten archivos PDF (.pdf)");
+        }
+
+        // Generar nombre único
+        String uniqueFileName = System.currentTimeMillis() + "_" + 
+                               Math.abs(originalName.hashCode()) + extension;
+
+        // Crear directorio si no existe
+        java.io.File uploadDir = new java.io.File("./uploads/menus");
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // Guardar archivo
+        java.io.File destinationFile = new java.io.File(uploadDir, uniqueFileName);
+        java.nio.file.Files.copy(uploadedFile.content(), destinationFile.toPath(), 
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+        // Retornar URL completa
+        return "http://localhost:7070/uploads/menus/" + uniqueFileName;
+    }
 }

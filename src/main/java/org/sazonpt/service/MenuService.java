@@ -246,4 +246,84 @@ public class MenuService {
                 .map(Menu.EstadoMenu::getValor)
                 .toList();
     }
+
+    // Método simplificado para actualizar menú por restaurantero
+    public boolean actualizarMenuPorRestaurantero(int idMenu, int idRestaurantero, Menu menuActualizado) {
+        try {
+            // Buscar el menú entre los del restaurantero
+            List<Menu> menus = menuRepository.findByRestaurantero(idRestaurantero);
+            Optional<Menu> menuExistenteOpt = menus.stream()
+                    .filter(menu -> menu.getId_menu() == idMenu)
+                    .findFirst();
+            
+            if (menuExistenteOpt.isEmpty()) {
+                return false; // Menú no encontrado para este restaurantero
+            }
+            
+            Menu menuExistente = menuExistenteOpt.get();
+            
+            // Actualizar solo los campos proporcionados, manteniendo la estructura de clave primaria
+            if (menuActualizado.getRuta_archivo() != null && !menuActualizado.getRuta_archivo().trim().isEmpty()) {
+                menuExistente.setRuta_archivo(menuActualizado.getRuta_archivo());
+            }
+            
+            if (menuActualizado.getRuta_menu() != null && !menuActualizado.getRuta_menu().trim().isEmpty()) {
+                menuExistente.setRuta_menu(menuActualizado.getRuta_menu());
+            }
+            
+            if (menuActualizado.getEstado() != null && !menuActualizado.getEstado().trim().isEmpty()) {
+                // Validar el estado
+                try {
+                    Menu.EstadoMenu.fromString(menuActualizado.getEstado());
+                    menuExistente.setEstado(menuActualizado.getEstado());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Estado de menú inválido: " + menuActualizado.getEstado());
+                }
+            }
+
+            return menuRepository.update(menuExistente);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar el menú: " + e.getMessage(), e);
+        }
+    }
+
+    // Método súper simplificado - solo necesita el ID del menú
+    public boolean actualizarMenuSimplificado(int idMenu, Menu menuActualizado) {
+        try {
+            // Buscar el menú en toda la base de datos
+            List<Menu> todosMenus = menuRepository.findAll();
+            Optional<Menu> menuExistenteOpt = todosMenus.stream()
+                    .filter(menu -> menu.getId_menu() == idMenu)
+                    .findFirst();
+            
+            if (menuExistenteOpt.isEmpty()) {
+                return false; // Menú no encontrado
+            }
+            
+            Menu menuExistente = menuExistenteOpt.get();
+            
+            // Actualizar solo los campos proporcionados, manteniendo la estructura de clave primaria
+            if (menuActualizado.getRuta_archivo() != null && !menuActualizado.getRuta_archivo().trim().isEmpty()) {
+                menuExistente.setRuta_archivo(menuActualizado.getRuta_archivo());
+            }
+            
+            if (menuActualizado.getRuta_menu() != null && !menuActualizado.getRuta_menu().trim().isEmpty()) {
+                menuExistente.setRuta_menu(menuActualizado.getRuta_menu());
+            }
+            
+            if (menuActualizado.getEstado() != null && !menuActualizado.getEstado().trim().isEmpty()) {
+                // Validar el estado
+                try {
+                    Menu.EstadoMenu.fromString(menuActualizado.getEstado());
+                    menuExistente.setEstado(menuActualizado.getEstado());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Estado de menú inválido: " + menuActualizado.getEstado());
+                }
+            }
+
+            return menuRepository.update(menuExistente);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar el menú: " + e.getMessage(), e);
+        }
+    }
 }
