@@ -346,11 +346,7 @@ public class Solicitud_registroController {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             
-            // Obtener datos del body
-            @SuppressWarnings("unchecked")
-            Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
-            int idAdministrador = (Integer) requestBody.get("id_administrador");
-            
+            // Sin necesidad de body - aprobar directamente
             var solicitudes = solicitudService.obtenerSolicitudesPorRestaurantero(idRestaurantero);
             var solicitudPendiente = solicitudes.stream()
                 .filter(s -> "pendiente".equalsIgnoreCase(s.getEstado()))
@@ -361,11 +357,12 @@ public class Solicitud_registroController {
                 return;
             }
             
-            // Aprobar con revisión
+            // Aprobar con revisión - usando administrador por defecto (ID 1)
+            int idAdministradorDefecto = 1; // Puedes cambiar este valor según tu lógica de negocio
             boolean ok = solicitudService.aprobarSolicitudConRevision(
                 solicitudPendiente.get().getId_solicitud(), 
                 idRestaurantero, 
-                idAdministrador
+                idAdministradorDefecto
             );
             
             if (ok) {
@@ -375,7 +372,7 @@ public class Solicitud_registroController {
                     "data", Map.of(
                         "id_solicitud", solicitudPendiente.get().getId_solicitud(),
                         "id_restaurantero", idRestaurantero,
-                        "id_administrador", idAdministrador,
+                        "id_administrador", idAdministradorDefecto,
                         "estado", "aprobada"
                     )
                 ));
