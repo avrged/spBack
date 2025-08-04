@@ -240,4 +240,45 @@ public class ComprobanteService {
                 .map(Comprobante.TipoComprobante::getValor)
                 .toList();
     }
+
+    // Método súper simplificado - solo necesita el ID del comprobante
+    public boolean actualizarComprobanteSimplificado(int idComprobante, Comprobante comprobanteActualizado) {
+        try {
+            // Buscar el comprobante en toda la base de datos
+            List<Comprobante> todosComprobantes = comprobanteRepository.findAll();
+            Optional<Comprobante> comprobanteExistenteOpt = todosComprobantes.stream()
+                    .filter(comprobante -> comprobante.getId_comprobante() == idComprobante)
+                    .findFirst();
+            
+            if (comprobanteExistenteOpt.isEmpty()) {
+                return false; // Comprobante no encontrado
+            }
+            
+            Comprobante comprobanteExistente = comprobanteExistenteOpt.get();
+            
+            // Actualizar solo los campos proporcionados, manteniendo la estructura de clave primaria
+            if (comprobanteActualizado.getRuta_archivo() != null && !comprobanteActualizado.getRuta_archivo().trim().isEmpty()) {
+                comprobanteExistente.setRuta_archivo(comprobanteActualizado.getRuta_archivo());
+            }
+            
+            if (comprobanteActualizado.getTipo() != null && !comprobanteActualizado.getTipo().trim().isEmpty()) {
+                // Validar el tipo
+                try {
+                    Comprobante.TipoComprobante.fromString(comprobanteActualizado.getTipo());
+                    comprobanteExistente.setTipo(comprobanteActualizado.getTipo());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Tipo de comprobante inválido: " + comprobanteActualizado.getTipo());
+                }
+            }
+
+            // Actualizar fecha de subida si se cambió el archivo
+            if (comprobanteActualizado.getRuta_archivo() != null && !comprobanteActualizado.getRuta_archivo().trim().isEmpty()) {
+                comprobanteExistente.setFecha_subida(LocalDateTime.now());
+            }
+
+            return comprobanteRepository.update(comprobanteExistente);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar el comprobante: " + e.getMessage(), e);
+        }
+    }
 }

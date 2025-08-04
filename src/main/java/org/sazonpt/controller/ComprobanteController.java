@@ -1,9 +1,17 @@
 package org.sazonpt.controller;
 
 import io.javalin.http.Context;
+import io.javalin.http.UploadedFile;
 import org.sazonpt.model.Comprobante;
 import org.sazonpt.service.ComprobanteService;
+import org.sazonpt.util.ImprovedStaticFileHandler;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -337,5 +345,121 @@ public class ComprobanteController {
                 "message", "Error al obtener los tipos de comprobante: " + e.getMessage()
             ));
         }
+    }
+
+    // Método súper simplificado - solo necesita el ID del comprobante
+    public void actualizarComprobanteSimplificado(Context ctx) {
+        try {
+            int idComprobante = Integer.parseInt(ctx.pathParam("idComprobante"));
+            
+            Comprobante comprobanteActualizado = new Comprobante();
+            String nuevaRutaArchivo = null;
+            
+            // Detectar si es form-data o JSON
+            String contentType = ctx.header("Content-Type");
+            
+            if (contentType != null && contentType.contains("multipart/form-data")) {
+                // Verificar si hay un archivo subido
+                if (!ctx.uploadedFiles().isEmpty()) {
+                    // Procesar archivo PDF subido
+                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    
+                    try {
+                        // Guardar el archivo PDF
+                        nuevaRutaArchivo = guardarArchivoPDF(uploadedFile);
+                        comprobanteActualizado.setRuta_archivo(nuevaRutaArchivo);
+                    } catch (Exception e) {
+                        ctx.status(500).json(Map.of(
+                            "success", false,
+                            "message", "Error al guardar el archivo PDF: " + e.getMessage()
+                        ));
+                        return;
+                    }
+                } else {
+                    // Procesar form-data con ruta de texto
+                    String rutaArchivo = ctx.formParam("ruta_archivo");
+                    String tipo = ctx.formParam("tipo");
+                    
+                    if (rutaArchivo != null && !rutaArchivo.trim().isEmpty()) {
+                        comprobanteActualizado.setRuta_archivo(rutaArchivo);
+                    }
+                    if (tipo != null && !tipo.trim().isEmpty()) {
+                        comprobanteActualizado.setTipo(tipo);
+                    }
+                }
+            } else {
+                // Procesar JSON
+                comprobanteActualizado = ctx.bodyAsClass(Comprobante.class);
+            }
+            
+            boolean actualizado = comprobanteService.actualizarComprobanteSimplificado(idComprobante, comprobanteActualizado);
+            
+            if (actualizado) {
+                ctx.json(Map.of(
+                    "success", true,
+                    "message", "Comprobante actualizado correctamente",
+                    "nueva_ruta", nuevaRutaArchivo != null ? nuevaRutaArchivo : "Comprobante actualizado"
+                ));
+            } else {
+                ctx.status(404).json(Map.of(
+                    "success", false,
+                    "message", "No se pudo actualizar el comprobante. Verifica que el comprobante exista"
+                ));
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of(
+                "success", false,
+                "message", "ID de comprobante inválido"
+            ));
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).json(Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of(
+                "success", false,
+                "message", "Error al actualizar el comprobante: " + e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Guarda un archivo PDF subido y retorna la URL completa
+     */
+    private String guardarArchivoPDF(UploadedFile uploadedFile) throws Exception {
+        // Validar que sea un PDF
+        String fileName = uploadedFile.filename();
+        if (fileName == null || !fileName.toLowerCase().endsWith(".pdf")) {
+            throw new IllegalArgumentException("Solo se permiten archivos PDF");
+        }
+
+        // Verificar tipo MIME
+        String contentType = uploadedFile.contentType();
+        if (contentType != null && !contentType.equals("application/pdf")) {
+            throw new IllegalArgumentException("El archivo debe ser un PDF válido");
+        }
+
+        // Crear directorio si no existe
+        Path documentsDir = Paths.get("uploads/documents");
+        if (!Files.exists(documentsDir)) {
+            Files.createDirectories(documentsDir);
+        }
+
+        // Generar nombre único para el archivo
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String randomSuffix = String.valueOf((int)(Math.random() * 1000000000));
+        String newFileName = timestamp + "_" + randomSuffix + ".pdf";
+        
+        // Ruta donde se guardará el archivo
+        Path filePath = documentsDir.resolve(newFileName);
+        
+        // Guardar el archivo
+        try (InputStream inputStream = uploadedFile.content()) {
+            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+        
+        // Generar URL completa
+        return "http://localhost:7070/uploads/documents/" + newFileName;
     }
 }

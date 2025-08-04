@@ -50,6 +50,10 @@ public class ComprobanteRoutes {
         app.put("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}/{idZona}", 
                comprobanteController::actualizarComprobante);
         
+        // Actualizar comprobante de forma simplificada (solo requiere ID del comprobante)
+        app.put("/comprobantes/{idComprobante}", 
+               comprobanteController::actualizarComprobanteSimplificado);
+        
         // Eliminar comprobante
         app.delete("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}/{idZona}", 
                   comprobanteController::eliminarComprobante);
