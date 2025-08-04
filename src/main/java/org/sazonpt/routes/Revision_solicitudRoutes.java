@@ -19,7 +19,7 @@ public class Revision_solicitudRoutes {
         app.put("/revisiones/{id}", revisionController::actualizarRevision);
         
         // Rutas específicas por solicitud
-        app.get("/revisiones/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}", 
+        app.get("/revisiones/solicitud/{idSolicitud}", 
                revisionController::obtenerRevisionesPorSolicitud);
         
         // Rutas específicas por administrador
@@ -27,18 +27,18 @@ public class Revision_solicitudRoutes {
                revisionController::obtenerRevisionesPorAdministrador);
         
         // Ruta para crear revisión rápida
-        app.post("/revisiones/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}/administrador/{idAdministrador}", 
+        app.post("/revisiones/solicitud/{idSolicitud}/administrador/{idAdministrador}", 
                 revisionController::crearRevisionRapida);
         
         // Ruta para aprobar solicitud (con parámetros en URL)
-        app.post("/revisiones/aprobar/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}/administrador/{idAdministrador}", 
+        app.post("/revisiones/aprobar/solicitud/{idSolicitud}/administrador/{idAdministrador}", 
                 revisionController::aprobarSolicitud);
         
         // Ruta para aprobar solicitud (con JSON en body)
         app.post("/revisiones-solicitud/aprobar", revisionController::aprobarSolicitudJSON);
         
         // Ruta para eliminar revisión con todos los IDs
-        app.delete("/revisiones/{id}/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}/administrador/{idAdministrador}", 
+        app.delete("/revisiones/{id}/solicitud/{idSolicitud}/administrador/{idAdministrador}", 
                   revisionController::eliminarRevision);
     }
 }

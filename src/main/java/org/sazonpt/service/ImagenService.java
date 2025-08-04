@@ -151,4 +151,92 @@ public class ImagenService {
         
         return crearImagen(nuevaImagen);
     }
+
+    // Métodos simplificados usando solo id_restaurantero
+    
+    public Optional<Imagen> obtenerImagenPorRestaurantero(int idImagen, int idRestaurantero) {
+        try {
+            // Buscar entre todas las imágenes del restaurantero
+            List<Imagen> imagenes = imagenRepository.findByRestaurantero(idRestaurantero);
+            return imagenes.stream()
+                    .filter(imagen -> imagen.getId_imagen() == idImagen)
+                    .findFirst();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener la imagen: " + e.getMessage(), e);
+        }
+    }
+
+    public Imagen crearImagenParaRestaurantero(int idRestaurantero) {
+        // Validar ID de restaurantero
+        if (idRestaurantero <= 0) {
+            throw new IllegalArgumentException("ID de restaurantero inválido");
+        }
+
+        Imagen nuevaImagen = new Imagen();
+        nuevaImagen.setId_restaurantero(idRestaurantero);
+        nuevaImagen.setFecha_subida(LocalDateTime.now());
+        
+        // Establecer valores por defecto para los campos requeridos
+        nuevaImagen.setId_restaurante(1); // Valor por defecto
+        nuevaImagen.setId_solicitud(1);   // Valor por defecto
+        nuevaImagen.setRuta_imagen(""); // Ruta vacía inicial
+        
+        try {
+            return imagenRepository.save(nuevaImagen);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al crear la imagen: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean actualizarImagenPorRestaurantero(int idImagen, int idRestaurantero, Imagen imagenActualizada) {
+        try {
+            // Buscar la imagen entre las del restaurantero
+            List<Imagen> imagenes = imagenRepository.findByRestaurantero(idRestaurantero);
+            Optional<Imagen> imagenExistenteOpt = imagenes.stream()
+                    .filter(imagen -> imagen.getId_imagen() == idImagen)
+                    .findFirst();
+            
+            if (imagenExistenteOpt.isEmpty()) {
+                return false; // Imagen no encontrada para este restaurantero
+            }
+            
+            Imagen imagenExistente = imagenExistenteOpt.get();
+            
+            // Actualizar solo los campos proporcionados, manteniendo la estructura de clave primaria
+            if (imagenActualizada.getRuta_imagen() != null && !imagenActualizada.getRuta_imagen().trim().isEmpty()) {
+                imagenExistente.setRuta_imagen(imagenActualizada.getRuta_imagen());
+            }
+            
+            // Mantener la fecha de subida original o actualizar si se proporciona
+            if (imagenActualizada.getFecha_subida() != null) {
+                imagenExistente.setFecha_subida(imagenActualizada.getFecha_subida());
+            }
+
+            return imagenRepository.update(imagenExistente);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar la imagen: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean eliminarImagenPorRestaurantero(int idImagen, int idRestaurantero) {
+        try {
+            // Buscar la imagen entre las del restaurantero
+            List<Imagen> imagenes = imagenRepository.findByRestaurantero(idRestaurantero);
+            Optional<Imagen> imagenOpt = imagenes.stream()
+                    .filter(imagen -> imagen.getId_imagen() == idImagen)
+                    .findFirst();
+            
+            if (imagenOpt.isEmpty()) {
+                return false; // Imagen no encontrada para este restaurantero
+            }
+            
+            Imagen imagen = imagenOpt.get();
+            
+            // Eliminar usando la clave primaria completa
+            return imagenRepository.delete(imagen.getId_imagen(), imagen.getId_restaurante(), 
+                                         imagen.getId_solicitud(), imagen.getId_restaurantero());
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al eliminar la imagen: " + e.getMessage(), e);
+        }
+    }
 }

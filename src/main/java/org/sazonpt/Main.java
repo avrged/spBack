@@ -83,6 +83,9 @@ public class Main {
         
         // Registrar rutas de file upload
         AppModule.initFileUpload().register(app);
+        
+        // Registrar rutas de descargas
+        AppModule.initDescarga().register(app);
 
         // Manejo de archivos estáticos mejorado
         app.get("/uploads/*", ImprovedStaticFileHandler::handleStaticFile);

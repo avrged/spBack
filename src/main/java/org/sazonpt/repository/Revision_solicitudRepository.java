@@ -14,15 +14,12 @@ public class Revision_solicitudRepository {
         List<Revision_solicitud> revisiones = new ArrayList<>();
         String sql = """
             SELECT rs.id_revision, rs.fecha, 
-                   rs.id_solicitud, rs.id_restaurantero, rs.id_administrador,
-                   sr.nombre_propuesto_restaurante, u1.nombre as admin_nombre, u2.nombre as restaurantero_nombre
+                   rs.id_solicitud, rs.id_administrador,
+                   sr.nombre_propuesto_restaurante, u1.nombre as admin_nombre
             FROM revision_solicitud rs
             INNER JOIN solicitud_registro sr ON rs.id_solicitud = sr.id_solicitud 
-                AND rs.id_restaurantero = sr.id_restaurantero
             INNER JOIN administrador a ON rs.id_administrador = a.id_usuario
             INNER JOIN usuario u1 ON a.id_usuario = u1.id_usuario
-            INNER JOIN restaurantero r ON rs.id_restaurantero = r.id_usuario
-            INNER JOIN usuario u2 ON r.id_usuario = u2.id_usuario
             ORDER BY rs.fecha DESC
             """;
 
@@ -35,7 +32,6 @@ public class Revision_solicitudRepository {
                 revision.setId_revision(rs.getInt("id_revision"));
                 revision.setFecha(rs.getString("fecha"));
                 revision.setId_solicitud(rs.getInt("id_solicitud"));
-                revision.setId_restaurantero(rs.getInt("id_restaurantero"));
                 revision.setId_administrador(rs.getInt("id_administrador"));
                 
                 revisiones.add(revision);
@@ -47,15 +43,12 @@ public class Revision_solicitudRepository {
     public Optional<Revision_solicitud> findById(int id) throws SQLException {
         String sql = """
             SELECT rs.id_revision, rs.fecha, 
-                   rs.id_solicitud, rs.id_restaurantero, rs.id_administrador,
-                   sr.nombre_propuesto_restaurante, u1.nombre as admin_nombre, u2.nombre as restaurantero_nombre
+                   rs.id_solicitud, rs.id_administrador,
+                   sr.nombre_propuesto_restaurante, u1.nombre as admin_nombre
             FROM revision_solicitud rs
             INNER JOIN solicitud_registro sr ON rs.id_solicitud = sr.id_solicitud 
-                AND rs.id_restaurantero = sr.id_restaurantero
             INNER JOIN administrador a ON rs.id_administrador = a.id_usuario
             INNER JOIN usuario u1 ON a.id_usuario = u1.id_usuario
-            INNER JOIN restaurantero r ON rs.id_restaurantero = r.id_usuario
-            INNER JOIN usuario u2 ON r.id_usuario = u2.id_usuario
             WHERE rs.id_revision = ?
             """;
 
@@ -70,7 +63,6 @@ public class Revision_solicitudRepository {
                 revision.setId_revision(rs.getInt("id_revision"));
                 revision.setFecha(rs.getString("fecha"));
                 revision.setId_solicitud(rs.getInt("id_solicitud"));
-                revision.setId_restaurantero(rs.getInt("id_restaurantero"));
                 revision.setId_administrador(rs.getInt("id_administrador"));
                 
                 return Optional.of(revision);
@@ -79,13 +71,13 @@ public class Revision_solicitudRepository {
         return Optional.empty();
     }
 
-    public List<Revision_solicitud> findBySolicitud(int idSolicitud, int idRestaurantero) throws SQLException {
+    public List<Revision_solicitud> findBySolicitud(int idSolicitud) throws SQLException {
         List<Revision_solicitud> revisiones = new ArrayList<>();
         String sql = """
             SELECT rs.id_revision, rs.fecha, 
-                   rs.id_solicitud, rs.id_restaurantero, rs.id_administrador
+                   rs.id_solicitud, rs.id_administrador
             FROM revision_solicitud rs
-            WHERE rs.id_solicitud = ? AND rs.id_restaurantero = ?
+            WHERE rs.id_solicitud = ?
             ORDER BY rs.fecha DESC
             """;
 
@@ -93,7 +85,6 @@ public class Revision_solicitudRepository {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, idSolicitud);
-            stmt.setInt(2, idRestaurantero);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -101,7 +92,6 @@ public class Revision_solicitudRepository {
                 revision.setId_revision(rs.getInt("id_revision"));
                 revision.setFecha(rs.getString("fecha"));
                 revision.setId_solicitud(rs.getInt("id_solicitud"));
-                revision.setId_restaurantero(rs.getInt("id_restaurantero"));
                 revision.setId_administrador(rs.getInt("id_administrador"));
                 
                 revisiones.add(revision);
@@ -114,11 +104,10 @@ public class Revision_solicitudRepository {
         List<Revision_solicitud> revisiones = new ArrayList<>();
         String sql = """
             SELECT rs.id_revision, rs.fecha, 
-                   rs.id_solicitud, rs.id_restaurantero, rs.id_administrador,
+                   rs.id_solicitud, rs.id_administrador,
                    sr.nombre_propuesto_restaurante
             FROM revision_solicitud rs
             INNER JOIN solicitud_registro sr ON rs.id_solicitud = sr.id_solicitud 
-                AND rs.id_restaurantero = sr.id_restaurantero
             WHERE rs.id_administrador = ?
             ORDER BY rs.fecha DESC
             """;
@@ -134,7 +123,6 @@ public class Revision_solicitudRepository {
                 revision.setId_revision(rs.getInt("id_revision"));
                 revision.setFecha(rs.getString("fecha"));
                 revision.setId_solicitud(rs.getInt("id_solicitud"));
-                revision.setId_restaurantero(rs.getInt("id_restaurantero"));
                 revision.setId_administrador(rs.getInt("id_administrador"));
                 
                 revisiones.add(revision);
@@ -145,9 +133,8 @@ public class Revision_solicitudRepository {
 
     public Revision_solicitud save(Revision_solicitud revision) throws SQLException {
         String sql = """
-            INSERT INTO revision_solicitud (fecha, id_solicitud, 
-                                          id_restaurantero, id_administrador)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO revision_solicitud (fecha, id_solicitud, id_administrador)
+            VALUES (?, ?, ?)
             """;
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -155,8 +142,7 @@ public class Revision_solicitudRepository {
 
             stmt.setString(1, revision.getFecha());
             stmt.setInt(2, revision.getId_solicitud());
-            stmt.setInt(3, revision.getId_restaurantero());
-            stmt.setInt(4, revision.getId_administrador());
+            stmt.setInt(3, revision.getId_administrador());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -175,7 +161,7 @@ public class Revision_solicitudRepository {
         String sql = """
             UPDATE revision_solicitud 
             SET fecha = ?
-            WHERE id_revision = ? AND id_solicitud = ? AND id_restaurantero = ? AND id_administrador = ?
+            WHERE id_revision = ? AND id_solicitud = ? AND id_administrador = ?
             """;
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -184,17 +170,16 @@ public class Revision_solicitudRepository {
             stmt.setString(1, revision.getFecha());
             stmt.setInt(2, revision.getId_revision());
             stmt.setInt(3, revision.getId_solicitud());
-            stmt.setInt(4, revision.getId_restaurantero());
-            stmt.setInt(5, revision.getId_administrador());
+            stmt.setInt(4, revision.getId_administrador());
 
             return stmt.executeUpdate() > 0;
         }
     }
 
-    public boolean delete(int idRevision, int idSolicitud, int idRestaurantero, int idAdministrador) throws SQLException {
+    public boolean delete(int idRevision, int idSolicitud, int idAdministrador) throws SQLException {
         String sql = """
             DELETE FROM revision_solicitud 
-            WHERE id_revision = ? AND id_solicitud = ? AND id_restaurantero = ? AND id_administrador = ?
+            WHERE id_revision = ? AND id_solicitud = ? AND id_administrador = ?
             """;
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -202,8 +187,7 @@ public class Revision_solicitudRepository {
 
             stmt.setInt(1, idRevision);
             stmt.setInt(2, idSolicitud);
-            stmt.setInt(3, idRestaurantero);
-            stmt.setInt(4, idAdministrador);
+            stmt.setInt(3, idAdministrador);
 
             return stmt.executeUpdate() > 0;
         }
@@ -221,14 +205,13 @@ public class Revision_solicitudRepository {
         }
     }
 
-    public boolean solicitudExists(int idSolicitud, int idRestaurantero) throws SQLException {
-        String sql = "SELECT 1 FROM solicitud_registro WHERE id_solicitud = ? AND id_restaurantero = ?";
+    public boolean solicitudExists(int idSolicitud) throws SQLException {
+        String sql = "SELECT 1 FROM solicitud_registro WHERE id_solicitud = ?";
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, idSolicitud);
-            stmt.setInt(2, idRestaurantero);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
         }

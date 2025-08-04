@@ -33,9 +33,9 @@ public class Revision_solicitudService {
         }
     }
 
-    public List<Revision_solicitud> obtenerRevisionesPorSolicitud(int idSolicitud, int idRestaurantero) {
+    public List<Revision_solicitud> obtenerRevisionesPorSolicitud(int idSolicitud) {
         try {
-            return revisionRepository.findBySolicitud(idSolicitud, idRestaurantero);
+            return revisionRepository.findBySolicitud(idSolicitud);
         } catch (SQLException e) {
             throw new RuntimeException("Error al obtener las revisiones de la solicitud: " + e.getMessage(), e);
         }
@@ -54,16 +54,13 @@ public class Revision_solicitudService {
         if (revision.getId_solicitud() <= 0) {
             throw new IllegalArgumentException("ID de solicitud inválido");
         }
-        if (revision.getId_restaurantero() <= 0) {
-            throw new IllegalArgumentException("ID de restaurantero inválido");
-        }
         if (revision.getId_administrador() <= 0) {
             throw new IllegalArgumentException("ID de administrador inválido");
         }
 
         // Verificar que la solicitud existe
         try {
-            if (!revisionRepository.solicitudExists(revision.getId_solicitud(), revision.getId_restaurantero())) {
+            if (!revisionRepository.solicitudExists(revision.getId_solicitud())) {
                 throw new IllegalArgumentException("La solicitud especificada no existe");
             }
         } catch (SQLException e) {
@@ -112,13 +109,13 @@ public class Revision_solicitudService {
         }
     }
 
-    public boolean eliminarRevision(int idRevision, int idSolicitud, int idRestaurantero, int idAdministrador) {
+    public boolean eliminarRevision(int idRevision, int idSolicitud, int idAdministrador) {
         try {
             if (!revisionRepository.existsById(idRevision)) {
                 throw new IllegalArgumentException("La revisión de solicitud no existe");
             }
 
-            return revisionRepository.delete(idRevision, idSolicitud, idRestaurantero, idAdministrador);
+            return revisionRepository.delete(idRevision, idSolicitud, idAdministrador);
         } catch (SQLException e) {
             throw new RuntimeException("Error al eliminar la revisión de solicitud: " + e.getMessage(), e);
         }
@@ -132,20 +129,18 @@ public class Revision_solicitudService {
         }
     }
 
-    public Revision_solicitud crearRevisionPorAdministrador(int idSolicitud, int idRestaurantero, 
-                                                           int idAdministrador) {
+    public Revision_solicitud crearRevisionPorAdministrador(int idSolicitud, int idAdministrador) {
         Revision_solicitud revision = new Revision_solicitud();
         revision.setId_solicitud(idSolicitud);
-        revision.setId_restaurantero(idRestaurantero);
         revision.setId_administrador(idAdministrador);
         
         return crearRevision(revision);
     }
 
-    public Revision_solicitud aprobarSolicitud(int idSolicitud, int idRestaurantero, int idAdministrador) {
+    public Revision_solicitud aprobarSolicitud(int idSolicitud, int idAdministrador) {
         try {
             // Crear la revisión que registra la aprobación
-            Revision_solicitud revision = crearRevisionPorAdministrador(idSolicitud, idRestaurantero, idAdministrador);
+            Revision_solicitud revision = crearRevisionPorAdministrador(idSolicitud, idAdministrador);
             
             // Actualizar el estado de la solicitud a "aprobado"
             boolean estadoActualizado = revisionRepository.actualizarEstadoSolicitud(idSolicitud, "aprobado");

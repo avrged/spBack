@@ -76,8 +76,7 @@ public class Revision_solicitudController {
     public void obtenerRevisionesPorSolicitud(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
-            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            List<Revision_solicitud> revisiones = revisionService.obtenerRevisionesPorSolicitud(idSolicitud, idRestaurantero);
+            List<Revision_solicitud> revisiones = revisionService.obtenerRevisionesPorSolicitud(idSolicitud);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -155,11 +154,10 @@ public class Revision_solicitudController {
     public void crearRevisionRapida(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
-            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             int idAdministrador = Integer.parseInt(ctx.pathParam("idAdministrador"));
             
             Revision_solicitud revisionCreada = revisionService.crearRevisionPorAdministrador(
-                idSolicitud, idRestaurantero, idAdministrador);
+                idSolicitud, idAdministrador);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -233,12 +231,9 @@ public class Revision_solicitudController {
         try {
             int idRevision = Integer.parseInt(ctx.pathParam("id"));
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
-            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             int idAdministrador = Integer.parseInt(ctx.pathParam("idAdministrador"));
-            
-            boolean eliminada = revisionService.eliminarRevision(idRevision, idSolicitud, idRestaurantero, idAdministrador);
-            
-            if (eliminada) {
+
+            boolean eliminada = revisionService.eliminarRevision(idRevision, idSolicitud, idAdministrador);            if (eliminada) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("message", "Revisión eliminada correctamente");
@@ -269,10 +264,9 @@ public class Revision_solicitudController {
     public void aprobarSolicitud(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
-            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             int idAdministrador = Integer.parseInt(ctx.pathParam("idAdministrador"));
 
-            Revision_solicitud revision = revisionService.aprobarSolicitud(idSolicitud, idRestaurantero, idAdministrador);
+            Revision_solicitud revision = revisionService.aprobarSolicitud(idSolicitud, idAdministrador);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -307,10 +301,9 @@ public class Revision_solicitudController {
             Map<String, Object> requestBody = objectMapper.readValue(ctx.body(), Map.class);
             
             int idSolicitud = (Integer) requestBody.get("idSolicitud");
-            int idRestaurantero = (Integer) requestBody.get("idRestaurantero");
             int idAdministrador = (Integer) requestBody.get("idAdministrador");
 
-            Revision_solicitud revision = revisionService.aprobarSolicitud(idSolicitud, idRestaurantero, idAdministrador);
+            Revision_solicitud revision = revisionService.aprobarSolicitud(idSolicitud, idAdministrador);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -321,7 +314,7 @@ public class Revision_solicitudController {
         } catch (ClassCastException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", "Formato de datos inválido. Esperados: idSolicitud, idRestaurantero, idAdministrador");
+            response.put("message", "Formato de datos inválido. Esperados: idSolicitud, idAdministrador");
 
             ctx.status(400).json(response);
         } catch (IllegalArgumentException e) {

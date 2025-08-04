@@ -2,6 +2,7 @@ package org.sazonpt.di;
 
 import org.sazonpt.controller.AdministradorController;
 import org.sazonpt.controller.ComprobanteController;
+import org.sazonpt.controller.DescargaController;
 import org.sazonpt.controller.FileUploadController;
 import org.sazonpt.controller.ImagenController;
 import org.sazonpt.controller.MenuController;
@@ -14,6 +15,7 @@ import org.sazonpt.controller.UsuarioController;
 import org.sazonpt.controller.Solicitud_registroEstadoController;
 import org.sazonpt.repository.AdministradorRepository;
 import org.sazonpt.repository.ComprobanteRepository;
+import org.sazonpt.repository.DescargaRepository;
 import org.sazonpt.repository.ImagenRepository;
 import org.sazonpt.repository.MenuRepository;
 import org.sazonpt.repository.RestauranteRepository;
@@ -23,6 +25,7 @@ import org.sazonpt.repository.Solicitud_registroRepository;
 import org.sazonpt.repository.UsuarioRepository;
 import org.sazonpt.routes.AdministradorRoutes;
 import org.sazonpt.routes.ComprobanteRoutes;
+import org.sazonpt.routes.DescargaRoutes;
 import org.sazonpt.routes.FileUploadRoutes;
 import org.sazonpt.routes.ImagenRoutes;
 import org.sazonpt.routes.MenuRoutes;
@@ -34,6 +37,7 @@ import org.sazonpt.routes.Solicitud_registroRoutes;
 import org.sazonpt.routes.UsuarioRoutes;
 import org.sazonpt.service.AdministradorService;
 import org.sazonpt.service.ComprobanteService;
+import org.sazonpt.service.DescargaService;
 import org.sazonpt.service.ImagenService;
 import org.sazonpt.service.MenuService;
 import org.sazonpt.service.RegistroRestauranteService;
@@ -182,5 +186,25 @@ public class AppModule {
     public static FileUploadRoutes initFileUpload() {
         FileUploadController fileUploadController = new FileUploadController();
         return new FileUploadRoutes(fileUploadController);
-    } 
+    }
+    
+    public static DescargaRoutes initDescarga() {
+        DescargaRepository descargaRepository = new DescargaRepository();
+        DescargaService descargaService = new DescargaService(descargaRepository);
+        DescargaController descargaController = new DescargaController(descargaService);
+        return new DescargaRoutes(descargaController);
+    }
+    
+    // Método para obtener solo el controller de descarga si se necesita
+    public static DescargaController getDescargaController() {
+        DescargaRepository descargaRepository = new DescargaRepository();
+        DescargaService descargaService = new DescargaService(descargaRepository);
+        return new DescargaController(descargaService);
+    }
+    
+    // Método para obtener solo el service de descarga si se necesita
+    public static DescargaService getDescargaService() {
+        DescargaRepository descargaRepository = new DescargaRepository();
+        return new DescargaService(descargaRepository);
+    }
 }
