@@ -10,6 +10,7 @@ public class Solicitud_registro {
     private String correo;
     private String nombre_propietario;
     private String horario_atencion;
+    private String direccion;
     private int id_restaurantero;
 
     public enum EstadoSolicitud {
@@ -44,7 +45,7 @@ public class Solicitud_registro {
     public Solicitud_registro(int id_solicitud, LocalDateTime fecha, String estado, 
                              String nombre_propuesto_restaurante, String correo, 
                              String nombre_propietario, String horario_atencion, 
-                             int id_restaurantero) {
+                             String direccion, int id_restaurantero) {
         this.id_solicitud = id_solicitud;
         this.fecha = fecha;
         this.estado = estado;
@@ -52,6 +53,7 @@ public class Solicitud_registro {
         this.correo = correo;
         this.nombre_propietario = nombre_propietario;
         this.horario_atencion = horario_atencion;
+        this.direccion = direccion;
         this.id_restaurantero = id_restaurantero;
     }
 
@@ -63,6 +65,7 @@ public class Solicitud_registro {
     public String getCorreo() { return correo; }
     public String getNombre_propietario() { return nombre_propietario; }
     public String getHorario_atencion() { return horario_atencion; }
+    public String getDireccion() { return direccion; }
     public int getId_restaurantero() { return id_restaurantero; }
 
     // Setters
@@ -78,6 +81,9 @@ public class Solicitud_registro {
     }
     public void setHorario_atencion(String horario_atencion) { 
         this.horario_atencion = horario_atencion; 
+    }
+    public void setDireccion(String direccion) { 
+        this.direccion = direccion; 
     }
     public void setId_restaurantero(int id_restaurantero) { 
         this.id_restaurantero = id_restaurantero; 

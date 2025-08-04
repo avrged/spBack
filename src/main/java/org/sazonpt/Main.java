@@ -86,6 +86,9 @@ public class Main {
         
         // Registrar rutas de descargas
         AppModule.initDescarga().register(app);
+        
+        // Registrar rutas de zonas
+        AppModule.initZona().register(app);
 
         // Manejo de archivos estáticos mejorado
         app.get("/uploads/*", ImprovedStaticFileHandler::handleStaticFile);

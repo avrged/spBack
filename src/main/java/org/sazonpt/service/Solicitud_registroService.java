@@ -4,6 +4,7 @@ import org.sazonpt.model.Solicitud_registro;
 import org.sazonpt.repository.Solicitud_registroRepository;
 import org.sazonpt.repository.RestauranteRepository;
 import org.sazonpt.repository.Revision_solicitudRepository;
+import org.sazonpt.repository.ZonaRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -18,10 +19,13 @@ public class Solicitud_registroService {
 
     public Solicitud_registroService(Solicitud_registroRepository solicitudRepository) {
         this.solicitudRepository = solicitudRepository;
-        // Inicializar RestauranteService para la creación automática
+        // Inicializar RestauranteService con ZonaService incluido
+        ZonaRepository zonaRepository = new ZonaRepository();
+        ZonaService zonaService = new ZonaService(zonaRepository);
         this.restauranteService = new RestauranteService(
             new RestauranteRepository(), 
-            solicitudRepository
+            solicitudRepository,
+            zonaService
         );
         // Inicializar repositorio de revisiones
         this.revisionRepository = new Revision_solicitudRepository();

@@ -357,22 +357,21 @@ public class Solicitud_registroController {
                 return;
             }
             
-            // Aprobar con revisión - usando administrador por defecto (ID 1)
-            int idAdministradorDefecto = 1; // Puedes cambiar este valor según tu lógica de negocio
-            boolean ok = solicitudService.aprobarSolicitudConRevision(
+            // Aprobar con creación automática de restaurante y zona
+            int idZonaDefecto = 1; // Se ignorará porque se creará automáticamente
+            
+            boolean ok = solicitudService.aprobarSolicitudConRestaurante(
                 solicitudPendiente.get().getId_solicitud(), 
-                idRestaurantero, 
-                idAdministradorDefecto
+                idZonaDefecto
             );
             
             if (ok) {
                 ctx.json(Map.of(
                     "success", true, 
-                    "message", "Solicitud aprobada correctamente",
+                    "message", "Solicitud aprobada correctamente con restaurante y zona creados automáticamente",
                     "data", Map.of(
                         "id_solicitud", solicitudPendiente.get().getId_solicitud(),
                         "id_restaurantero", idRestaurantero,
-                        "id_administrador", idAdministradorDefecto,
                         "estado", "aprobada"
                     )
                 ));

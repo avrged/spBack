@@ -2,6 +2,7 @@ package org.sazonpt.service;
 
 import org.sazonpt.model.Restaurante;
 import org.sazonpt.model.Solicitud_registro;
+import org.sazonpt.model.Zona;
 import org.sazonpt.repository.RestauranteRepository;
 import org.sazonpt.repository.Solicitud_registroRepository;
 
@@ -15,11 +16,14 @@ public class RestauranteService {
     
     private final RestauranteRepository restauranteRepository;
     private final Solicitud_registroRepository solicitudRepository;
+    private final ZonaService zonaService;
 
     public RestauranteService(RestauranteRepository restauranteRepository, 
-                             Solicitud_registroRepository solicitudRepository) {
+                             Solicitud_registroRepository solicitudRepository,
+                             ZonaService zonaService) {
         this.restauranteRepository = restauranteRepository;
         this.solicitudRepository = solicitudRepository;
+        this.zonaService = zonaService;
     }
 
     public List<Restaurante> obtenerTodosLosRestaurantes() {
@@ -108,8 +112,9 @@ public class RestauranteService {
 
     /**
      * Método especial para crear un restaurante automáticamente cuando se aprueba una solicitud
+     * Crea automáticamente una zona con la dirección del restaurante
      */
-    public Restaurante crearRestauranteDesdeAprobacion(int idSolicitud, int idRestaurantero, int idZona) {
+    public Restaurante crearRestauranteDesdeAprobacion(int idSolicitud, int idRestaurantero, int idZonaIgnorada) {
         try {
             // Obtener los datos de la solicitud aprobada
             Optional<Solicitud_registro> solicitudOpt = solicitudRepository.findById(idSolicitud);
@@ -129,17 +134,31 @@ public class RestauranteService {
                 throw new IllegalArgumentException("Ya existe un restaurante para esta solicitud");
             }
 
-            // Crear el restaurante con los datos de la solicitud
+            // Crear automáticamente la zona con el nombre del restaurante como ubicación
+            String nombreZona = solicitud.getNombre_propuesto_restaurante();
+            Zona nuevaZona = new Zona(nombreZona, idRestaurantero);
+            Zona zonaCreada = zonaService.crearZona(nuevaZona);
+            
+            System.out.println("✅ Zona creada automáticamente: " + zonaCreada.getNombre() + " (ID: " + zonaCreada.getId_zona() + ")");
+
+            // Crear el restaurante con los datos de la solicitud y la zona recién creada
             Restaurante restaurante = new Restaurante();
             restaurante.setNombre(solicitud.getNombre_propuesto_restaurante());
             restaurante.setHorario(solicitud.getHorario_atencion());
             restaurante.setTelefono(""); // Se puede completar después
-            restaurante.setEtiquetas(""); // Se puede completar después
+            restaurante.setEtiquetas(""); // Se puede completar después  
             restaurante.setId_solicitud(idSolicitud);
             restaurante.setId_restaurantero(idRestaurantero);
-            restaurante.setId_zona(idZona);
+            restaurante.setId_zona(zonaCreada.getId_zona()); // Usar la zona recién creada
+            restaurante.setDireccion(nombreZona); // Usar el nombre como dirección por ahora
+            restaurante.setFacebook(""); // Se puede completar después
+            restaurante.setInstagram(""); // Se puede completar después
 
-            return restauranteRepository.save(restaurante);
+            Restaurante restauranteCreado = restauranteRepository.save(restaurante);
+            
+            System.out.println("✅ Restaurante creado automáticamente: " + restauranteCreado.getNombre() + " en zona ID: " + zonaCreada.getId_zona());
+            
+            return restauranteCreado;
 
         } catch (SQLException e) {
             throw new RuntimeException("Error al crear el restaurante desde la aprobación: " + e.getMessage(), e);

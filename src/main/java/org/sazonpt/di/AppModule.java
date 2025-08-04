@@ -13,6 +13,7 @@ import org.sazonpt.controller.Revision_solicitudController;
 import org.sazonpt.controller.Solicitud_registroController;
 import org.sazonpt.controller.UsuarioController;
 import org.sazonpt.controller.Solicitud_registroEstadoController;
+import org.sazonpt.controller.ZonaController;
 import org.sazonpt.repository.AdministradorRepository;
 import org.sazonpt.repository.ComprobanteRepository;
 import org.sazonpt.repository.DescargaRepository;
@@ -23,6 +24,7 @@ import org.sazonpt.repository.RestauranteroRepository;
 import org.sazonpt.repository.Revision_solicitudRepository;
 import org.sazonpt.repository.Solicitud_registroRepository;
 import org.sazonpt.repository.UsuarioRepository;
+import org.sazonpt.repository.ZonaRepository;
 import org.sazonpt.routes.AdministradorRoutes;
 import org.sazonpt.routes.ComprobanteRoutes;
 import org.sazonpt.routes.DescargaRoutes;
@@ -35,6 +37,7 @@ import org.sazonpt.routes.RestauranteroRoutes;
 import org.sazonpt.routes.Revision_solicitudRoutes;
 import org.sazonpt.routes.Solicitud_registroRoutes;
 import org.sazonpt.routes.UsuarioRoutes;
+import org.sazonpt.routes.ZonaRoutes;
 import org.sazonpt.service.AdministradorService;
 import org.sazonpt.service.ComprobanteService;
 import org.sazonpt.service.DescargaService;
@@ -46,6 +49,7 @@ import org.sazonpt.service.RestauranteroService;
 import org.sazonpt.service.Revision_solicitudService;
 import org.sazonpt.service.Solicitud_registroService;
 import org.sazonpt.service.UsuarioService;
+import org.sazonpt.service.ZonaService;
 
 public class AppModule {
     
@@ -89,7 +93,12 @@ public class AppModule {
     public static RestauranteRoutes initRestaurante() {
         Solicitud_registroRepository solicitudRepository = new Solicitud_registroRepository();
         RestauranteRepository restauranteRepository = new RestauranteRepository();
-        RestauranteService restauranteService = new RestauranteService(restauranteRepository, solicitudRepository);
+        
+        // Crear ZonaService para la dependencia
+        ZonaRepository zonaRepository = new ZonaRepository();
+        ZonaService zonaService = new ZonaService(zonaRepository);
+        
+        RestauranteService restauranteService = new RestauranteService(restauranteRepository, solicitudRepository, zonaService);
         RestauranteController restauranteController = new RestauranteController(restauranteService);
         return new RestauranteRoutes(restauranteController);
     }
@@ -206,5 +215,25 @@ public class AppModule {
     public static DescargaService getDescargaService() {
         DescargaRepository descargaRepository = new DescargaRepository();
         return new DescargaService(descargaRepository);
+    }
+    
+    public static ZonaRoutes initZona() {
+        ZonaRepository zonaRepository = new ZonaRepository();
+        ZonaService zonaService = new ZonaService(zonaRepository);
+        ZonaController zonaController = new ZonaController(zonaService);
+        return new ZonaRoutes(zonaController);
+    }
+    
+    // Método para obtener solo el controller de zona si se necesita
+    public static ZonaController getZonaController() {
+        ZonaRepository zonaRepository = new ZonaRepository();
+        ZonaService zonaService = new ZonaService(zonaRepository);
+        return new ZonaController(zonaService);
+    }
+    
+    // Método para obtener solo el service de zona si se necesita
+    public static ZonaService getZonaService() {
+        ZonaRepository zonaRepository = new ZonaRepository();
+        return new ZonaService(zonaRepository);
     }
 }
