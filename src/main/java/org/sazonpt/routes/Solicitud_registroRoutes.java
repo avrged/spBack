@@ -18,10 +18,6 @@ public class Solicitud_registroRoutes {
         app.get("/solicitudes/{id}", solicitudController::obtenerSolicitudPorId);
         app.put("/solicitudes/{id}", solicitudController::actualizarSolicitud);
         
-        // Rutas específicas para gestión de estado
-        app.post("/solicitudes/{id}/aprobar", solicitudController::aprobarSolicitud);
-        app.post("/solicitudes/{id}/rechazar", solicitudController::rechazarSolicitud);
-        
         // Rutas por restaurantero
         app.get("/solicitudes/restaurantero/{idRestaurantero}", solicitudController::obtenerSolicitudesPorRestaurantero);
         app.delete("/solicitudes/{id}/restaurantero/{idRestaurantero}", solicitudController::eliminarSolicitud);

@@ -159,60 +159,6 @@ public class Solicitud_registroService {
         }
     }
 
-    public boolean aprobarSolicitud(int idSolicitud) {
-        return aprobarSolicitudConRestaurante(idSolicitud, 1); // ID zona por defecto = 1
-    }
-
-    /**
-     * Aprueba una solicitud y crea automáticamente el restaurante
-     */
-    public boolean aprobarSolicitudConRestaurante(int idSolicitud, int idZona) {
-        try {
-            // Primero obtener los datos de la solicitud
-            Optional<Solicitud_registro> solicitudOpt = solicitudRepository.findById(idSolicitud);
-            if (solicitudOpt.isEmpty()) {
-                throw new IllegalArgumentException("No se encontró la solicitud");
-            }
-
-            Solicitud_registro solicitud = solicitudOpt.get();
-
-            // Verificar que no esté ya aprobada
-            if ("aprobada".equalsIgnoreCase(solicitud.getEstado())) {
-                throw new IllegalArgumentException("La solicitud ya está aprobada");
-            }
-
-            // Cambiar estado a aprobada
-            boolean estadoActualizado = cambiarEstadoSolicitud(idSolicitud, 
-                Solicitud_registro.EstadoSolicitud.APROBADA.getValor());
-
-            if (estadoActualizado) {
-                try {
-                    // Crear el restaurante automáticamente
-                    restauranteService.crearRestauranteDesdeAprobacion(
-                        idSolicitud, 
-                        solicitud.getId_restaurantero(), 
-                        idZona
-                    );
-                    System.out.println("✅ Restaurante creado automáticamente para solicitud ID: " + idSolicitud);
-                    return true;
-                } catch (Exception e) {
-                    // Si falla la creación del restaurante, revertir el estado de la solicitud
-                    System.err.println("❌ Error al crear restaurante, revirtiendo estado de solicitud: " + e.getMessage());
-                    cambiarEstadoSolicitud(idSolicitud, "pendiente");
-                    throw new RuntimeException("Error al crear el restaurante automáticamente: " + e.getMessage(), e);
-                }
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al aprobar la solicitud: " + e.getMessage(), e);
-        }
-    }
-
-    public boolean rechazarSolicitud(int idSolicitud) {
-        return cambiarEstadoSolicitud(idSolicitud, Solicitud_registro.EstadoSolicitud.RECHAZADA.getValor());
-    }
-
     public boolean eliminarSolicitud(int idSolicitud, int idRestaurantero) {
         try {
             if (!solicitudRepository.existsById(idSolicitud)) {
