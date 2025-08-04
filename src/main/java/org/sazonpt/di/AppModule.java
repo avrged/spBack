@@ -11,6 +11,7 @@ import org.sazonpt.controller.RestauranteroController;
 import org.sazonpt.controller.Revision_solicitudController;
 import org.sazonpt.controller.Solicitud_registroController;
 import org.sazonpt.controller.UsuarioController;
+import org.sazonpt.controller.Solicitud_registroEstadoController;
 import org.sazonpt.repository.AdministradorRepository;
 import org.sazonpt.repository.ComprobanteRepository;
 import org.sazonpt.repository.ImagenRepository;
@@ -181,5 +182,5 @@ public class AppModule {
     public static FileUploadRoutes initFileUpload() {
         FileUploadController fileUploadController = new FileUploadController();
         return new FileUploadRoutes(fileUploadController);
-    }
+    } 
 }

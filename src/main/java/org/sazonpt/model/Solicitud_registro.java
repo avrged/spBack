@@ -14,7 +14,7 @@ public class Solicitud_registro {
 
     public enum EstadoSolicitud {
         PENDIENTE("pendiente"),
-        APROBADA("aprobada"),
+        APROBADA("aprobado"),
         RECHAZADA("rechazada");
 
         private final String valor;

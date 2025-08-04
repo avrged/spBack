@@ -29,5 +29,8 @@ public class RestauranteRoutes {
         // Ruta para eliminar restaurante con todos los IDs
         app.delete("/restaurantes/{id}/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}", 
                   restauranteController::eliminarRestaurante);
+        
+        // Ruta para actualizar restaurante por idRestaurantero
+        app.put("/restaurantes/restaurantero/{idRestaurantero}", restauranteController::actualizarRestaurantePorRestaurantero);
     }
 }

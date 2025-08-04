@@ -14,7 +14,7 @@ public class RestauranteRepository {
         List<Restaurante> restaurantes = new ArrayList<>();
         String sql = """
             SELECT r.id_restaurante, r.nombre, r.horario, r.telefono, r.etiquetas,
-                   r.id_solicitud, r.id_restaurantero, r.id_zona,
+                   r.id_solicitud, r.id_restaurantero, r.id_zona, r.direccion, r.facebook, r.instagram,
                    sr.nombre_propuesto_restaurante, u.nombre as restaurantero_nombre
             FROM restaurante r
             INNER JOIN solicitud_registro sr ON r.id_solicitud = sr.id_solicitud 
@@ -38,7 +38,9 @@ public class RestauranteRepository {
                 restaurante.setId_solicitud(rs.getInt("id_solicitud"));
                 restaurante.setId_restaurantero(rs.getInt("id_restaurantero"));
                 restaurante.setId_zona(rs.getInt("id_zona"));
-                
+                restaurante.setDireccion(rs.getString("direccion"));
+                restaurante.setFacebook(rs.getString("facebook"));
+                restaurante.setInstagram(rs.getString("instagram"));
                 restaurantes.add(restaurante);
             }
         }
@@ -85,7 +87,7 @@ public class RestauranteRepository {
         List<Restaurante> restaurantes = new ArrayList<>();
         String sql = """
             SELECT r.id_restaurante, r.nombre, r.horario, r.telefono, r.etiquetas,
-                   r.id_solicitud, r.id_restaurantero, r.id_zona
+                   r.id_solicitud, r.id_restaurantero, r.id_zona, r.direccion, r.facebook, r.instagram
             FROM restaurante r
             WHERE r.id_restaurantero = ?
             ORDER BY r.nombre
@@ -107,7 +109,9 @@ public class RestauranteRepository {
                 restaurante.setId_solicitud(rs.getInt("id_solicitud"));
                 restaurante.setId_restaurantero(rs.getInt("id_restaurantero"));
                 restaurante.setId_zona(rs.getInt("id_zona"));
-                
+                restaurante.setDireccion(rs.getString("direccion"));
+                restaurante.setFacebook(rs.getString("facebook"));
+                restaurante.setInstagram(rs.getString("instagram"));
                 restaurantes.add(restaurante);
             }
         }
@@ -150,8 +154,8 @@ public class RestauranteRepository {
     public Restaurante save(Restaurante restaurante) throws SQLException {
         String sql = """
             INSERT INTO restaurante (nombre, horario, telefono, etiquetas, 
-                                   id_solicitud, id_restaurantero, id_zona)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                                   id_solicitud, id_restaurantero, id_zona, direccion, facebook, instagram)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (Connection conn = DBConfig.getDataSource().getConnection();
@@ -164,6 +168,9 @@ public class RestauranteRepository {
             stmt.setInt(5, restaurante.getId_solicitud());
             stmt.setInt(6, restaurante.getId_restaurantero());
             stmt.setInt(7, restaurante.getId_zona());
+            stmt.setString(8, restaurante.getDireccion());
+            stmt.setString(9, restaurante.getFacebook());
+            stmt.setString(10, restaurante.getInstagram());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -181,7 +188,7 @@ public class RestauranteRepository {
     public boolean update(Restaurante restaurante) throws SQLException {
         String sql = """
             UPDATE restaurante 
-            SET nombre = ?, horario = ?, telefono = ?, etiquetas = ?, id_zona = ?
+            SET nombre = ?, horario = ?, telefono = ?, etiquetas = ?, id_zona = ?, direccion = ?, facebook = ?, instagram = ?
             WHERE id_restaurante = ? AND id_solicitud = ? AND id_restaurantero = ?
             """;
 
@@ -193,10 +200,29 @@ public class RestauranteRepository {
             stmt.setString(3, restaurante.getTelefono());
             stmt.setString(4, restaurante.getEtiquetas());
             stmt.setInt(5, restaurante.getId_zona());
-            stmt.setInt(6, restaurante.getId_restaurante());
-            stmt.setInt(7, restaurante.getId_solicitud());
-            stmt.setInt(8, restaurante.getId_restaurantero());
+            stmt.setString(6, restaurante.getDireccion());
+            stmt.setString(7, restaurante.getFacebook());
+            stmt.setString(8, restaurante.getInstagram());
+            stmt.setInt(9, restaurante.getId_restaurante());
+            stmt.setInt(10, restaurante.getId_solicitud());
+            stmt.setInt(11, restaurante.getId_restaurantero());
 
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean updateByRestaurantero(int idRestaurantero, Restaurante restaurante) throws SQLException {
+        String sql = "UPDATE restaurante SET nombre=?, horario=?, telefono=?, etiquetas=?, direccion=?, facebook=?, instagram=? WHERE id_restaurantero=?";
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, restaurante.getNombre());
+            stmt.setString(2, restaurante.getHorario());
+            stmt.setString(3, restaurante.getTelefono());
+            stmt.setString(4, restaurante.getEtiquetas());
+            stmt.setString(5, restaurante.getDireccion());
+            stmt.setString(6, restaurante.getFacebook());
+            stmt.setString(7, restaurante.getInstagram());
+            stmt.setInt(8, idRestaurantero);
             return stmt.executeUpdate() > 0;
         }
     }

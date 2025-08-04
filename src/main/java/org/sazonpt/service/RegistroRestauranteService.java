@@ -65,7 +65,10 @@ public class RegistroRestauranteService {
                 buildEtiquetas(datos), // Construir etiquetas basadas en datos del form
                 idSolicitud,
                 datos.getIdRestaurantero(),
-                datos.getIdZona()
+                datos.getIdZona(),
+                datos.getDireccion(),
+                datos.getFacebook(),
+                datos.getInstagram()              
             );
             
             restaurante = restauranteRepository.save(restaurante);

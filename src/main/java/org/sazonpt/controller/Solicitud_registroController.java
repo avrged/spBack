@@ -1,14 +1,16 @@
 package org.sazonpt.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.javalin.http.Context;
-import org.sazonpt.model.Solicitud_registro;
-import org.sazonpt.service.Solicitud_registroService;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.sazonpt.model.Solicitud_registro;
+import org.sazonpt.service.Solicitud_registroService;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.javalin.http.Context;
 
 public class Solicitud_registroController {
     
@@ -264,6 +266,54 @@ public class Solicitud_registroController {
             response.put("message", "Error al eliminar la solicitud: " + e.getMessage());
             
             ctx.status(500).json(response);
+        }
+    }
+
+    public void aprobarPorRestaurantero(Context ctx) {
+        try {
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            var solicitudes = solicitudService.obtenerSolicitudesPorRestaurantero(idRestaurantero);
+            var solicitudPendiente = solicitudes.stream()
+                .filter(s -> "pendiente".equalsIgnoreCase(s.getEstado()))
+                .findFirst();
+            if (solicitudPendiente.isEmpty()) {
+                ctx.status(404).json(Map.of("success", false, "message", "No hay solicitud pendiente para este restaurantero"));
+                return;
+            }
+            boolean ok = solicitudService.cambiarEstadoSolicitud(solicitudPendiente.get().getId_solicitud(), "aprobado");
+            if (ok) {
+                ctx.json(Map.of("success", true, "message", "Solicitud aprobada correctamente"));
+            } else {
+                ctx.status(500).json(Map.of("success", false, "message", "No se pudo aprobar la solicitud"));
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of("success", false, "message", "ID inválido"));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("success", false, "message", "Error: " + e.getMessage()));
+        }
+    }
+
+    public void pendientePorRestaurantero(Context ctx) {
+        try {
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            var solicitudes = solicitudService.obtenerSolicitudesPorRestaurantero(idRestaurantero);
+            var solicitudAprobada = solicitudes.stream()
+                .filter(s -> "aprobado".equalsIgnoreCase(s.getEstado()))
+                .findFirst();
+            if (solicitudAprobada.isEmpty()) {
+                ctx.status(404).json(Map.of("success", false, "message", "No hay solicitud aprobada para este restaurantero"));
+                return;
+            }
+            boolean ok = solicitudService.cambiarEstadoSolicitud(solicitudAprobada.get().getId_solicitud(), "pendiente");
+            if (ok) {
+                ctx.json(Map.of("success", true, "message", "Solicitud cambiada a pendiente correctamente"));
+            } else {
+                ctx.status(500).json(Map.of("success", false, "message", "No se pudo cambiar el estado de la solicitud"));
+            }
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of("success", false, "message", "ID inválido"));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("success", false, "message", "Error: " + e.getMessage()));
         }
     }
 }

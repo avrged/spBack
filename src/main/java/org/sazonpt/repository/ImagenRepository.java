@@ -1,13 +1,18 @@
 package org.sazonpt.repository;
 
-import org.sazonpt.config.DBConfig;
-import org.sazonpt.model.Imagen;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.sazonpt.config.DBConfig;
+import org.sazonpt.model.Imagen;
 
 public class ImagenRepository {
 
@@ -242,16 +247,14 @@ public class ImagenRepository {
     private Imagen mapRowToImagen(ResultSet rs) throws SQLException {
         Imagen imagen = new Imagen();
         imagen.setId_imagen(rs.getInt("id_imagen"));
-        
+        imagen.setRuta_imagen(rs.getString("ruta_imagen"));
         Timestamp timestamp = rs.getTimestamp("fecha_subida");
         if (timestamp != null) {
             imagen.setFecha_subida(timestamp.toLocalDateTime());
         }
-        
         imagen.setId_restaurante(rs.getInt("id_restaurante"));
         imagen.setId_solicitud(rs.getInt("id_solicitud"));
         imagen.setId_restaurantero(rs.getInt("id_restaurantero"));
-        
         return imagen;
     }
 }

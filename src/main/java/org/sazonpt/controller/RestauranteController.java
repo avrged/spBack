@@ -192,6 +192,21 @@ public class RestauranteController {
         }
     }
 
+    public void actualizarRestaurantePorRestaurantero(Context ctx) {
+        try {
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            Restaurante restauranteActualizado = ctx.bodyAsClass(Restaurante.class);
+            boolean actualizado = restauranteService.actualizarPorRestaurantero(idRestaurantero, restauranteActualizado);
+            if (actualizado) {
+                ctx.json(Map.of("success", true, "message", "Restaurante actualizado correctamente"));
+            } else {
+                ctx.status(404).json(Map.of("success", false, "message", "No se encontró restaurante para ese restaurantero"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("success", false, "message", "Error: " + e.getMessage()));
+        }
+    }
+
     public void eliminarRestaurante(Context ctx) {
         try {
             int idRestaurante = Integer.parseInt(ctx.pathParam("id"));

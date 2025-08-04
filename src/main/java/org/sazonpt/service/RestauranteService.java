@@ -200,4 +200,12 @@ public class RestauranteService {
             throw new RuntimeException("Error al verificar el restaurante por solicitud: " + e.getMessage(), e);
         }
     }
+
+    public boolean actualizarPorRestaurantero(int idRestaurantero, Restaurante restaurante) {
+        try {
+            return restauranteRepository.updateByRestaurantero(idRestaurantero, restaurante);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar el restaurante: " + e.getMessage(), e);
+        }
+    }
 }

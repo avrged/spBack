@@ -262,6 +262,7 @@ public class RegistroRestauranteController {
     }
     
     private String validarDatos(RegistroRestauranteDTO datos) {
+        
         if (datos.getNombreRestaurante() == null || datos.getNombreRestaurante().trim().isEmpty()) {
             return "Nombre del restaurante es obligatorio";
         }
