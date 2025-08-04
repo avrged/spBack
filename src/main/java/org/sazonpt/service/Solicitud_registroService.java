@@ -243,16 +243,18 @@ public class Solicitud_registroService {
 
     /**
      * Aprueba una solicitud y crea la revisión correspondiente
+     * SOLO cambia el estado y crea la revisión, SIN crear el restaurante automáticamente
      */
     public boolean aprobarSolicitudConRevision(int idSolicitud, int idRestaurantero, int idAdministrador) {
         try {
-            // Primero aprobar la solicitud con el método existente
-            boolean aprobada = aprobarSolicitudConRestaurante(idSolicitud, 1); // ID zona por defecto = 1
+            // 1. Cambiar el estado de la solicitud a "aprobada"
+            boolean estadoActualizado = cambiarEstadoSolicitud(idSolicitud, 
+                Solicitud_registro.EstadoSolicitud.APROBADA.getValor());
             
-            if (aprobada) {
-                // Crear la revisión en la tabla revision_solicitud
+            if (estadoActualizado) {
+                // 2. Crear la revisión en la tabla revision_solicitud
                 revisionRepository.crearRevision(idSolicitud, idRestaurantero, idAdministrador);
-                System.out.println("✅ Revisión creada para solicitud ID: " + idSolicitud);
+                System.out.println("✅ Solicitud aprobada y revisión creada para solicitud ID: " + idSolicitud);
                 return true;
             }
             

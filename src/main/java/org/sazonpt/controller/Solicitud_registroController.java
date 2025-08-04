@@ -175,7 +175,17 @@ public class Solicitud_registroController {
             // Obtener datos del body
             @SuppressWarnings("unchecked")
             Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
-            int idAdministrador = (Integer) requestBody.get("id_administrador");
+            
+            // Manejar el id_administrador de forma segura (puede venir como String o Integer)
+            Object idAdminObj = requestBody.get("id_administrador");
+            int idAdministrador;
+            if (idAdminObj instanceof Integer) {
+                idAdministrador = (Integer) idAdminObj;
+            } else if (idAdminObj instanceof String) {
+                idAdministrador = Integer.parseInt((String) idAdminObj);
+            } else {
+                throw new IllegalArgumentException("id_administrador debe ser un número entero");
+            }
             
             // Obtener la solicitud para obtener el id_restaurantero
             Optional<Solicitud_registro> solicitudOpt = solicitudService.obtenerSolicitudPorId(id);
@@ -233,7 +243,18 @@ public class Solicitud_registroController {
             // Obtener datos del body
             @SuppressWarnings("unchecked")
             Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
-            int idAdministrador = (Integer) requestBody.get("id_administrador");
+            
+            // Manejar el id_administrador de forma segura (puede venir como String o Integer)
+            Object idAdminObj = requestBody.get("id_administrador");
+            int idAdministrador;
+            if (idAdminObj instanceof Integer) {
+                idAdministrador = (Integer) idAdminObj;
+            } else if (idAdminObj instanceof String) {
+                idAdministrador = Integer.parseInt((String) idAdminObj);
+            } else {
+                throw new IllegalArgumentException("id_administrador debe ser un número entero");
+            }
+            
             String motivoRechazo = (String) requestBody.getOrDefault("motivo_rechazo", "");
             
             // Obtener la solicitud para obtener el id_restaurantero
@@ -373,7 +394,7 @@ public class Solicitud_registroController {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             var solicitudes = solicitudService.obtenerSolicitudesPorRestaurantero(idRestaurantero);
             var solicitudAprobada = solicitudes.stream()
-                .filter(s -> "aprobado".equalsIgnoreCase(s.getEstado()))
+                .filter(s -> "aprobada".equalsIgnoreCase(s.getEstado()))
                 .findFirst();
             if (solicitudAprobada.isEmpty()) {
                 ctx.status(404).json(Map.of("success", false, "message", "No hay solicitud aprobada para este restaurantero"));

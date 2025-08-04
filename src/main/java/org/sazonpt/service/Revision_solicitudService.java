@@ -143,8 +143,8 @@ public class Revision_solicitudService {
             // Crear la revisión que registra la aprobación
             Revision_solicitud revision = crearRevisionPorAdministrador(idSolicitud, idRestaurantero, idAdministrador);
             
-            // Actualizar el estado de la solicitud a "aprobado"
-            boolean estadoActualizado = revisionRepository.actualizarEstadoSolicitud(idSolicitud, "aprobado");
+            // Actualizar el estado de la solicitud a "aprobada"
+            boolean estadoActualizado = revisionRepository.actualizarEstadoSolicitud(idSolicitud, "aprobada");
             
             if (!estadoActualizado) {
                 throw new RuntimeException("Error al actualizar el estado de la solicitud");
