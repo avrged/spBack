@@ -34,6 +34,6 @@ public class RestauranteRoutes {
         app.put("/restaurantes/restaurantero/{idRestaurantero}", restauranteController::actualizarRestaurantePorRestaurantero);
         
         // Ruta para actualizar campos específicos de un restaurante
-        app.put("/restaurantes/{id}/campos", restauranteController::actualizarCamposEspecificos);
+        app.put("/restaurantes/actualizar/{id}", restauranteController::actualizarCamposEspecificos);
     }
 }

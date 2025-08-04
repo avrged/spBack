@@ -372,7 +372,7 @@ public class Solicitud_registroController {
                     "data", Map.of(
                         "id_solicitud", solicitudPendiente.get().getId_solicitud(),
                         "id_restaurantero", idRestaurantero,
-                        "estado", "aprobada"
+                        "estado", "aprobado"
                     )
                 ));
             } else {
