@@ -1,7 +1,7 @@
 package org.sazonpt.util;
 
 public class UrlBuilder {
-    private static final String BASE_URL = "http://localhost:7070";
+    private static final String BASE_URL = "http://52.23.26.163:7070";
     private static final String UPLOADS_PATH = "/uploads";
 
     public static String buildImageUrl(String nombreArchivo) {
