@@ -8,7 +8,6 @@ import org.sazonpt.util.ImprovedStaticFileHandler;
 
 public class Main {
     public static void main(String[] args) {
-        // Configuración de Jetty antes de inicializar Javalin
         configureJettyLogging();
         
         // Inicializar directorios de upload
