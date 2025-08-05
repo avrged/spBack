@@ -290,7 +290,6 @@ public class RestauranteRepository {
         }
     }
 
-
     public boolean actualizarCamposEspecificos(int idRestaurante, Map<String, String> campos) throws SQLException {
         if (campos.isEmpty()) {
             return false;

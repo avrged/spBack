@@ -95,13 +95,11 @@ public class RestauranteService {
         }
 
         try {
-            // Crear zona automáticamente usando la dirección como nombre
             if (restaurante.getDireccion() != null && !restaurante.getDireccion().trim().isEmpty()) {
                 Zona zona = new Zona(restaurante.getDireccion(), restaurante.getId_restaurantero());
                 try {
                     zonaService.crearZona(zona);
                 } catch (Exception ex) {
-                    // Si la zona ya existe, ignorar el error
                     if (!ex.getMessage().contains("Ya existe una zona")) {
                         throw ex;
                     }
@@ -113,13 +111,8 @@ public class RestauranteService {
         }
     }
 
-    /**
-     * Método especial para crear un restaurante automáticamente cuando se aprueba una solicitud
-     * Crea automáticamente una zona con la dirección del restaurante
-     */
     public Restaurante crearRestauranteDesdeAprobacion(int idSolicitud, int idRestaurantero, int idZonaIgnorada) {
         try {
-            // Obtener los datos de la solicitud aprobada
             Optional<Solicitud_registro> solicitudOpt = solicitudRepository.findById(idSolicitud);
             if (solicitudOpt.isEmpty()) {
                 throw new IllegalArgumentException("No se encontró la solicitud");
@@ -127,40 +120,35 @@ public class RestauranteService {
 
             Solicitud_registro solicitud = solicitudOpt.get();
 
-            // Verificar que la solicitud esté aprobada
             if (!"aprobada".equalsIgnoreCase(solicitud.getEstado())) {
                 throw new IllegalArgumentException("La solicitud debe estar aprobada para crear el restaurante");
             }
 
-            // Verificar que no existe ya un restaurante para esta solicitud
             if (restauranteRepository.existsBySolicitud(idSolicitud, idRestaurantero)) {
                 throw new IllegalArgumentException("Ya existe un restaurante para esta solicitud");
             }
 
-            // Crear automáticamente la zona con el nombre del restaurante como ubicación
             String nombreZona = solicitud.getNombre_propuesto_restaurante();
             Zona nuevaZona = new Zona(nombreZona, idRestaurantero);
             Zona zonaCreada = zonaService.crearZona(nuevaZona);
             
-            System.out.println("✅ Zona creada automáticamente: " + zonaCreada.getNombre() + " (ID: " + zonaCreada.getId_zona() + ")");
+            System.out.println("Zona creada automáticamente: " + zonaCreada.getNombre() + " (ID: " + zonaCreada.getId_zona() + ")");
 
-            // Crear el restaurante con los datos de la solicitud y la zona recién creada
             Restaurante restaurante = new Restaurante();
             restaurante.setNombre(solicitud.getNombre_propuesto_restaurante());
             restaurante.setHorario(solicitud.getHorario_atencion());
-            restaurante.setTelefono(""); // Se puede completar después
-            restaurante.setEtiquetas(""); // Se puede completar después  
+            restaurante.setTelefono("");
+            restaurante.setEtiquetas(""); 
             restaurante.setId_solicitud(idSolicitud);
             restaurante.setId_restaurantero(idRestaurantero);
-            // id_zona eliminado
-            restaurante.setDireccion(nombreZona); // Usar el nombre como dirección por ahora
-            restaurante.setFacebook(""); // Se puede completar después
-            restaurante.setInstagram(""); // Se puede completar después
+            restaurante.setDireccion(nombreZona);
+            restaurante.setFacebook("");
+            restaurante.setInstagram("");
 
             Restaurante restauranteCreado = restauranteRepository.save(restaurante);
-            
-            System.out.println("✅ Restaurante creado automáticamente: " + restauranteCreado.getNombre());
-            
+
+            System.out.println("Restaurante creado automáticamente: " + restauranteCreado.getNombre());
+
             return restauranteCreado;
 
         } catch (SQLException e) {
@@ -170,20 +158,15 @@ public class RestauranteService {
 
     public boolean actualizarRestaurante(int id, Restaurante restauranteActualizado) {
         try {
-            // Verificar que el restaurante existe
             if (!restauranteRepository.existsById(id)) {
                 throw new IllegalArgumentException("El restaurante no existe");
             }
-
-            // Validaciones
             if (restauranteActualizado.getNombre() == null || restauranteActualizado.getNombre().trim().isEmpty()) {
                 throw new IllegalArgumentException("El nombre del restaurante es obligatorio");
             }
             if (restauranteActualizado.getHorario() == null || restauranteActualizado.getHorario().trim().isEmpty()) {
                 throw new IllegalArgumentException("El horario es obligatorio");
             }
-
-            // id_zona eliminado
 
             restauranteActualizado.setId_restaurante(id);
             return restauranteRepository.update(restauranteActualizado);
@@ -236,7 +219,6 @@ public class RestauranteService {
             throw new IllegalArgumentException("Debe especificar al menos un campo para actualizar");
         }
 
-        // Validar campos permitidos
         List<String> camposPermitidos = Arrays.asList("horario", "telefono", "etiquetas", "direccion", "facebook", "instagram");
         for (String campo : campos.keySet()) {
             if (!camposPermitidos.contains(campo)) {
