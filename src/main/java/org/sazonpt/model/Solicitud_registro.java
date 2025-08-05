@@ -57,7 +57,6 @@ public class Solicitud_registro {
         this.id_restaurantero = id_restaurantero;
     }
 
-    // Getters
     public int getId_solicitud() { return id_solicitud; }
     public LocalDateTime getFecha() { return fecha; }
     public String getEstado() { return estado; }
@@ -68,7 +67,6 @@ public class Solicitud_registro {
     public String getDireccion() { return direccion; }
     public int getId_restaurantero() { return id_restaurantero; }
 
-    // Setters
     public void setId_solicitud(int id_solicitud) { this.id_solicitud = id_solicitud; }
     public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
     public void setEstado(String estado) { this.estado = estado; }

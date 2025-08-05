@@ -10,9 +10,6 @@ import java.util.Optional;
 
 public class ZonaRepository {
 
-    /**
-     * Obtiene todas las zonas
-     */
     public List<Zona> findAll() throws SQLException {
         List<Zona> zonas = new ArrayList<>();
         String sql = "SELECT id_zona, nombre, id_restaurantero FROM zona ORDER BY nombre";
@@ -34,9 +31,6 @@ public class ZonaRepository {
         return zonas;
     }
 
-    /**
-     * Busca una zona por ID
-     */
     public Optional<Zona> findById(int idZona) throws SQLException {
         String sql = "SELECT id_zona, nombre, id_restaurantero FROM zona WHERE id_zona = ?";
         
@@ -60,9 +54,6 @@ public class ZonaRepository {
         return Optional.empty();
     }
 
-    /**
-     * Obtiene todas las zonas de un restaurantero específico
-     */
     public List<Zona> findByRestaurantero(int idRestaurantero) throws SQLException {
         List<Zona> zonas = new ArrayList<>();
         String sql = "SELECT id_zona, nombre, id_restaurantero FROM zona WHERE id_restaurantero = ? ORDER BY nombre";
@@ -87,9 +78,6 @@ public class ZonaRepository {
         return zonas;
     }
 
-    /**
-     * Crea una nueva zona
-     */
     public Zona save(Zona zona) throws SQLException {
         String sql = "INSERT INTO zona (nombre, id_restaurantero) VALUES (?, ?)";
         
@@ -133,9 +121,6 @@ public class ZonaRepository {
         }
     }
 
-    /**
-     * Elimina una zona por ID
-     */
     public boolean deleteById(int idZona) throws SQLException {
         String sql = "DELETE FROM zona WHERE id_zona = ?";
         
@@ -147,9 +132,6 @@ public class ZonaRepository {
         }
     }
 
-    /**
-     * Verifica si existe una zona por ID
-     */
     public boolean existsById(int idZona) throws SQLException {
         String sql = "SELECT 1 FROM zona WHERE id_zona = ?";
         
@@ -164,9 +146,6 @@ public class ZonaRepository {
         }
     }
 
-    /**
-     * Verifica si existe una zona con el mismo nombre para un restaurantero
-     */
     public boolean existsByNombreAndRestaurantero(String nombre, int idRestaurantero) throws SQLException {
         String sql = "SELECT 1 FROM zona WHERE nombre = ? AND id_restaurantero = ?";
         
@@ -182,9 +161,6 @@ public class ZonaRepository {
         }
     }
 
-    /**
-     * Verifica si existe una zona con el mismo nombre para un restaurantero, excluyendo un ID específico
-     */
     public boolean existsByNombreAndRestauranteroExcludingId(String nombre, int idRestaurantero, int idZonaExcluir) throws SQLException {
         String sql = "SELECT 1 FROM zona WHERE nombre = ? AND id_restaurantero = ? AND id_zona != ?";
         
@@ -201,9 +177,6 @@ public class ZonaRepository {
         }
     }
 
-    /**
-     * Cuenta el número total de zonas
-     */
     public int count() throws SQLException {
         String sql = "SELECT COUNT(*) FROM zona";
         
@@ -218,9 +191,6 @@ public class ZonaRepository {
         }
     }
 
-    /**
-     * Cuenta el número de zonas de un restaurantero específico
-     */
     public int countByRestaurantero(int idRestaurantero) throws SQLException {
         String sql = "SELECT COUNT(*) FROM zona WHERE id_restaurantero = ?";
         

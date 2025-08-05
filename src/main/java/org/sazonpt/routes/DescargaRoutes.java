@@ -23,17 +23,14 @@ public class DescargaRoutes {
         
         app.put("/descargas/restaurantero/{idRestaurantero}", descargaController::actualizarDescargaPorRestaurantero);
 
-        // Rutas de filtrado por diferentes criterios
-        app.get("/descargas/restaurantero/{id}", descargaController::obtenerDescargasPorRestaurantero);
+        app.get("/descargas/restaurantero/{idRestaurantero}", descargaController::obtenerDescargasPorRestaurantero);
         app.get("/descargas/origen/{origen}", descargaController::obtenerDescargasPorOrigen);
         app.get("/descargas/opinion/{opinion}", descargaController::obtenerDescargasPorOpinion);
 
-        // Rutas de acciones especiales
         app.patch("/descargas/{id}/incrementar", descargaController::incrementarDescargas);
         app.post("/descargas/rapida", descargaController::crearDescargaRapida);
 
-        // Rutas de estadísticas y reportes
-        app.get("/descargas/estadisticas/restaurantero/{id}/total", descargaController::obtenerTotalDescargasPorRestaurantero);
+        app.get("/descargas/estadisticas/restaurantero/{idRestaurantero}/total", descargaController::obtenerTotalDescargasPorRestaurantero);
         app.get("/descargas/estadisticas/top", descargaController::obtenerTopDescargasPorOrigen);
     }
 }

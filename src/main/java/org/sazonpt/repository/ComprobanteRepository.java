@@ -153,8 +153,6 @@ public class ComprobanteRepository {
         return comprobantes;
     }
 
-    // Método findByZona eliminado porque id_zona ya no existe
-
     public Comprobante save(Comprobante comprobante) throws SQLException {
         String sql = """
             INSERT INTO comprobante (tipo, ruta_archivo, fecha_subida, id_restaurante, 
@@ -206,7 +204,6 @@ public class ComprobanteRepository {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Validar que el restaurante existe
             if (!restauranteExists(comprobante.getId_restaurante(), comprobante.getId_solicitud(), 
                                  comprobante.getId_restaurantero())) {
                 throw new SQLException("El restaurante especificado no existe");

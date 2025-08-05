@@ -7,11 +7,9 @@ public class Usuario {
     private String contrasena;
     private String tipo;
     
-    // Constructor vacío
     public Usuario() {
     }
     
-    // Constructor con todos los parámetros
     public Usuario(Integer id_usuario, String nombre, String correo, String contrasena, String tipo) {
         this.id_usuario = id_usuario;
         this.nombre = nombre;
@@ -20,7 +18,6 @@ public class Usuario {
         this.tipo = tipo;
     }
     
-    // Constructor sin ID (útil para crear nuevos usuarios)
     public Usuario(String nombre, String correo, String contrasena, String tipo) {
         this.nombre = nombre;
         this.correo = correo;
@@ -28,7 +25,6 @@ public class Usuario {
         this.tipo = tipo;
     }
     
-    // Getters y Setters
     public Integer getIdUsuario() {
         return id_usuario;
     }
@@ -77,7 +73,6 @@ public class Usuario {
         this.tipo = tipo;
     }
     
-    // Método toString para facilitar el debugging
     @Override
     public String toString() {
         return "Usuario{" +
@@ -88,7 +83,6 @@ public class Usuario {
                 '}';
     }
     
-    // Método equals y hashCode basados en el ID
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

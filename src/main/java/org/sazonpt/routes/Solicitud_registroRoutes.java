@@ -12,20 +12,16 @@ public class Solicitud_registroRoutes {
     }
 
     public void register(Javalin app) {
-        // Rutas CRUD para solicitudes de registro
         app.get("/solicitudes", solicitudController::obtenerTodasLasSolicitudes);
         app.post("/solicitudes", solicitudController::crearSolicitud);
         app.get("/solicitudes/{id}", solicitudController::obtenerSolicitudPorId);
         app.put("/solicitudes/{id}", solicitudController::actualizarSolicitud);
-        
-        // Rutas específicas para gestión de estado
+
         app.post("/solicitudes/{id}/aprobar", solicitudController::aprobarSolicitud);
         app.post("/solicitudes/{id}/rechazar", solicitudController::rechazarSolicitud);
-        
-        // Rutas por restaurantero
+
         app.get("/solicitudes/restaurantero/{idRestaurantero}", solicitudController::obtenerSolicitudesPorRestaurantero);
         app.delete("/solicitudes/{id}/restaurantero/{idRestaurantero}", solicitudController::eliminarSolicitud);
-        // app.put("/solicitudes/restaurantero/{idRestaurantero}/aprobar", solicitudController::aprobarPorRestaurantero); // Eliminado para evitar doble registro y error de creación automática
         app.put("/solicitudes/restaurantero/{idRestaurantero}/pendiente", solicitudController::pendientePorRestaurantero);
     }
 }

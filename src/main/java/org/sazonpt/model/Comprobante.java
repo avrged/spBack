@@ -11,9 +11,7 @@ public class Comprobante {
     private int id_restaurante;
     private int id_solicitud;
     private int id_restaurantero;
-    // private int id_zona;
     
-    // Enum para tipos de comprobante
     public enum TipoComprobante {
         COMPROBANTE_DOMICILIO("comprobante_domicilio"),
         MENU_RESTAURANTE("menu_restaurante"),
@@ -43,11 +41,9 @@ public class Comprobante {
         }
     }
     
-    // Constructor por defecto
     public Comprobante() {
     }
     
-    // Constructor completo
     public Comprobante(int id_comprobante, String tipo, String ruta_archivo,
                       LocalDateTime fecha_subida, int id_restaurante, int id_solicitud, 
                       int id_restaurantero) {
@@ -60,7 +56,6 @@ public class Comprobante {
         this.id_restaurantero = id_restaurantero;
     }
     
-    // Constructor sin ID (para crear nuevos registros)
     public Comprobante(String tipo, String ruta_archivo, LocalDateTime fecha_subida, 
                       int id_restaurante, int id_solicitud, int id_restaurantero) {
         this.tipo = tipo;
@@ -71,7 +66,6 @@ public class Comprobante {
         this.id_restaurantero = id_restaurantero;
     }
     
-    // Getters y Setters
     public int getId_comprobante() {
         return id_comprobante;
     }
@@ -127,9 +121,6 @@ public class Comprobante {
     public void setId_restaurantero(int id_restaurantero) {
         this.id_restaurantero = id_restaurantero;
     }
-    
-    // public int getId_zona() { return id_zona; }
-    // public void setId_zona(int id_zona) { this.id_zona = id_zona; }
     
     @Override
     public String toString() {

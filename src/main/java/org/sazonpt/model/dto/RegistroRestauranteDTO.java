@@ -1,8 +1,6 @@
 package org.sazonpt.model.dto;
 
 public class RegistroRestauranteDTO {
-    
-    // Datos del restaurante
     private String nombreRestaurante;
     private String propietario;
     private String correoElectronico;
@@ -11,23 +9,17 @@ public class RegistroRestauranteDTO {
     private String instagram;
     private String direccion;
     private String horarios;
-    
-    // Archivos
     private String imagenPrincipal;
     private String imagenSecundaria;
     private String imagenPlatillo;
-    private String comprobanteDomicilio;  // PDF
-    private String menuRestaurante;       // PDF
+    private String comprobanteDomicilio;
+    private String menuRestaurante;
     
-    // IDs necesarios
     private int idRestaurantero;
-    // idZona eliminado del flujo
-    
-    // Constructor por defecto
+
     public RegistroRestauranteDTO() {
     }
     
-    // Constructor completo
     public RegistroRestauranteDTO(String nombreRestaurante, String propietario, String correoElectronico,
                                  String numeroCelular, String facebook, String instagram, String direccion,
                                  String horarios, String imagenPrincipal, String imagenSecundaria,
@@ -47,10 +39,8 @@ public class RegistroRestauranteDTO {
         this.comprobanteDomicilio = comprobanteDomicilio;
         this.menuRestaurante = menuRestaurante;
         this.idRestaurantero = idRestaurantero;
-        // idZona eliminado
     }
     
-    // Getters y Setters
     public String getNombreRestaurante() {
         return nombreRestaurante;
     }
@@ -163,7 +153,6 @@ public class RegistroRestauranteDTO {
         this.idRestaurantero = idRestaurantero;
     }
     
-    // Métodos de idZona eliminados
     @Override
     public String toString() {
         return "RegistroRestauranteDTO{" +
@@ -176,7 +165,6 @@ public class RegistroRestauranteDTO {
                 ", direccion='" + direccion + '\'' +
                 ", horarios='" + horarios + '\'' +
                 ", idRestaurantero=" + idRestaurantero +
-                // idZona eliminado
                 '}';
     }
 }

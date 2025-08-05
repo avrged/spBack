@@ -31,14 +31,12 @@ public class Descarga {
     public String getOpinion() { return opinion; }
     public int getId_restaurantero() { return id_restaurantero; }
 
-    // Setters
     public void setId_descarga(int id_descarga) { this.id_descarga = id_descarga; }
     public void setCantidad_descargas(int cantidad_descargas) { this.cantidad_descargas = cantidad_descargas; }
     public void setOrigen(String origen) { this.origen = origen; }
     public void setOpinion(String opinion) { this.opinion = opinion; }
     public void setId_restaurantero(int id_restaurantero) { this.id_restaurantero = id_restaurantero; }
 
-    // Enums para validación
     public enum Origen {
         NACIONAL("Nacional"),
         EXTRANJERO("Extranjero");
@@ -90,7 +88,6 @@ public class Descarga {
         }
     }
 
-    // Método toString para debugging
     @Override
     public String toString() {
         return "descarga{" +
@@ -102,7 +99,6 @@ public class Descarga {
                 '}';
     }
 
-    // Método equals
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -111,7 +107,6 @@ public class Descarga {
         return id_descarga == descarga.id_descarga;
     }
 
-    // Método hashCode
     @Override
     public int hashCode() {
         return Integer.hashCode(id_descarga);

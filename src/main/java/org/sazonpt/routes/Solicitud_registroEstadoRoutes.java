@@ -12,7 +12,6 @@ public class Solicitud_registroEstadoRoutes {
     }
 
     public void register(Javalin app) {
-        // PUT para aprobar solicitud por idRestaurantero
         app.put("/solicitudes/restaurantero/{idRestaurantero}/aprobar", estadoController::aprobarPorRestaurantero);
     }
 }

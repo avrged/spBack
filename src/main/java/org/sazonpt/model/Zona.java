@@ -6,24 +6,20 @@ public class Zona {
     private String nombre;
     private int id_restaurantero;
     
-    // Constructor vacío
     public Zona() {
     }
     
-    // Constructor con todos los parámetros
     public Zona(int id_zona, String nombre, int id_restaurantero) {
         this.id_zona = id_zona;
         this.nombre = nombre;
         this.id_restaurantero = id_restaurantero;
     }
     
-    // Constructor sin ID (para crear nuevas zonas)
     public Zona(String nombre, int id_restaurantero) {
         this.nombre = nombre;
         this.id_restaurantero = id_restaurantero;
     }
     
-    // Getters y Setters
     public int getId_zona() {
         return id_zona;
     }
@@ -48,7 +44,6 @@ public class Zona {
         this.id_restaurantero = id_restaurantero;
     }
     
-    // toString para debugging
     @Override
     public String toString() {
         return "Zona{" +
@@ -58,7 +53,6 @@ public class Zona {
                 '}';
     }
     
-    // equals y hashCode para comparaciones
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

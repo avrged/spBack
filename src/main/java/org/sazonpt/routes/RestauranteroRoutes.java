@@ -11,18 +11,15 @@ public class RestauranteroRoutes {
     }
     
     public void register(Javalin app) {
-        // Rutas CRUD para restauranteros
         app.get("/restauranteros", restauranteroController::getAll);
         app.post("/restauranteros", restauranteroController::create);
         app.get("/restauranteros/{id}", restauranteroController::getById);
         app.put("/restauranteros/{id}", restauranteroController::update);
-        
-        // Rutas específicas de restauranteros
+
         app.post("/restauranteros/promover/{id}", restauranteroController::promoverUsuario);
         app.delete("/restauranteros/revocar/{id}", restauranteroController::revocarPermisos);
         app.get("/restauranteros/verificar/{id}", restauranteroController::verificarRestaurantero);
-        
-        // Ruta para autenticación específica de restauranteros
+
         app.post("/auth/restaurantero/login", restauranteroController::login);
     }
 }

@@ -8,7 +8,6 @@ public class Restaurante {
     private String etiquetas;
     private int id_solicitud;
     private int id_restaurantero;
-    // private int id_zona;
     private String direccion;
     private String facebook;
     private String instagram;
@@ -38,10 +37,8 @@ public class Restaurante {
         }
     }
 
-    // Constructor vacío
     public Restaurante() {}
 
-    // Constructor completo
     public Restaurante(int id_restaurante, String nombre, String horario, String telefono,
                       String etiquetas, int id_solicitud, int id_restaurantero, String direccion, String facebook, String instagram) {
         this.id_restaurante = id_restaurante;
@@ -56,7 +53,6 @@ public class Restaurante {
         this.instagram = instagram;
     }
 
-    // Constructor para crear desde solicitud aprobada
     public Restaurante(String nombre, String horario, String telefono, String etiquetas,
                       int id_solicitud, int id_restaurantero, String direccion, String facebook, String instagram) {
         this.nombre = nombre;
@@ -70,7 +66,6 @@ public class Restaurante {
         this.instagram = instagram;
     }
 
-    // Getters
     public int getId_restaurante() { return id_restaurante; }
     public String getNombre() { return nombre; }
     public String getHorario() { return horario; }
@@ -78,12 +73,10 @@ public class Restaurante {
     public String getEtiquetas() { return etiquetas; }
     public int getId_solicitud() { return id_solicitud; }
     public int getId_restaurantero() { return id_restaurantero; }
-    // public int getId_zona() { return id_zona; }
     public String getDireccion() { return direccion; }
     public String getFacebook() { return facebook; }
     public String getInstagram() { return instagram; }
 
-    // Setters
     public void setId_restaurante(int id_restaurante) { this.id_restaurante = id_restaurante; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public void setHorario(String horario) { this.horario = horario; }
@@ -91,12 +84,10 @@ public class Restaurante {
     public void setEtiquetas(String etiquetas) { this.etiquetas = etiquetas; }
     public void setId_solicitud(int id_solicitud) { this.id_solicitud = id_solicitud; }
     public void setId_restaurantero(int id_restaurantero) { this.id_restaurantero = id_restaurantero; }
-    // public void setId_zona(int id_zona) { this.id_zona = id_zona; }
     public void setDireccion(String direccion) { this.direccion = direccion; }
     public void setFacebook(String facebook) { this.facebook = facebook; }
     public void setInstagram(String instagram) { this.instagram = instagram; }
 
-    // Método toString
     @Override
     public String toString() {
         return "Restaurante{" +
@@ -113,7 +104,6 @@ public class Restaurante {
                 '}';
     }
 
-    // Métodos equals y hashCode basados en el ID
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

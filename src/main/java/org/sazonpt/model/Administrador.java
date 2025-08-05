@@ -4,22 +4,18 @@ public class Administrador {
     private Usuario usuario;
     private Integer id_usuario;
     
-    // Constructor vacío
     public Administrador() {
     }
     
-    // Constructor con Usuario completo
     public Administrador(Usuario usuario) {
         this.usuario = usuario;
         this.id_usuario = usuario != null ? usuario.getIdUsuario() : null;
     }
     
-    // Constructor solo con ID
     public Administrador(Integer id_usuario) {
         this.id_usuario = id_usuario;
     }
     
-    // Getters y Setters
     public Usuario getUsuario() {
         return usuario;
     }
@@ -37,7 +33,6 @@ public class Administrador {
         this.id_usuario = id_usuario;
     }
     
-    // Métodos de conveniencia para acceder a datos del usuario
     public String getNombre() {
         return usuario != null ? usuario.getNombre() : null;
     }
@@ -50,7 +45,6 @@ public class Administrador {
         return usuario != null ? usuario.getTipo() : null;
     }
     
-    // Método toString
     @Override
     public String toString() {
         return "Administrador{" +
@@ -59,7 +53,6 @@ public class Administrador {
                 '}';
     }
     
-    // Métodos equals y hashCode basados en el ID
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

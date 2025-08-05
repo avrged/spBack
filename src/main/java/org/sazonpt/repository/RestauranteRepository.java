@@ -38,7 +38,6 @@ public class RestauranteRepository {
                 restaurante.setEtiquetas(rs.getString("etiquetas"));
                 restaurante.setId_solicitud(rs.getInt("id_solicitud"));
                 restaurante.setId_restaurantero(rs.getInt("id_restaurantero"));
-                // id_zona eliminado
                 restaurante.setDireccion(rs.getString("direccion"));
                 restaurante.setFacebook(rs.getString("facebook"));
                 restaurante.setInstagram(rs.getString("instagram"));
@@ -144,8 +143,6 @@ public class RestauranteRepository {
                 restaurante.setEtiquetas(rs.getString("etiquetas"));
                 restaurante.setId_solicitud(rs.getInt("id_solicitud"));
                 restaurante.setId_restaurantero(rs.getInt("id_restaurantero"));
-                // id_zona eliminado
-                
                 restaurantes.add(restaurante);
             }
         }
@@ -293,15 +290,12 @@ public class RestauranteRepository {
         }
     }
 
-    /**
-     * Actualiza campos específicos de un restaurante
-     */
+
     public boolean actualizarCamposEspecificos(int idRestaurante, Map<String, String> campos) throws SQLException {
         if (campos.isEmpty()) {
             return false;
         }
 
-        // Construir la consulta dinámicamente
         StringBuilder sql = new StringBuilder("UPDATE restaurante SET ");
         List<String> sets = new ArrayList<>();
         List<String> valores = new ArrayList<>();

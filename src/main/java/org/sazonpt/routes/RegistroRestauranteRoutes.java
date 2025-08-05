@@ -12,13 +12,10 @@ public class RegistroRestauranteRoutes {
     }
     
     public void registerRoutes(Javalin app) {
-        // Registro de restaurante
         app.post("/registro-restaurante", controller::registrarRestaurante);
-        
-        // Consultar estado de solicitud
+
         app.get("/solicitud/{id}/estado", controller::obtenerEstadoSolicitud);
 
-        // Consultar solicitudes de un restaurantero
         app.get("/restaurantero/{id}/solicitudes", controller::obtenerSolicitudesRestaurantero);
     }
 }

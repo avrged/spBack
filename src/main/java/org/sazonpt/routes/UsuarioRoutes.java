@@ -11,14 +11,11 @@ public class UsuarioRoutes {
     }
     
     public void register(Javalin app) {
-        // Rutas CRUD para usuarios
         app.get("/usuarios", usuarioController::getAll);
         app.post("/usuarios", usuarioController::create);
         app.get("/usuarios/{id}", usuarioController::getById);
         app.put("/usuarios/{id}", usuarioController::update);
         app.delete("/usuarios/{id}", usuarioController::delete);
-
-        // Ruta para autenticación/login
         app.post("/auth/login", usuarioController::login);
     }
 }

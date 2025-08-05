@@ -4,22 +4,18 @@ public class Restaurantero {
     private Usuario usuario;
     private Integer id_usuario;
     
-    // Constructor vacío
     public Restaurantero() {
     }
     
-    // Constructor con Usuario completo
     public Restaurantero(Usuario usuario) {
         this.usuario = usuario;
         this.id_usuario = usuario != null ? usuario.getId_usuario() : null;
     }
     
-    // Constructor solo con ID
     public Restaurantero(Integer id_usuario) {
         this.id_usuario = id_usuario;
     }
     
-    // Getters y Setters
     public Usuario getUsuario() {
         return usuario;
     }
@@ -37,7 +33,6 @@ public class Restaurantero {
         this.id_usuario = id_usuario;
     }
     
-    // Métodos de conveniencia para acceder a datos del usuario
     public String getNombre() {
         return usuario != null ? usuario.getNombre() : null;
     }
@@ -50,7 +45,6 @@ public class Restaurantero {
         return usuario != null ? usuario.getTipo() : null;
     }
     
-    // Método toString
     @Override
     public String toString() {
         return "Restaurantero{" +
@@ -59,7 +53,6 @@ public class Restaurantero {
                 '}';
     }
     
-    // Métodos equals y hashCode basados en el ID
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

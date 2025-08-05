@@ -17,23 +17,18 @@ public class RestauranteRoutes {
         app.post("/restaurantes", restauranteController::crearRestaurante);
         app.get("/restaurantes/{id}", restauranteController::obtenerRestaurantePorId);
         app.put("/restaurantes/{id}", restauranteController::actualizarRestaurante);
-        
-        // Rutas específicas por restaurantero
+
         app.get("/restaurantes/restaurantero/{idRestaurantero}", 
                restauranteController::obtenerRestaurantesPorRestaurantero);
-        
-        // Rutas específicas por zona
+
         app.get("/restaurantes/zona/{idZona}", 
                restauranteController::obtenerRestaurantesPorZona);
-        
-        // Ruta para eliminar restaurante con todos los IDs
+
         app.delete("/restaurantes/{id}/solicitud/{idSolicitud}/restaurantero/{idRestaurantero}", 
                   restauranteController::eliminarRestaurante);
-        
-        // Ruta para actualizar restaurante por idRestaurantero
+
         app.put("/restaurantes/restaurantero/{idRestaurantero}", restauranteController::actualizarRestaurantePorRestaurantero);
-        
-        // Ruta para actualizar campos específicos de un restaurante
+
         app.put("/restaurantes/actualizar/{id}", restauranteController::actualizarCamposEspecificos);
     }
 }
