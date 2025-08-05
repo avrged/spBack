@@ -20,16 +20,10 @@ public class RegistroRestauranteController {
         this.registroService = registroService;
     }
     
-    /**
-     * POST /api/registro-restaurante
-     * Registra un nuevo restaurante con todos sus datos
-     */
     public void registrarRestaurante(Context ctx) {
         try {
-            // Obtener datos del formulario o JSON
             RegistroRestauranteDTO datos = extraerDatos(ctx);
             
-            // Validar datos obligatorios
             String validacion = validarDatos(datos);
             if (validacion != null) {
                 ctx.status(400).json(Map.of(
@@ -39,7 +33,6 @@ public class RegistroRestauranteController {
                 return;
             }
             
-            // Registrar restaurante
             String resultado = registroService.registrarRestaurante(datos);
             
             ctx.status(201).json(Map.of(
@@ -61,10 +54,6 @@ public class RegistroRestauranteController {
         }
     }
     
-    /**
-     * GET /api/solicitud/{id}/estado
-     * Obtiene el estado de una solicitud
-     */
     public void obtenerEstadoSolicitud(Context ctx) {
         try {
             int idSolicitud = Integer.parseInt(ctx.pathParam("id"));
@@ -88,10 +77,6 @@ public class RegistroRestauranteController {
         }
     }
     
-    /**
-     * GET /api/restaurantero/{id}/solicitudes
-     * Obtiene todas las solicitudes de un restaurantero
-     */
     public void obtenerSolicitudesRestaurantero(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("id"));
@@ -118,24 +103,20 @@ public class RegistroRestauranteController {
     private RegistroRestauranteDTO extraerDatos(Context ctx) {
         String contentType = ctx.header("Content-Type");
         
-        // Si contiene multipart/form-data, manejar archivos
         if (contentType != null && contentType.contains("multipart/form-data")) {
             return extraerDatosConArchivos(ctx);
         }
         
-        // Si es JSON, parsear como JSON
         if (contentType != null && contentType.contains("application/json")) {
             return ctx.bodyAsClass(RegistroRestauranteDTO.class);
         }
-        
-        // Si es form data simple, parsear como formulario
+
         return extraerDatosFormulario(ctx);
     }
     
     private RegistroRestauranteDTO extraerDatosFormulario(Context ctx) {
         RegistroRestauranteDTO datos = new RegistroRestauranteDTO();
-        
-        // Datos del restaurante
+
         datos.setNombreRestaurante(ctx.formParam("nombreRestaurante"));
         datos.setPropietario(ctx.formParam("propietario"));
         datos.setCorreoElectronico(ctx.formParam("correoElectronico"));
@@ -145,19 +126,16 @@ public class RegistroRestauranteController {
         datos.setDireccion(ctx.formParam("direccion"));
         datos.setHorarios(ctx.formParam("horarios"));
         
-        // Archivos (rutas de archivos subidos)
         datos.setImagenPrincipal(ctx.formParam("imagenPrincipal"));
         datos.setImagenSecundaria(ctx.formParam("imagenSecundaria"));
         datos.setImagenPlatillo(ctx.formParam("imagenPlatillo"));
         datos.setComprobanteDomicilio(ctx.formParam("comprobanteDomicilio"));
         datos.setMenuRestaurante(ctx.formParam("menuRestaurante"));
         
-        // IDs
         String idRestaurantero = ctx.formParam("idRestaurantero");
         if (idRestaurantero != null) {
             datos.setIdRestaurantero(Integer.parseInt(idRestaurantero));
         }
-        // idZona eliminado del flujo
         
         return datos;
     }
@@ -165,7 +143,6 @@ public class RegistroRestauranteController {
     private RegistroRestauranteDTO extraerDatosConArchivos(Context ctx) {
         RegistroRestauranteDTO datos = new RegistroRestauranteDTO();
         
-        // Extraer datos de texto del formulario
         datos.setNombreRestaurante(ctx.formParam("nombreRestaurante"));
         datos.setPropietario(ctx.formParam("propietario"));
         datos.setCorreoElectronico(ctx.formParam("correoElectronico"));
@@ -175,14 +152,11 @@ public class RegistroRestauranteController {
         datos.setDireccion(ctx.formParam("direccion"));
         datos.setHorarios(ctx.formParam("horarios"));
         
-        // Convertir IDs
         String idRestaurantero = ctx.formParam("idRestaurantero");
         if (idRestaurantero != null && !idRestaurantero.trim().isEmpty()) {
             datos.setIdRestaurantero(Integer.parseInt(idRestaurantero));
         }
-        // idZona eliminado del flujo
         
-        // Procesar archivos subidos
         datos.setImagenPrincipal(procesarArchivo(ctx, "imagenPrincipal", "images"));
         datos.setImagenSecundaria(procesarArchivo(ctx, "imagenSecundaria", "images"));
         datos.setImagenPlatillo(procesarArchivo(ctx, "imagenPlatillo", "images"));
@@ -196,45 +170,37 @@ public class RegistroRestauranteController {
         UploadedFile uploadedFile = ctx.uploadedFile(fieldName);
         
         if (uploadedFile == null) {
-            return null; // Campo opcional
+            return null;
         }
         
         try {
-            // Validar archivo
             String originalName = uploadedFile.filename();
             if (originalName == null || originalName.trim().isEmpty()) {
                 throw new RuntimeException("El archivo " + fieldName + " debe tener un nombre válido");
             }
             
-            // Obtener extensión
             String extension = "";
             int lastDotIndex = originalName.lastIndexOf('.');
             if (lastDotIndex > 0) {
                 extension = originalName.substring(lastDotIndex);
             }
             
-            // Validar extensiones según tipo
             if (!esExtensionValida(folder, extension)) {
                 throw new RuntimeException("Tipo de archivo no válido para " + fieldName + ": " + extension);
             }
             
-            // Generar nombre único
             String uniqueName = UUID.randomUUID().toString() + extension;
             
-            // Crear directorio si no existe
             File dir = new File("./uploads/" + folder);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
             
-            // Guardar archivo
             File file = new File(dir, uniqueName);
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 fos.write(uploadedFile.content().readAllBytes());
             }
             
-            // CORRECCIÓN: Devolver solo el nombre del archivo único
-            // No incluir la carpeta aquí, se manejará en el servicio
             return uniqueName;
             
         } catch (IOException e) {
@@ -276,15 +242,13 @@ public class RegistroRestauranteController {
         if (datos.getIdRestaurantero() <= 0) {
             return "ID de restaurantero inválido";
         }
-        // idZona eliminado del flujo y de la validación
         
-        // Validar que al menos una imagen sea proporcionada
         if ((datos.getImagenPrincipal() == null || datos.getImagenPrincipal().trim().isEmpty()) &&
             (datos.getImagenSecundaria() == null || datos.getImagenSecundaria().trim().isEmpty()) &&
             (datos.getImagenPlatillo() == null || datos.getImagenPlatillo().trim().isEmpty())) {
             return "Al menos una imagen es obligatoria";
         }
         
-        return null; // Todo válido
+        return null;
     }
 }

@@ -171,12 +171,9 @@ public class Solicitud_registroController {
     public void aprobarSolicitud(Context ctx) {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            
-            // Obtener datos del body
             @SuppressWarnings("unchecked")
             Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
-            
-            // Manejar el id_administrador de forma segura (puede venir como String o Integer)
+
             Object idAdminObj = requestBody.get("id_administrador");
             int idAdministrador;
             if (idAdminObj instanceof Integer) {
@@ -186,8 +183,7 @@ public class Solicitud_registroController {
             } else {
                 throw new IllegalArgumentException("id_administrador debe ser un número entero");
             }
-            
-            // Obtener la solicitud para obtener el id_restaurantero
+
             Optional<Solicitud_registro> solicitudOpt = solicitudService.obtenerSolicitudPorId(id);
             if (solicitudOpt.isEmpty()) {
                 Map<String, Object> response = new HashMap<>();
@@ -198,8 +194,7 @@ public class Solicitud_registroController {
             }
             
             Solicitud_registro solicitud = solicitudOpt.get();
-            
-            // Aprobar la solicitud y crear la revisión
+
             boolean aprobada = solicitudService.aprobarSolicitudConRevision(id, solicitud.getId_restaurantero(), idAdministrador);
             
             if (aprobada) {
@@ -356,9 +351,7 @@ public class Solicitud_registroController {
                 ctx.status(404).json(Map.of("success", false, "message", "No hay solicitud pendiente para este restaurantero"));
                 return;
             }
-            
-            // Aprobar con creación automática de restaurante y zona
-            int idZonaDefecto = 1; // Se ignorará porque se creará automáticamente
+            int idZonaDefecto = 1;
             
             boolean ok = solicitudService.aprobarSolicitudConRestaurante(
                 solicitudPendiente.get().getId_solicitud(), 

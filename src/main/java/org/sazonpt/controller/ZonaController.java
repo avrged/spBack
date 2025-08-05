@@ -19,10 +19,7 @@ public class ZonaController {
         this.zonaService = zonaService;
         this.objectMapper = new ObjectMapper();
     }
-    
-    /**
-     * GET /zonas - Obtiene todas las zonas
-     */
+
     public void obtenerTodasLasZonas(Context ctx) {
         try {
             List<Zona> zonas = zonaService.obtenerTodasLasZonas();
@@ -42,10 +39,7 @@ public class ZonaController {
             ctx.status(500).json(response);
         }
     }
-    
-    /**
-     * GET /zonas/{id} - Obtiene una zona por ID
-     */
+
     public void obtenerZonaPorId(Context ctx) {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -79,10 +73,7 @@ public class ZonaController {
             ctx.status(500).json(response);
         }
     }
-    
-    /**
-     * GET /zonas/restaurantero/{idRestaurantero} - Obtiene zonas por restaurantero
-     */
+
     public void obtenerZonasPorRestaurantero(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
@@ -109,10 +100,7 @@ public class ZonaController {
             ctx.status(500).json(response);
         }
     }
-    
-    /**
-     * POST /zonas - Crea una nueva zona
-     */
+
     public void crearZona(Context ctx) {
         try {
             Zona zona = objectMapper.readValue(ctx.body(), Zona.class);
@@ -138,10 +126,7 @@ public class ZonaController {
             ctx.status(500).json(response);
         }
     }
-    
-    /**
-     * PUT /zonas/{id} - Actualiza una zona existente
-     */
+
     public void actualizarZona(Context ctx) {
         try {
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -225,10 +210,7 @@ public class ZonaController {
             ctx.status(500).json(response);
         }
     }
-    
-    /**
-     * GET /zonas/buscar?nombre={nombre} - Busca zonas por nombre
-     */
+
     public void buscarZonasPorNombre(Context ctx) {
         try {
             String nombre = ctx.queryParam("nombre");
@@ -250,10 +232,7 @@ public class ZonaController {
             ctx.status(500).json(response);
         }
     }
-    
-    /**
-     * GET /zonas/estadisticas - Obtiene estadísticas de zonas
-     */
+
     public void obtenerEstadisticas(Context ctx) {
         try {
             int totalZonas = zonaService.contarZonas();
@@ -275,10 +254,7 @@ public class ZonaController {
             ctx.status(500).json(response);
         }
     }
-    
-    /**
-     * GET /zonas/restaurantero/{idRestaurantero}/estadisticas - Estadísticas por restaurantero
-     */
+
     public void obtenerEstadisticasPorRestaurantero(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));

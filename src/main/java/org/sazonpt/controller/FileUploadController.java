@@ -15,8 +15,6 @@ public class FileUploadController {
     public void uploadFile(Context ctx) {
         try {
             UploadedFile uploadedFile = ctx.uploadedFile("file");
-            
-            // Obtener tipo desde formParam o desde attribute (rutas específicas)
             String type = ctx.formParam("type");
             if (type == null || type.trim().isEmpty()) {
                 type = ctx.attribute("predefined-type");
@@ -37,8 +35,7 @@ public class FileUploadController {
                 ));
                 return;
             }
-            
-            // Validar tipo de archivo
+
             String originalName = uploadedFile.filename();
             if (originalName == null || originalName.trim().isEmpty()) {
                 ctx.status(400).json(Map.of(
@@ -47,15 +44,13 @@ public class FileUploadController {
                 ));
                 return;
             }
-            
-            // Obtener extensión
+
             String extension = "";
             int lastDotIndex = originalName.lastIndexOf('.');
             if (lastDotIndex > 0) {
                 extension = originalName.substring(lastDotIndex);
             }
-            
-            // Validar extensiones según tipo
+
             if (!isValidFileType(type, extension)) {
                 ctx.status(400).json(Map.of(
                     "success", false, 
@@ -63,11 +58,9 @@ public class FileUploadController {
                 ));
                 return;
             }
-            
-            // Generar nombre único
+
             String uniqueName = UUID.randomUUID().toString() + extension;
-            
-            // Determinar carpeta según tipo
+
             String folder = switch (type.toLowerCase()) {
                 case "image" -> "images";
                 case "document" -> "documents";
@@ -82,26 +75,22 @@ public class FileUploadController {
             };
             
             if (folder == null) return;
-            
-            // Crear directorio si no existe
+
             File dir = new File(UPLOADS_BASE_PATH + folder);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            
-            // Guardar archivo
+
             File file = new File(dir, uniqueName);
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 fos.write(uploadedFile.content().readAllBytes());
             }
-            
-            // Devolver ruta relativa
+
             String relativePath = folder + "/" + uniqueName;
             
-            // Construir URL completa (usando variable de entorno si existe)
             String staticIp = System.getenv("STATIC_IP");
             if (staticIp == null) {
-                staticIp = "localhost:7070"; // Fallback para desarrollo local
+                staticIp = "localhost:7070";
             }
             String fullUrl = "http://" + staticIp + "/uploads/" + relativePath;
             

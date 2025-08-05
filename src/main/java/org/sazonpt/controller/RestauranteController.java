@@ -243,10 +243,6 @@ public class RestauranteController {
         }
     }
 
-    /**
-     * Actualiza campos específicos de un restaurante
-     * PUT /restaurantes/{id}/campos
-     */
     public void actualizarCamposEspecificos(Context ctx) {
         try {
             int idRestaurante = Integer.parseInt(ctx.pathParam("id"));
@@ -254,8 +250,7 @@ public class RestauranteController {
             @SuppressWarnings("unchecked")
             Map<String, Object> body = ctx.bodyAsClass(Map.class);
             Map<String, String> campos = new HashMap<>();
-            
-            // Procesar solo los campos permitidos
+
             String[] camposPermitidos = {"horario", "telefono", "etiquetas", "direccion", "facebook", "instagram"};
             
             for (String campo : camposPermitidos) {

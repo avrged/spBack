@@ -93,8 +93,7 @@ public class AppModule {
     public static RestauranteRoutes initRestaurante() {
         Solicitud_registroRepository solicitudRepository = new Solicitud_registroRepository();
         RestauranteRepository restauranteRepository = new RestauranteRepository();
-        
-        // Crear ZonaService para la dependencia
+
         ZonaRepository zonaRepository = new ZonaRepository();
         ZonaService zonaService = new ZonaService(zonaRepository);
         
@@ -102,23 +101,20 @@ public class AppModule {
         RestauranteController restauranteController = new RestauranteController(restauranteService);
         return new RestauranteRoutes(restauranteController);
     }
-    
-    // Método para obtener solo el controller de usuario si se necesita
+
     public static UsuarioController getUsuarioController() {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         UsuarioService usuarioService = new UsuarioService(usuarioRepository);
         return new UsuarioController(usuarioService);
     }
-    
-    // Método para obtener solo el controller de administrador si se necesita
+
     public static AdministradorController getAdministradorController() {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         AdministradorRepository administradorRepository = new AdministradorRepository();
         AdministradorService administradorService = new AdministradorService(administradorRepository, usuarioRepository);
         return new AdministradorController(administradorService);
     }
-    
-    // Método para obtener solo el controller de restaurantero si se necesita
+
     public static RestauranteroController getRestauranteroController() {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
@@ -148,7 +144,6 @@ public class AppModule {
     }
     
     public static RegistroRestauranteRoutes initRegistroRestaurante() {
-        // Inicializar todos los repositorios necesarios
         Solicitud_registroRepository solicitudRepository = new Solicitud_registroRepository();
         RestauranteRepository restauranteRepository = new RestauranteRepository();
         ImagenRepository imagenRepository = new ImagenRepository();
@@ -156,11 +151,9 @@ public class AppModule {
         MenuRepository menuRepository = new MenuRepository();
         RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
         DescargaRepository descargaRepository = new DescargaRepository();
-        
-        // Crear ZonaService para la dependencia
         ZonaRepository zonaRepository = new ZonaRepository();
         ZonaService zonaService = new ZonaService(zonaRepository);
-        // Crear el servicio con todas las dependencias
+
         RegistroRestauranteService registroService = new RegistroRestauranteService(
             solicitudRepository,
             restauranteRepository,
@@ -171,27 +164,23 @@ public class AppModule {
             zonaService,
             descargaRepository
         );
-        
-        // Crear el controlador
+
         RegistroRestauranteController registroController = new RegistroRestauranteController(registroService);
         
         return new RegistroRestauranteRoutes(registroController);
     }
     
-    // Método para obtener solo el service de usuario si se necesita
     public static UsuarioService getUsuarioService() {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         return new UsuarioService(usuarioRepository);
     }
-    
-    // Método para obtener solo el service de administrador si se necesita
+
     public static AdministradorService getAdministradorService() {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         AdministradorRepository administradorRepository = new AdministradorRepository();
         return new AdministradorService(administradorRepository, usuarioRepository);
     }
-    
-    // Método para obtener solo el service de restaurantero si se necesita
+
     public static RestauranteroService getRestauranteroService() {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
@@ -210,14 +199,12 @@ public class AppModule {
         return new DescargaRoutes(descargaController);
     }
     
-    // Método para obtener solo el controller de descarga si se necesita
     public static DescargaController getDescargaController() {
         DescargaRepository descargaRepository = new DescargaRepository();
         DescargaService descargaService = new DescargaService(descargaRepository);
         return new DescargaController(descargaService);
     }
-    
-    // Método para obtener solo el service de descarga si se necesita
+
     public static DescargaService getDescargaService() {
         DescargaRepository descargaRepository = new DescargaRepository();
         return new DescargaService(descargaRepository);
@@ -229,15 +216,13 @@ public class AppModule {
         ZonaController zonaController = new ZonaController(zonaService);
         return new ZonaRoutes(zonaController);
     }
-    
-    // Método para obtener solo el controller de zona si se necesita
+
     public static ZonaController getZonaController() {
         ZonaRepository zonaRepository = new ZonaRepository();
         ZonaService zonaService = new ZonaService(zonaRepository);
         return new ZonaController(zonaService);
     }
-    
-    // Método para obtener solo el service de zona si se necesita
+
     public static ZonaService getZonaService() {
         ZonaRepository zonaRepository = new ZonaRepository();
         return new ZonaService(zonaRepository);

@@ -150,8 +150,6 @@ public class ComprobanteController {
         }
     }
 
-    // Método obtenerComprobantesPorZona eliminado porque id_zona ya no existe
-
     public void crearComprobante(Context ctx) {
         try {
             Comprobante comprobante = ctx.bodyAsClass(Comprobante.class);
@@ -181,7 +179,6 @@ public class ComprobanteController {
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
 
-            // Obtener datos del body
             @SuppressWarnings("unchecked")
             Map<String, Object> requestBody = ctx.bodyAsClass(Map.class);
             String tipo = (String) requestBody.get("tipo");
@@ -320,25 +317,20 @@ public class ComprobanteController {
         }
     }
 
-    // Método súper simplificado - solo necesita el ID del comprobante
     public void actualizarComprobanteSimplificado(Context ctx) {
         try {
             int idComprobante = Integer.parseInt(ctx.pathParam("idComprobante"));
             
             Comprobante comprobanteActualizado = new Comprobante();
             String nuevaRutaArchivo = null;
-            
-            // Detectar si es form-data o JSON
+
             String contentType = ctx.header("Content-Type");
             
             if (contentType != null && contentType.contains("multipart/form-data")) {
-                // Verificar si hay un archivo subido
                 if (!ctx.uploadedFiles().isEmpty()) {
-                    // Procesar archivo PDF subido
-                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    var uploadedFile = ctx.uploadedFiles().get(0);
                     
                     try {
-                        // Guardar el archivo PDF
                         nuevaRutaArchivo = guardarArchivoPDF(uploadedFile);
                         comprobanteActualizado.setRuta_archivo(nuevaRutaArchivo);
                     } catch (Exception e) {
@@ -349,7 +341,6 @@ public class ComprobanteController {
                         return;
                     }
                 } else {
-                    // Procesar form-data con ruta de texto
                     String rutaArchivo = ctx.formParam("ruta_archivo");
                     String tipo = ctx.formParam("tipo");
                     
@@ -361,7 +352,6 @@ public class ComprobanteController {
                     }
                 }
             } else {
-                // Procesar JSON
                 comprobanteActualizado = ctx.bodyAsClass(Comprobante.class);
             }
             
@@ -397,42 +387,33 @@ public class ComprobanteController {
         }
     }
 
-    /**
-     * Guarda un archivo PDF subido y retorna la URL completa
-     */
     private String guardarArchivoPDF(UploadedFile uploadedFile) throws Exception {
-        // Validar que sea un PDF
+
         String fileName = uploadedFile.filename();
         if (fileName == null || !fileName.toLowerCase().endsWith(".pdf")) {
             throw new IllegalArgumentException("Solo se permiten archivos PDF");
         }
 
-        // Verificar tipo MIME
         String contentType = uploadedFile.contentType();
         if (contentType != null && !contentType.equals("application/pdf")) {
             throw new IllegalArgumentException("El archivo debe ser un PDF válido");
         }
 
-        // Crear directorio si no existe
         Path documentsDir = Paths.get("uploads/documents");
         if (!Files.exists(documentsDir)) {
             Files.createDirectories(documentsDir);
         }
 
-        // Generar nombre único para el archivo
         String timestamp = String.valueOf(System.currentTimeMillis());
         String randomSuffix = String.valueOf((int)(Math.random() * 1000000000));
         String newFileName = timestamp + "_" + randomSuffix + ".pdf";
-        
-        // Ruta donde se guardará el archivo
+
         Path filePath = documentsDir.resolve(newFileName);
-        
-        // Guardar el archivo
+
         try (InputStream inputStream = uploadedFile.content()) {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
-        
-        // Generar URL completa
+
         return "http://localhost:7070/uploads/documents/" + newFileName;
     }
 }

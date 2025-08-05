@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class DescargaController {
-    // PUT /descargas/restaurantero/{idRestaurantero}
     public void actualizarDescargaPorRestaurantero(io.javalin.http.Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
@@ -367,7 +366,6 @@ public class DescargaController {
         }
     }
 
-    // Endpoint para crear descarga rápida con parámetros específicos
     public void crearDescargaRapida(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));

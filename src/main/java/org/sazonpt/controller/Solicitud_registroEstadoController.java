@@ -13,11 +13,9 @@ public class Solicitud_registroEstadoController {
         this.solicitudService = solicitudService;
     }
 
-    // PUT /solicitudes/restaurantero/{idRestaurantero}/aprobar
     public void aprobarPorRestaurantero(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            // Buscar la solicitud pendiente de ese restaurantero
             var solicitudes = solicitudService.obtenerSolicitudesPorRestaurantero(idRestaurantero);
             var solicitudPendiente = solicitudes.stream()
                 .filter(s -> "pendiente".equalsIgnoreCase(s.getEstado()))
@@ -28,7 +26,7 @@ public class Solicitud_registroEstadoController {
             }
             int idSolicitud = solicitudPendiente.get().getId_solicitud();
             int idRestauranteroSolicitud = solicitudPendiente.get().getId_restaurantero();
-            int idAdministrador = 1; // ID por defecto, puedes cambiarlo si tienes autenticación
+            int idAdministrador = 1;
             boolean ok = solicitudService.aprobarSolicitudConRevision(idSolicitud, idRestauranteroSolicitud, idAdministrador);
             if (ok) {
                 ctx.json(Map.of("success", true, "message", "Solicitud aprobada correctamente y revisión registrada"));

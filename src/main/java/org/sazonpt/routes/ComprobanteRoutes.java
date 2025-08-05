@@ -26,8 +26,7 @@ public class ComprobanteRoutes {
         app.get("/comprobantes/tipo/{tipo}", 
                comprobanteController::obtenerComprobantesPorTipo);
 
-        
-        // Obtener tipos de comprobante disponibles
+
         app.get("/comprobantes/tipos", 
                comprobanteController::obtenerTiposComprobante);
 

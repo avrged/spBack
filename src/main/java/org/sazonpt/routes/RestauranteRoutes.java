@@ -12,7 +12,6 @@ public class RestauranteRoutes {
     }
 
     public void register(Javalin app) {
-        // Rutas CRUD para restaurantes
         app.get("/restaurantes", restauranteController::obtenerTodosLosRestaurantes);
         app.post("/restaurantes", restauranteController::crearRestaurante);
         app.get("/restaurantes/{id}", restauranteController::obtenerRestaurantePorId);

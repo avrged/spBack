@@ -243,8 +243,6 @@ public class ImagenController {
             ));
         }
     }
-
-    // Métodos simplificados usando solo id_restaurantero
     
     public void obtenerImagenPorRestaurantero(Context ctx) {
         try {
@@ -314,18 +312,13 @@ public class ImagenController {
             
             Imagen imagenActualizada = new Imagen();
             String nuevaRutaImagen = null;
-            
-            // Detectar si es form-data o JSON
             String contentType = ctx.header("Content-Type");
             
             if (contentType != null && contentType.contains("multipart/form-data")) {
-                // Verificar si hay un archivo subido
                 if (!ctx.uploadedFiles().isEmpty()) {
-                    // Procesar archivo subido
-                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    var uploadedFile = ctx.uploadedFiles().get(0);
                     
                     try {
-                        // Guardar el archivo
                         nuevaRutaImagen = guardarArchivoImagen(uploadedFile);
                         imagenActualizada.setRuta_imagen(nuevaRutaImagen);
                     } catch (Exception e) {
@@ -336,14 +329,12 @@ public class ImagenController {
                         return;
                     }
                 } else {
-                    // Procesar form-data con ruta de texto
                     String rutaImagen = ctx.formParam("ruta_imagen");
                     if (rutaImagen != null && !rutaImagen.trim().isEmpty()) {
                         imagenActualizada.setRuta_imagen(rutaImagen);
                     }
                 }
             } else {
-                // Procesar JSON
                 imagenActualizada = ctx.bodyAsClass(Imagen.class);
             }
             
@@ -380,40 +371,33 @@ public class ImagenController {
     }
 
     private String guardarArchivoImagen(io.javalin.http.UploadedFile uploadedFile) throws Exception {
-        // Validaciones
         String originalName = uploadedFile.filename();
         if (originalName == null || originalName.trim().isEmpty()) {
             throw new IllegalArgumentException("El archivo debe tener un nombre válido");
         }
 
-        // Obtener extensión
         String extension = "";
         int lastDotIndex = originalName.lastIndexOf('.');
         if (lastDotIndex > 0) {
             extension = originalName.substring(lastDotIndex);
         }
 
-        // Validar extensiones de imagen
         if (!extension.toLowerCase().matches("\\.(jpg|jpeg|png|gif|webp)")) {
             throw new IllegalArgumentException("Solo se permiten archivos de imagen (jpg, jpeg, png, gif, webp)");
         }
 
-        // Generar nombre único
         String uniqueFileName = System.currentTimeMillis() + "_" + 
                                Math.abs(originalName.hashCode()) + extension;
 
-        // Crear directorio si no existe
         java.io.File uploadDir = new java.io.File("./uploads/images");
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
 
-        // Guardar archivo
         java.io.File destinationFile = new java.io.File(uploadDir, uniqueFileName);
         java.nio.file.Files.copy(uploadedFile.content(), destinationFile.toPath(), 
                                 java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
-        // Retornar URL completa
         return "http://localhost:7070/uploads/images/" + uniqueFileName;
     }
 
@@ -451,13 +435,11 @@ public class ImagenController {
     public void actualizarImagenesRestaurantero(Context ctx) {
         try {
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            
-            // Obtener las rutas de las imágenes desde form-data
+
             String rutaImagen1 = ctx.formParam("ruta_imagen1");
             String rutaImagen2 = ctx.formParam("ruta_imagen2");
             String rutaImagen3 = ctx.formParam("ruta_imagen3");
-            
-            // Obtener todas las imágenes del restaurantero
+
             List<Imagen> imagenes = imagenService.obtenerImagenesPorRestaurantero(idRestaurantero);
             
             if (imagenes.isEmpty()) {
@@ -467,8 +449,7 @@ public class ImagenController {
                 ));
                 return;
             }
-            
-            // Limitar a las primeras 3 imágenes (o las que estén disponibles)
+
             int imagenesActualizadas = 0;
             String[] rutasNuevas = {rutaImagen1, rutaImagen2, rutaImagen3};
             
@@ -516,25 +497,19 @@ public class ImagenController {
         }
     }
 
-    // Método súper simplificado - solo necesita el ID de la imagen
     public void actualizarImagenSimplificado(Context ctx) {
         try {
             int idImagen = Integer.parseInt(ctx.pathParam("idImagen"));
             
             Imagen imagenActualizada = new Imagen();
             String nuevaRutaImagen = null;
-            
-            // Detectar si es form-data o JSON
             String contentType = ctx.header("Content-Type");
             
             if (contentType != null && contentType.contains("multipart/form-data")) {
-                // Verificar si hay un archivo subido
                 if (!ctx.uploadedFiles().isEmpty()) {
-                    // Procesar archivo de imagen subido
-                    var uploadedFile = ctx.uploadedFiles().get(0); // Tomar el primer archivo
+                    var uploadedFile = ctx.uploadedFiles().get(0);
                     
                     try {
-                        // Guardar el archivo de imagen
                         nuevaRutaImagen = guardarArchivoImagen(uploadedFile);
                         imagenActualizada.setRuta_imagen(nuevaRutaImagen);
                     } catch (Exception e) {
@@ -545,7 +520,6 @@ public class ImagenController {
                         return;
                     }
                 } else {
-                    // Procesar form-data con ruta de texto
                     String rutaImagen = ctx.formParam("ruta_imagen");
                     
                     if (rutaImagen != null && !rutaImagen.trim().isEmpty()) {
@@ -553,7 +527,6 @@ public class ImagenController {
                     }
                 }
             } else {
-                // Procesar JSON
                 imagenActualizada = ctx.bodyAsClass(Imagen.class);
             }
             

@@ -156,7 +156,6 @@ public class UsuarioController {
             Usuario usuario = usuarioService.autenticarUsuario(correo, contrasena);
             
             if (usuario != null) {
-                // Crear respuesta sin incluir la contraseña
                 Map<String, Object> response = Map.of(
                     "success", true,
                     "message", "Autenticación exitosa",
