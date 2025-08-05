@@ -21,7 +21,7 @@ public class RegistroRestauranteDTO {
     
     // IDs necesarios
     private int idRestaurantero;
-    private int idZona;
+    // idZona eliminado del flujo
     
     // Constructor por defecto
     public RegistroRestauranteDTO() {
@@ -32,7 +32,7 @@ public class RegistroRestauranteDTO {
                                  String numeroCelular, String facebook, String instagram, String direccion,
                                  String horarios, String imagenPrincipal, String imagenSecundaria,
                                  String imagenPlatillo, String comprobanteDomicilio, String menuRestaurante,
-                                 int idRestaurantero, int idZona) {
+                                 int idRestaurantero) {
         this.nombreRestaurante = nombreRestaurante;
         this.propietario = propietario;
         this.correoElectronico = correoElectronico;
@@ -47,7 +47,7 @@ public class RegistroRestauranteDTO {
         this.comprobanteDomicilio = comprobanteDomicilio;
         this.menuRestaurante = menuRestaurante;
         this.idRestaurantero = idRestaurantero;
-        this.idZona = idZona;
+        // idZona eliminado
     }
     
     // Getters y Setters
@@ -163,14 +163,7 @@ public class RegistroRestauranteDTO {
         this.idRestaurantero = idRestaurantero;
     }
     
-    public int getIdZona() {
-        return idZona;
-    }
-    
-    public void setIdZona(int idZona) {
-        this.idZona = idZona;
-    }
-    
+    // Métodos de idZona eliminados
     @Override
     public String toString() {
         return "RegistroRestauranteDTO{" +
@@ -183,7 +176,7 @@ public class RegistroRestauranteDTO {
                 ", direccion='" + direccion + '\'' +
                 ", horarios='" + horarios + '\'' +
                 ", idRestaurantero=" + idRestaurantero +
-                ", idZona=" + idZona +
+                // idZona eliminado
                 '}';
     }
 }

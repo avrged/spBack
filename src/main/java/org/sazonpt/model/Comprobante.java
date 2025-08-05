@@ -11,7 +11,7 @@ public class Comprobante {
     private int id_restaurante;
     private int id_solicitud;
     private int id_restaurantero;
-    private int id_zona;
+    // private int id_zona;
     
     // Enum para tipos de comprobante
     public enum TipoComprobante {
@@ -50,7 +50,7 @@ public class Comprobante {
     // Constructor completo
     public Comprobante(int id_comprobante, String tipo, String ruta_archivo,
                       LocalDateTime fecha_subida, int id_restaurante, int id_solicitud, 
-                      int id_restaurantero, int id_zona) {
+                      int id_restaurantero) {
         this.id_comprobante = id_comprobante;
         this.tipo = tipo;
         this.ruta_archivo = ruta_archivo;
@@ -58,19 +58,17 @@ public class Comprobante {
         this.id_restaurante = id_restaurante;
         this.id_solicitud = id_solicitud;
         this.id_restaurantero = id_restaurantero;
-        this.id_zona = id_zona;
     }
     
     // Constructor sin ID (para crear nuevos registros)
     public Comprobante(String tipo, String ruta_archivo, LocalDateTime fecha_subida, 
-                      int id_restaurante, int id_solicitud, int id_restaurantero, int id_zona) {
+                      int id_restaurante, int id_solicitud, int id_restaurantero) {
         this.tipo = tipo;
         this.ruta_archivo = ruta_archivo;
         this.fecha_subida = fecha_subida;
         this.id_restaurante = id_restaurante;
         this.id_solicitud = id_solicitud;
         this.id_restaurantero = id_restaurantero;
-        this.id_zona = id_zona;
     }
     
     // Getters y Setters
@@ -130,13 +128,8 @@ public class Comprobante {
         this.id_restaurantero = id_restaurantero;
     }
     
-    public int getId_zona() {
-        return id_zona;
-    }
-    
-    public void setId_zona(int id_zona) {
-        this.id_zona = id_zona;
-    }
+    // public int getId_zona() { return id_zona; }
+    // public void setId_zona(int id_zona) { this.id_zona = id_zona; }
     
     @Override
     public String toString() {
@@ -148,7 +141,6 @@ public class Comprobante {
                 ", id_restaurante=" + id_restaurante +
                 ", id_solicitud=" + id_solicitud +
                 ", id_restaurantero=" + id_restaurantero +
-                ", id_zona=" + id_zona +
                 '}';
     }
     
@@ -163,7 +155,7 @@ public class Comprobante {
         if (id_restaurante != that.id_restaurante) return false;
         if (id_solicitud != that.id_solicitud) return false;
         if (id_restaurantero != that.id_restaurantero) return false;
-        return id_zona == that.id_zona;
+        return true;
     }
     
     @Override
@@ -172,7 +164,6 @@ public class Comprobante {
         result = 31 * result + id_restaurante;
         result = 31 * result + id_solicitud;
         result = 31 * result + id_restaurantero;
-        result = 31 * result + id_zona;
         return result;
     }
 }

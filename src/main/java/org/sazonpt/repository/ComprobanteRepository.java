@@ -18,12 +18,11 @@ public class ComprobanteRepository {
     public List<Comprobante> findAll() throws SQLException {
         String sql = """
             SELECT c.id_comprobante, c.tipo, c.ruta_archivo, c.fecha_subida, 
-                   c.id_restaurante, c.id_solicitud, c.id_restaurantero, c.id_zona
+                   c.id_restaurante, c.id_solicitud, c.id_restaurantero
             FROM comprobante c
             INNER JOIN restaurante r ON c.id_restaurante = r.id_restaurante 
                 AND c.id_solicitud = r.id_solicitud 
-                AND c.id_restaurantero = r.id_restaurantero 
-                AND c.id_zona = r.id_zona
+                AND c.id_restaurantero = r.id_restaurantero
             ORDER BY c.fecha_subida DESC
             """;
 
@@ -40,17 +39,16 @@ public class ComprobanteRepository {
     }
 
     public Optional<Comprobante> findById(int idComprobante, int idRestaurante, int idSolicitud, 
-                                         int idRestaurantero, int idZona) throws SQLException {
+                                         int idRestaurantero) throws SQLException {
         String sql = """
             SELECT c.id_comprobante, c.tipo, c.ruta_archivo, c.fecha_subida, 
-                   c.id_restaurante, c.id_solicitud, c.id_restaurantero, c.id_zona
+                   c.id_restaurante, c.id_solicitud, c.id_restaurantero
             FROM comprobante c
             INNER JOIN restaurante r ON c.id_restaurante = r.id_restaurante 
                 AND c.id_solicitud = r.id_solicitud 
-                AND c.id_restaurantero = r.id_restaurantero 
-                AND c.id_zona = r.id_zona
+                AND c.id_restaurantero = r.id_restaurantero
             WHERE c.id_comprobante = ? AND c.id_restaurante = ? AND c.id_solicitud = ? 
-                AND c.id_restaurantero = ? AND c.id_zona = ?
+                AND c.id_restaurantero = ?
             """;
 
         try (Connection conn = getConnection();
@@ -60,7 +58,6 @@ public class ComprobanteRepository {
             stmt.setInt(2, idRestaurante);
             stmt.setInt(3, idSolicitud);
             stmt.setInt(4, idRestaurantero);
-            stmt.setInt(5, idZona);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -72,17 +69,16 @@ public class ComprobanteRepository {
     }
 
     public List<Comprobante> findByRestaurante(int idRestaurante, int idSolicitud, 
-                                              int idRestaurantero, int idZona) throws SQLException {
+                                              int idRestaurantero) throws SQLException {
         String sql = """
             SELECT c.id_comprobante, c.tipo, c.ruta_archivo, c.fecha_subida, 
-                   c.id_restaurante, c.id_solicitud, c.id_restaurantero, c.id_zona
+                   c.id_restaurante, c.id_solicitud, c.id_restaurantero
             FROM comprobante c
             INNER JOIN restaurante r ON c.id_restaurante = r.id_restaurante 
                 AND c.id_solicitud = r.id_solicitud 
-                AND c.id_restaurantero = r.id_restaurantero 
-                AND c.id_zona = r.id_zona
+                AND c.id_restaurantero = r.id_restaurantero
             WHERE c.id_restaurante = ? AND c.id_solicitud = ? 
-                AND c.id_restaurantero = ? AND c.id_zona = ?
+                AND c.id_restaurantero = ?
             ORDER BY c.fecha_subida DESC
             """;
 
@@ -93,7 +89,6 @@ public class ComprobanteRepository {
             stmt.setInt(1, idRestaurante);
             stmt.setInt(2, idSolicitud);
             stmt.setInt(3, idRestaurantero);
-            stmt.setInt(4, idZona);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -107,12 +102,11 @@ public class ComprobanteRepository {
     public List<Comprobante> findByRestaurantero(int idRestaurantero) throws SQLException {
         String sql = """
             SELECT c.id_comprobante, c.tipo, c.ruta_archivo, c.fecha_subida, 
-                   c.id_restaurante, c.id_solicitud, c.id_restaurantero, c.id_zona
+                   c.id_restaurante, c.id_solicitud, c.id_restaurantero
             FROM comprobante c
             INNER JOIN restaurante r ON c.id_restaurante = r.id_restaurante 
                 AND c.id_solicitud = r.id_solicitud 
-                AND c.id_restaurantero = r.id_restaurantero 
-                AND c.id_zona = r.id_zona
+                AND c.id_restaurantero = r.id_restaurantero
             WHERE c.id_restaurantero = ?
             ORDER BY c.fecha_subida DESC
             """;
@@ -135,12 +129,11 @@ public class ComprobanteRepository {
     public List<Comprobante> findByTipo(String tipo) throws SQLException {
         String sql = """
             SELECT c.id_comprobante, c.tipo, c.ruta_archivo, c.fecha_subida, 
-                   c.id_restaurante, c.id_solicitud, c.id_restaurantero, c.id_zona
+                   c.id_restaurante, c.id_solicitud, c.id_restaurantero
             FROM comprobante c
             INNER JOIN restaurante r ON c.id_restaurante = r.id_restaurante 
                 AND c.id_solicitud = r.id_solicitud 
-                AND c.id_restaurantero = r.id_restaurantero 
-                AND c.id_zona = r.id_zona
+                AND c.id_restaurantero = r.id_restaurantero
             WHERE c.tipo = ?
             ORDER BY c.fecha_subida DESC
             """;
@@ -160,39 +153,13 @@ public class ComprobanteRepository {
         return comprobantes;
     }
 
-    public List<Comprobante> findByZona(int idZona) throws SQLException {
-        String sql = """
-            SELECT c.id_comprobante, c.tipo, c.ruta_archivo, c.fecha_subida, 
-                   c.id_restaurante, c.id_solicitud, c.id_restaurantero, c.id_zona
-            FROM comprobante c
-            INNER JOIN restaurante r ON c.id_restaurante = r.id_restaurante 
-                AND c.id_solicitud = r.id_solicitud 
-                AND c.id_restaurantero = r.id_restaurantero 
-                AND c.id_zona = r.id_zona
-            WHERE c.id_zona = ?
-            ORDER BY c.fecha_subida DESC
-            """;
-
-        List<Comprobante> comprobantes = new ArrayList<>();
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, idZona);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    comprobantes.add(mapRowToComprobante(rs));
-                }
-            }
-        }
-        return comprobantes;
-    }
+    // Método findByZona eliminado porque id_zona ya no existe
 
     public Comprobante save(Comprobante comprobante) throws SQLException {
         String sql = """
             INSERT INTO comprobante (tipo, ruta_archivo, fecha_subida, id_restaurante, 
-                                   id_solicitud, id_restaurantero, id_zona) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                                   id_solicitud, id_restaurantero) 
+            VALUES (?, ?, ?, ?, ?, ?)
             """;
 
         try (Connection conn = getConnection();
@@ -200,7 +167,7 @@ public class ComprobanteRepository {
 
             // Validar que el restaurante existe
             if (!restauranteExists(comprobante.getId_restaurante(), comprobante.getId_solicitud(), 
-                                 comprobante.getId_restaurantero(), comprobante.getId_zona())) {
+                                 comprobante.getId_restaurantero())) {
                 throw new SQLException("El restaurante especificado no existe");
             }
 
@@ -211,7 +178,6 @@ public class ComprobanteRepository {
             stmt.setInt(4, comprobante.getId_restaurante());
             stmt.setInt(5, comprobante.getId_solicitud());
             stmt.setInt(6, comprobante.getId_restaurantero());
-            stmt.setInt(7, comprobante.getId_zona());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -234,7 +200,7 @@ public class ComprobanteRepository {
             UPDATE comprobante 
             SET tipo = ?, ruta_archivo = ?, fecha_subida = ?
             WHERE id_comprobante = ? AND id_restaurante = ? AND id_solicitud = ? 
-                AND id_restaurantero = ? AND id_zona = ?
+                AND id_restaurantero = ?
             """;
 
         try (Connection conn = getConnection();
@@ -242,7 +208,7 @@ public class ComprobanteRepository {
 
             // Validar que el restaurante existe
             if (!restauranteExists(comprobante.getId_restaurante(), comprobante.getId_solicitud(), 
-                                 comprobante.getId_restaurantero(), comprobante.getId_zona())) {
+                                 comprobante.getId_restaurantero())) {
                 throw new SQLException("El restaurante especificado no existe");
             }
 
@@ -254,18 +220,17 @@ public class ComprobanteRepository {
             stmt.setInt(5, comprobante.getId_restaurante());
             stmt.setInt(6, comprobante.getId_solicitud());
             stmt.setInt(7, comprobante.getId_restaurantero());
-            stmt.setInt(8, comprobante.getId_zona());
 
             return stmt.executeUpdate() > 0;
         }
     }
 
     public boolean delete(int idComprobante, int idRestaurante, int idSolicitud, 
-                         int idRestaurantero, int idZona) throws SQLException {
+                         int idRestaurantero) throws SQLException {
         String sql = """
             DELETE FROM comprobante 
             WHERE id_comprobante = ? AND id_restaurante = ? AND id_solicitud = ? 
-                AND id_restaurantero = ? AND id_zona = ?
+                AND id_restaurantero = ?
             """;
 
         try (Connection conn = getConnection();
@@ -275,18 +240,17 @@ public class ComprobanteRepository {
             stmt.setInt(2, idRestaurante);
             stmt.setInt(3, idSolicitud);
             stmt.setInt(4, idRestaurantero);
-            stmt.setInt(5, idZona);
 
             return stmt.executeUpdate() > 0;
         }
     }
 
     public boolean existsById(int idComprobante, int idRestaurante, int idSolicitud, 
-                             int idRestaurantero, int idZona) throws SQLException {
+                             int idRestaurantero) throws SQLException {
         String sql = """
             SELECT 1 FROM comprobante 
             WHERE id_comprobante = ? AND id_restaurante = ? AND id_solicitud = ? 
-                AND id_restaurantero = ? AND id_zona = ?
+                AND id_restaurantero = ?
             """;
 
         try (Connection conn = getConnection();
@@ -296,7 +260,6 @@ public class ComprobanteRepository {
             stmt.setInt(2, idRestaurante);
             stmt.setInt(3, idSolicitud);
             stmt.setInt(4, idRestaurantero);
-            stmt.setInt(5, idZona);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
@@ -304,10 +267,10 @@ public class ComprobanteRepository {
         }
     }
 
-    public boolean restauranteExists(int idRestaurante, int idSolicitud, int idRestaurantero, int idZona) throws SQLException {
+    public boolean restauranteExists(int idRestaurante, int idSolicitud, int idRestaurantero) throws SQLException {
         String sql = """
             SELECT 1 FROM restaurante 
-            WHERE id_restaurante = ? AND id_solicitud = ? AND id_restaurantero = ? AND id_zona = ?
+            WHERE id_restaurante = ? AND id_solicitud = ? AND id_restaurantero = ?
             """;
 
         try (Connection conn = getConnection();
@@ -316,7 +279,6 @@ public class ComprobanteRepository {
             stmt.setInt(1, idRestaurante);
             stmt.setInt(2, idSolicitud);
             stmt.setInt(3, idRestaurantero);
-            stmt.setInt(4, idZona);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
@@ -338,7 +300,7 @@ public class ComprobanteRepository {
         comprobante.setId_restaurante(rs.getInt("id_restaurante"));
         comprobante.setId_solicitud(rs.getInt("id_solicitud"));
         comprobante.setId_restaurantero(rs.getInt("id_restaurantero"));
-        comprobante.setId_zona(rs.getInt("id_zona"));
+        // id_zona eliminado
         
         return comprobante;
     }

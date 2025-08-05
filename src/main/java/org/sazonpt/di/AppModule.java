@@ -156,6 +156,9 @@ public class AppModule {
         MenuRepository menuRepository = new MenuRepository();
         RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
         
+        // Crear ZonaService para la dependencia
+        ZonaRepository zonaRepository = new ZonaRepository();
+        ZonaService zonaService = new ZonaService(zonaRepository);
         // Crear el servicio con todas las dependencias
         RegistroRestauranteService registroService = new RegistroRestauranteService(
             solicitudRepository,
@@ -163,7 +166,8 @@ public class AppModule {
             imagenRepository,
             comprobanteRepository,
             menuRepository,
-            restauranteroRepository
+            restauranteroRepository,
+            zonaService
         );
         
         // Crear el controlador
@@ -235,5 +239,11 @@ public class AppModule {
     public static ZonaService getZonaService() {
         ZonaRepository zonaRepository = new ZonaRepository();
         return new ZonaService(zonaRepository);
+    }
+    public static org.sazonpt.routes.Solicitud_registroEstadoRoutes initSolicitudRegistroEstado() {
+        org.sazonpt.repository.Solicitud_registroRepository solicitudRepository = new org.sazonpt.repository.Solicitud_registroRepository();
+        org.sazonpt.service.Solicitud_registroService solicitudService = new org.sazonpt.service.Solicitud_registroService(solicitudRepository);
+        org.sazonpt.controller.Solicitud_registroEstadoController estadoController = new org.sazonpt.controller.Solicitud_registroEstadoController(solicitudService);
+        return new org.sazonpt.routes.Solicitud_registroEstadoRoutes(estadoController);
     }
 }

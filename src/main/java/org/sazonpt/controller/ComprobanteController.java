@@ -46,10 +46,9 @@ public class ComprobanteController {
             int idRestaurante = Integer.parseInt(ctx.pathParam("idRestaurante"));
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            int idZona = Integer.parseInt(ctx.pathParam("idZona"));
 
             Optional<Comprobante> comprobanteOpt = comprobanteService.obtenerComprobantePorId(
-                idComprobante, idRestaurante, idSolicitud, idRestaurantero, idZona);
+                idComprobante, idRestaurante, idSolicitud, idRestaurantero);
             
             if (comprobanteOpt.isPresent()) {
                 ctx.json(Map.of(
@@ -81,10 +80,9 @@ public class ComprobanteController {
             int idRestaurante = Integer.parseInt(ctx.pathParam("idRestaurante"));
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            int idZona = Integer.parseInt(ctx.pathParam("idZona"));
 
             List<Comprobante> comprobantes = comprobanteService.obtenerComprobantesPorRestaurante(
-                idRestaurante, idSolicitud, idRestaurantero, idZona);
+                idRestaurante, idSolicitud, idRestaurantero);
             
             ctx.json(Map.of(
                 "success", true,
@@ -152,29 +150,7 @@ public class ComprobanteController {
         }
     }
 
-    public void obtenerComprobantesPorZona(Context ctx) {
-        try {
-            int idZona = Integer.parseInt(ctx.pathParam("idZona"));
-
-            List<Comprobante> comprobantes = comprobanteService.obtenerComprobantesPorZona(idZona);
-            
-            ctx.json(Map.of(
-                "success", true,
-                "data", comprobantes,
-                "message", "Comprobantes de la zona obtenidos correctamente"
-            ));
-        } catch (NumberFormatException e) {
-            ctx.status(400).json(Map.of(
-                "success", false,
-                "message", "ID de zona inválido"
-            ));
-        } catch (Exception e) {
-            ctx.status(500).json(Map.of(
-                "success", false,
-                "message", "Error al obtener los comprobantes por zona: " + e.getMessage()
-            ));
-        }
-    }
+    // Método obtenerComprobantesPorZona eliminado porque id_zona ya no existe
 
     public void crearComprobante(Context ctx) {
         try {
@@ -204,7 +180,6 @@ public class ComprobanteController {
             int idRestaurante = Integer.parseInt(ctx.pathParam("idRestaurante"));
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            int idZona = Integer.parseInt(ctx.pathParam("idZona"));
 
             // Obtener datos del body
             @SuppressWarnings("unchecked")
@@ -229,7 +204,7 @@ public class ComprobanteController {
             }
 
             Comprobante comprobanteCreado = comprobanteService.crearComprobanteParaRestaurante(
-                tipo, rutaArchivo, idRestaurante, idSolicitud, idRestaurantero, idZona);
+                tipo, rutaArchivo, idRestaurante, idSolicitud, idRestaurantero);
             
             ctx.status(201).json(Map.of(
                 "success", true,
@@ -260,12 +235,11 @@ public class ComprobanteController {
             int idRestaurante = Integer.parseInt(ctx.pathParam("idRestaurante"));
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            int idZona = Integer.parseInt(ctx.pathParam("idZona"));
             
             Comprobante comprobanteActualizado = ctx.bodyAsClass(Comprobante.class);
             
             boolean actualizado = comprobanteService.actualizarComprobante(idComprobante, idRestaurante, 
-                idSolicitud, idRestaurantero, idZona, comprobanteActualizado);
+                idSolicitud, idRestaurantero, comprobanteActualizado);
             
             if (actualizado) {
                 ctx.json(Map.of(
@@ -302,10 +276,9 @@ public class ComprobanteController {
             int idRestaurante = Integer.parseInt(ctx.pathParam("idRestaurante"));
             int idSolicitud = Integer.parseInt(ctx.pathParam("idSolicitud"));
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
-            int idZona = Integer.parseInt(ctx.pathParam("idZona"));
             
             boolean eliminado = comprobanteService.eliminarComprobante(idComprobante, idRestaurante, 
-                idSolicitud, idRestaurantero, idZona);
+                idSolicitud, idRestaurantero);
             
             if (eliminado) {
                 ctx.json(Map.of(

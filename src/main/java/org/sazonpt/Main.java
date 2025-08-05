@@ -62,6 +62,8 @@ public class Main {
         
         // Registrar rutas de solicitudes de registro
         AppModule.initSolicitudRegistro().register(app);
+        // Registrar rutas de estado de solicitud (aprobación por restaurantero)
+        AppModule.initSolicitudRegistroEstado().register(app);
         
         // Registrar rutas de revisiones de solicitud
         AppModule.initRevisionSolicitud().register(app);

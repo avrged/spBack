@@ -18,19 +18,22 @@ public class RegistroRestauranteService {
     private final ComprobanteRepository comprobanteRepository;
     private final MenuRepository menuRepository;
     private final RestauranteroRepository restauranteroRepository;
+    private final ZonaService zonaService;
     
     public RegistroRestauranteService(Solicitud_registroRepository solicitudRepository,
                                     RestauranteRepository restauranteRepository,
                                     ImagenRepository imagenRepository,
                                     ComprobanteRepository comprobanteRepository,
                                     MenuRepository menuRepository,
-                                    RestauranteroRepository restauranteroRepository) {
+                                    RestauranteroRepository restauranteroRepository,
+                                    ZonaService zonaService) {
         this.solicitudRepository = solicitudRepository;
         this.restauranteRepository = restauranteRepository;
         this.imagenRepository = imagenRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.menuRepository = menuRepository;
         this.restauranteroRepository = restauranteroRepository;
+        this.zonaService = zonaService;
     }
     
     /**
@@ -43,7 +46,7 @@ public class RegistroRestauranteService {
             if (!restauranteroRepository.existsById(datos.getIdRestaurantero())) {
                 throw new SQLException("El restaurantero especificado no existe");
             }
-            
+
             // 2. Crear la solicitud de registro
             Solicitud_registro solicitud = new Solicitud_registro();
             solicitud.setFecha(LocalDateTime.now());
@@ -53,10 +56,10 @@ public class RegistroRestauranteService {
             solicitud.setNombre_propietario(datos.getPropietario());
             solicitud.setHorario_atencion(datos.getHorarios());
             solicitud.setId_restaurantero(datos.getIdRestaurantero());
-            
+
             solicitud = solicitudRepository.save(solicitud);
             int idSolicitud = solicitud.getId_solicitud();
-            
+
             // 3. Crear el restaurante (ya que la solicitud se creó automáticamente como pendiente)
             Restaurante restaurante = new Restaurante(
                 datos.getNombreRestaurante(),
@@ -65,32 +68,43 @@ public class RegistroRestauranteService {
                 buildEtiquetas(datos), // Construir etiquetas basadas en datos del form
                 idSolicitud,
                 datos.getIdRestaurantero(),
-                datos.getIdZona(),
                 datos.getDireccion(),
                 datos.getFacebook(),
-                datos.getInstagram()              
+                datos.getInstagram()
             );
-            
+
             restaurante = restauranteRepository.save(restaurante);
             int idRestaurante = restaurante.getId_restaurante();
-            
-            // 4. Guardar imágenes
+
+            // 4. Crear zona automáticamente usando la dirección como nombre
+            if (datos.getDireccion() != null && !datos.getDireccion().trim().isEmpty()) {
+                try {
+                    Zona zona = new Zona(datos.getDireccion(), datos.getIdRestaurantero());
+                    // Si ya existe, el servicio lanza excepción y la ignoramos si es por duplicado
+                    zonaService.crearZona(zona);
+                } catch (Exception ex) {
+                    if (ex.getMessage() == null || !ex.getMessage().contains("Ya existe una zona")) {
+                        throw ex;
+                    }
+                }
+            }
+
+            // 5. Guardar imágenes
             List<String> imagenesCreadas = crearImagenes(datos, idRestaurante, idSolicitud, datos.getIdRestaurantero());
-            
-            // 5. Guardar comprobantes
-            List<String> comprobantesCreados = crearComprobantes(datos, idRestaurante, idSolicitud, 
-                                                               datos.getIdRestaurantero(), datos.getIdZona());
-            
-            // 6. Guardar menú
+
+            // 6. Guardar comprobantes
+            List<String> comprobantesCreados = crearComprobantes(datos, idRestaurante, idSolicitud, datos.getIdRestaurantero());
+
+            // 7. Guardar menú
             String menuCreado = crearMenu(datos, idRestaurante, idSolicitud, datos.getIdRestaurantero());
-            
+
             return String.format("Restaurante registrado exitosamente. ID: %d, Solicitud: %d. " +
-                               "Imágenes: %s, Comprobantes: %s, Menú: %s", 
-                               idRestaurante, idSolicitud, 
-                               String.join(", ", imagenesCreadas),
-                               String.join(", ", comprobantesCreados),
-                               menuCreado);
-                               
+                    "Imágenes: %s, Comprobantes: %s, Menú: %s",
+                    idRestaurante, idSolicitud,
+                    String.join(", ", imagenesCreadas),
+                    String.join(", ", comprobantesCreados),
+                    menuCreado);
+
         } catch (SQLException e) {
             throw new SQLException("Error al registrar el restaurante: " + e.getMessage(), e);
         }
@@ -164,7 +178,7 @@ public class RegistroRestauranteService {
     }
     
     private List<String> crearComprobantes(RegistroRestauranteDTO datos, int idRestaurante, 
-                                         int idSolicitud, int idRestaurantero, int idZona) throws SQLException {
+                                         int idSolicitud, int idRestaurantero) throws SQLException {
         List<String> comprobantesCreados = new ArrayList<>();
         
         // Comprobante de domicilio
@@ -175,8 +189,7 @@ public class RegistroRestauranteService {
                 LocalDateTime.now(),
                 idRestaurante,
                 idSolicitud,
-                idRestaurantero,
-                idZona
+                idRestaurantero
             );
             comprobanteRepository.save(comprobanteDomicilio);
             comprobantesCreados.add("Domicilio");

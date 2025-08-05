@@ -8,7 +8,7 @@ public class Restaurante {
     private String etiquetas;
     private int id_solicitud;
     private int id_restaurantero;
-    private int id_zona;
+    // private int id_zona;
     private String direccion;
     private String facebook;
     private String instagram;
@@ -43,7 +43,7 @@ public class Restaurante {
 
     // Constructor completo
     public Restaurante(int id_restaurante, String nombre, String horario, String telefono,
-                      String etiquetas, int id_solicitud, int id_restaurantero, int id_zona, String direccion, String facebook, String instagram) {
+                      String etiquetas, int id_solicitud, int id_restaurantero, String direccion, String facebook, String instagram) {
         this.id_restaurante = id_restaurante;
         this.nombre = nombre;
         this.horario = horario;
@@ -51,7 +51,6 @@ public class Restaurante {
         this.etiquetas = etiquetas;
         this.id_solicitud = id_solicitud;
         this.id_restaurantero = id_restaurantero;
-        this.id_zona = id_zona;
         this.direccion = direccion;
         this.facebook = facebook;
         this.instagram = instagram;
@@ -59,14 +58,13 @@ public class Restaurante {
 
     // Constructor para crear desde solicitud aprobada
     public Restaurante(String nombre, String horario, String telefono, String etiquetas,
-                      int id_solicitud, int id_restaurantero, int id_zona, String direccion, String facebook, String instagram) {
+                      int id_solicitud, int id_restaurantero, String direccion, String facebook, String instagram) {
         this.nombre = nombre;
         this.horario = horario;
         this.telefono = telefono;
         this.etiquetas = etiquetas;
         this.id_solicitud = id_solicitud;
         this.id_restaurantero = id_restaurantero;
-        this.id_zona = id_zona;
         this.direccion = direccion;
         this.facebook = facebook;
         this.instagram = instagram;
@@ -80,7 +78,7 @@ public class Restaurante {
     public String getEtiquetas() { return etiquetas; }
     public int getId_solicitud() { return id_solicitud; }
     public int getId_restaurantero() { return id_restaurantero; }
-    public int getId_zona() { return id_zona; }
+    // public int getId_zona() { return id_zona; }
     public String getDireccion() { return direccion; }
     public String getFacebook() { return facebook; }
     public String getInstagram() { return instagram; }
@@ -93,7 +91,7 @@ public class Restaurante {
     public void setEtiquetas(String etiquetas) { this.etiquetas = etiquetas; }
     public void setId_solicitud(int id_solicitud) { this.id_solicitud = id_solicitud; }
     public void setId_restaurantero(int id_restaurantero) { this.id_restaurantero = id_restaurantero; }
-    public void setId_zona(int id_zona) { this.id_zona = id_zona; }
+    // public void setId_zona(int id_zona) { this.id_zona = id_zona; }
     public void setDireccion(String direccion) { this.direccion = direccion; }
     public void setFacebook(String facebook) { this.facebook = facebook; }
     public void setInstagram(String instagram) { this.instagram = instagram; }
@@ -109,7 +107,6 @@ public class Restaurante {
                 ", etiquetas='" + etiquetas + '\'' +
                 ", id_solicitud=" + id_solicitud +
                 ", id_restaurantero=" + id_restaurantero +
-                ", id_zona=" + id_zona +
                 ", direccion='" + direccion + '\'' +
                 ", facebook='" + facebook + '\'' +
                 ", instagram='" + instagram + '\'' +

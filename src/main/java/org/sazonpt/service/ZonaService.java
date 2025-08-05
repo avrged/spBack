@@ -100,10 +100,7 @@ public class ZonaService {
             // Verificar que la zona existe
             if (!zonaRepository.existsById(idZona)) {
                 throw new IllegalArgumentException("No se encontró la zona con ID: " + idZona);
-            }
-            
-            // TODO: Aquí podrías agregar validación para verificar si hay restaurantes asociados
-            // y decidir si permitir la eliminación o no
+            }            
             
             return zonaRepository.deleteById(idZona);
         } catch (SQLException e) {

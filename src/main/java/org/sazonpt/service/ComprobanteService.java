@@ -25,20 +25,20 @@ public class ComprobanteService {
     }
 
     public Optional<Comprobante> obtenerComprobantePorId(int idComprobante, int idRestaurante, 
-                                                        int idSolicitud, int idRestaurantero, int idZona) {
+                                                        int idSolicitud, int idRestaurantero) {
         try {
             return comprobanteRepository.findById(idComprobante, idRestaurante, idSolicitud, 
-                                                 idRestaurantero, idZona);
+                                                 idRestaurantero);
         } catch (SQLException e) {
             throw new RuntimeException("Error al obtener el comprobante: " + e.getMessage(), e);
         }
     }
 
     public List<Comprobante> obtenerComprobantesPorRestaurante(int idRestaurante, int idSolicitud, 
-                                                              int idRestaurantero, int idZona) {
+                                                              int idRestaurantero) {
         try {
             return comprobanteRepository.findByRestaurante(idRestaurante, idSolicitud, 
-                                                          idRestaurantero, idZona);
+                                                          idRestaurantero);
         } catch (SQLException e) {
             throw new RuntimeException("Error al obtener los comprobantes del restaurante: " + e.getMessage(), e);
         }
@@ -65,17 +65,7 @@ public class ComprobanteService {
         }
     }
 
-    public List<Comprobante> obtenerComprobantesPorZona(int idZona) {
-        try {
-            if (idZona <= 0) {
-                throw new IllegalArgumentException("ID de zona inválido");
-            }
-            
-            return comprobanteRepository.findByZona(idZona);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener los comprobantes por zona: " + e.getMessage(), e);
-        }
-    }
+    // Método obtenerComprobantesPorZona eliminado porque id_zona ya no existe
 
     public Comprobante crearComprobante(Comprobante comprobante) {
         // Validaciones
@@ -103,15 +93,12 @@ public class ComprobanteService {
         if (comprobante.getId_restaurantero() <= 0) {
             throw new IllegalArgumentException("ID de restaurantero inválido");
         }
-        if (comprobante.getId_zona() <= 0) {
-            throw new IllegalArgumentException("ID de zona inválido");
-        }
+        // id_zona eliminado
 
         // Verificar que el restaurante existe
         try {
             if (!comprobanteRepository.restauranteExists(comprobante.getId_restaurante(), 
-                    comprobante.getId_solicitud(), comprobante.getId_restaurantero(), 
-                    comprobante.getId_zona())) {
+                    comprobante.getId_solicitud(), comprobante.getId_restaurantero())) {
                 throw new IllegalArgumentException("El restaurante especificado no existe");
             }
         } catch (SQLException e) {
@@ -131,11 +118,11 @@ public class ComprobanteService {
     }
 
     public boolean actualizarComprobante(int idComprobante, int idRestaurante, int idSolicitud, 
-                                        int idRestaurantero, int idZona, Comprobante comprobanteActualizado) {
+                                        int idRestaurantero, Comprobante comprobanteActualizado) {
         try {
             // Verificar que el comprobante existe
             if (!comprobanteRepository.existsById(idComprobante, idRestaurante, idSolicitud, 
-                                                 idRestaurantero, idZona)) {
+                                                 idRestaurantero)) {
                 throw new IllegalArgumentException("El comprobante no existe");
             }
 
@@ -165,14 +152,10 @@ public class ComprobanteService {
             if (comprobanteActualizado.getId_restaurantero() <= 0) {
                 throw new IllegalArgumentException("ID de restaurantero inválido");
             }
-            if (comprobanteActualizado.getId_zona() <= 0) {
-                throw new IllegalArgumentException("ID de zona inválido");
-            }
 
             // Verificar que el restaurante existe
             if (!comprobanteRepository.restauranteExists(comprobanteActualizado.getId_restaurante(), 
-                    comprobanteActualizado.getId_solicitud(), comprobanteActualizado.getId_restaurantero(), 
-                    comprobanteActualizado.getId_zona())) {
+                    comprobanteActualizado.getId_solicitud(), comprobanteActualizado.getId_restaurantero())) {
                 throw new IllegalArgumentException("El restaurante especificado no existe");
             }
 
@@ -181,7 +164,6 @@ public class ComprobanteService {
             comprobanteActualizado.setId_restaurante(idRestaurante);
             comprobanteActualizado.setId_solicitud(idSolicitud);
             comprobanteActualizado.setId_restaurantero(idRestaurantero);
-            comprobanteActualizado.setId_zona(idZona);
 
             return comprobanteRepository.update(comprobanteActualizado);
         } catch (SQLException e) {
@@ -190,25 +172,25 @@ public class ComprobanteService {
     }
 
     public boolean eliminarComprobante(int idComprobante, int idRestaurante, int idSolicitud, 
-                                      int idRestaurantero, int idZona) {
+                                      int idRestaurantero) {
         try {
             if (!comprobanteRepository.existsById(idComprobante, idRestaurante, idSolicitud, 
-                                                 idRestaurantero, idZona)) {
+                                                 idRestaurantero)) {
                 throw new IllegalArgumentException("El comprobante no existe");
             }
 
             return comprobanteRepository.delete(idComprobante, idRestaurante, idSolicitud, 
-                                               idRestaurantero, idZona);
+                                               idRestaurantero);
         } catch (SQLException e) {
             throw new RuntimeException("Error al eliminar el comprobante: " + e.getMessage(), e);
         }
     }
 
     public boolean existeComprobante(int idComprobante, int idRestaurante, int idSolicitud, 
-                                    int idRestaurantero, int idZona) {
+                                    int idRestaurantero) {
         try {
             return comprobanteRepository.existsById(idComprobante, idRestaurante, idSolicitud, 
-                                                   idRestaurantero, idZona);
+                                                   idRestaurantero);
         } catch (SQLException e) {
             throw new RuntimeException("Error al verificar la existencia del comprobante: " + e.getMessage(), e);
         }
@@ -219,14 +201,13 @@ public class ComprobanteService {
      */
     public Comprobante crearComprobanteParaRestaurante(String tipo, String rutaArchivo, 
                                                       int idRestaurante, int idSolicitud, 
-                                                      int idRestaurantero, int idZona) {
+                                                      int idRestaurantero) {
         Comprobante nuevoComprobante = new Comprobante();
         nuevoComprobante.setTipo(tipo);
         nuevoComprobante.setRuta_archivo(rutaArchivo);
         nuevoComprobante.setId_restaurante(idRestaurante);
         nuevoComprobante.setId_solicitud(idSolicitud);
         nuevoComprobante.setId_restaurantero(idRestaurantero);
-        nuevoComprobante.setId_zona(idZona);
         nuevoComprobante.setFecha_subida(LocalDateTime.now());
         
         return crearComprobante(nuevoComprobante);

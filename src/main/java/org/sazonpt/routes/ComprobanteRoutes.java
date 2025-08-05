@@ -16,11 +16,11 @@ public class ComprobanteRoutes {
         app.get("/comprobantes", comprobanteController::obtenerTodosLosComprobantes);
         
         // Obtener comprobante específico por clave primaria compuesta
-        app.get("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}/{idZona}", 
+        app.get("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}", 
                comprobanteController::obtenerComprobantePorId);
         
         // Obtener comprobantes por restaurante
-        app.get("/comprobantes/restaurante/{idRestaurante}/{idSolicitud}/{idRestaurantero}/{idZona}", 
+        app.get("/comprobantes/restaurante/{idRestaurante}/{idSolicitud}/{idRestaurantero}", 
                comprobanteController::obtenerComprobantesPorRestaurante);
         
         // Obtener comprobantes por restaurantero
@@ -31,9 +31,7 @@ public class ComprobanteRoutes {
         app.get("/comprobantes/tipo/{tipo}", 
                comprobanteController::obtenerComprobantesPorTipo);
         
-        // Obtener comprobantes por zona
-        app.get("/comprobantes/zona/{idZona}", 
-               comprobanteController::obtenerComprobantesPorZona);
+        // Ruta de comprobantes por zona eliminada porque id_zona ya no existe
         
         // Obtener tipos de comprobante disponibles
         app.get("/comprobantes/tipos", 
@@ -43,11 +41,11 @@ public class ComprobanteRoutes {
         app.post("/comprobantes", comprobanteController::crearComprobante);
         
         // Crear comprobante específico para un restaurante
-        app.post("/comprobantes/restaurante/{idRestaurante}/{idSolicitud}/{idRestaurantero}/{idZona}", 
+        app.post("/comprobantes/restaurante/{idRestaurante}/{idSolicitud}/{idRestaurantero}", 
                 comprobanteController::crearComprobanteParaRestaurante);
         
         // Actualizar comprobante
-        app.put("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}/{idZona}", 
+        app.put("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}", 
                comprobanteController::actualizarComprobante);
         
         // Actualizar comprobante de forma simplificada (solo requiere ID del comprobante)
@@ -55,7 +53,7 @@ public class ComprobanteRoutes {
                comprobanteController::actualizarComprobanteSimplificado);
         
         // Eliminar comprobante
-        app.delete("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}/{idZona}", 
+        app.delete("/comprobantes/{idComprobante}/{idRestaurante}/{idSolicitud}/{idRestaurantero}", 
                   comprobanteController::eliminarComprobante);
     }
 }

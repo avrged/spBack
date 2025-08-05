@@ -72,9 +72,7 @@ public class RestauranteService {
         if (restaurante.getId_restaurantero() <= 0) {
             throw new IllegalArgumentException("ID de restaurantero inválido");
         }
-        if (restaurante.getId_zona() <= 0) {
-            throw new IllegalArgumentException("ID de zona inválido");
-        }
+        // id_zona eliminado
 
         // Verificar que la solicitud existe
         try {
@@ -85,14 +83,7 @@ public class RestauranteService {
             throw new RuntimeException("Error al verificar la solicitud: " + e.getMessage(), e);
         }
 
-        // Verificar que la zona existe
-        try {
-            if (!restauranteRepository.zonaExists(restaurante.getId_zona())) {
-                throw new IllegalArgumentException("La zona especificada no existe");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al verificar la zona: " + e.getMessage(), e);
-        }
+        // id_zona eliminado
 
         // Verificar que no existe ya un restaurante para esta solicitud
         try {
@@ -104,6 +95,18 @@ public class RestauranteService {
         }
 
         try {
+            // Crear zona automáticamente usando la dirección como nombre
+            if (restaurante.getDireccion() != null && !restaurante.getDireccion().trim().isEmpty()) {
+                Zona zona = new Zona(restaurante.getDireccion(), restaurante.getId_restaurantero());
+                try {
+                    zonaService.crearZona(zona);
+                } catch (Exception ex) {
+                    // Si la zona ya existe, ignorar el error
+                    if (!ex.getMessage().contains("Ya existe una zona")) {
+                        throw ex;
+                    }
+                }
+            }
             return restauranteRepository.save(restaurante);
         } catch (SQLException e) {
             throw new RuntimeException("Error al crear el restaurante: " + e.getMessage(), e);
@@ -149,14 +152,14 @@ public class RestauranteService {
             restaurante.setEtiquetas(""); // Se puede completar después  
             restaurante.setId_solicitud(idSolicitud);
             restaurante.setId_restaurantero(idRestaurantero);
-            restaurante.setId_zona(zonaCreada.getId_zona()); // Usar la zona recién creada
+            // id_zona eliminado
             restaurante.setDireccion(nombreZona); // Usar el nombre como dirección por ahora
             restaurante.setFacebook(""); // Se puede completar después
             restaurante.setInstagram(""); // Se puede completar después
 
             Restaurante restauranteCreado = restauranteRepository.save(restaurante);
             
-            System.out.println("✅ Restaurante creado automáticamente: " + restauranteCreado.getNombre() + " en zona ID: " + zonaCreada.getId_zona());
+            System.out.println("✅ Restaurante creado automáticamente: " + restauranteCreado.getNombre());
             
             return restauranteCreado;
 
@@ -180,12 +183,7 @@ public class RestauranteService {
                 throw new IllegalArgumentException("El horario es obligatorio");
             }
 
-            // Verificar que la zona existe si se cambió
-            if (restauranteActualizado.getId_zona() > 0) {
-                if (!restauranteRepository.zonaExists(restauranteActualizado.getId_zona())) {
-                    throw new IllegalArgumentException("La zona especificada no existe");
-                }
-            }
+            // id_zona eliminado
 
             restauranteActualizado.setId_restaurante(id);
             return restauranteRepository.update(restauranteActualizado);

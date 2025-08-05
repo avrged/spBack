@@ -154,14 +154,10 @@ public class RegistroRestauranteController {
         
         // IDs
         String idRestaurantero = ctx.formParam("idRestaurantero");
-        String idZona = ctx.formParam("idZona");
-        
         if (idRestaurantero != null) {
             datos.setIdRestaurantero(Integer.parseInt(idRestaurantero));
         }
-        if (idZona != null) {
-            datos.setIdZona(Integer.parseInt(idZona));
-        }
+        // idZona eliminado del flujo
         
         return datos;
     }
@@ -181,14 +177,10 @@ public class RegistroRestauranteController {
         
         // Convertir IDs
         String idRestaurantero = ctx.formParam("idRestaurantero");
-        String idZona = ctx.formParam("idZona");
-        
         if (idRestaurantero != null && !idRestaurantero.trim().isEmpty()) {
             datos.setIdRestaurantero(Integer.parseInt(idRestaurantero));
         }
-        if (idZona != null && !idZona.trim().isEmpty()) {
-            datos.setIdZona(Integer.parseInt(idZona));
-        }
+        // idZona eliminado del flujo
         
         // Procesar archivos subidos
         datos.setImagenPrincipal(procesarArchivo(ctx, "imagenPrincipal", "images"));
@@ -284,9 +276,7 @@ public class RegistroRestauranteController {
         if (datos.getIdRestaurantero() <= 0) {
             return "ID de restaurantero inválido";
         }
-        if (datos.getIdZona() <= 0) {
-            return "ID de zona inválido";
-        }
+        // idZona eliminado del flujo y de la validación
         
         // Validar que al menos una imagen sea proporcionada
         if ((datos.getImagenPrincipal() == null || datos.getImagenPrincipal().trim().isEmpty()) &&
