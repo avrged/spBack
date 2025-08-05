@@ -414,6 +414,6 @@ public class ComprobanteController {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        return "http://localhost:7070/uploads/documents/" + newFileName;
+        return "http://52.23.26.163:7070/uploads/documents/" + newFileName;
     }
 }

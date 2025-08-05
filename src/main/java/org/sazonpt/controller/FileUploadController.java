@@ -90,7 +90,7 @@ public class FileUploadController {
             
             String staticIp = System.getenv("STATIC_IP");
             if (staticIp == null) {
-                staticIp = "localhost:7070";
+                staticIp = "52.23.26.163:7070";
             }
             String fullUrl = "http://" + staticIp + "/uploads/" + relativePath;
             
@@ -182,7 +182,7 @@ public class FileUploadController {
                     String relativePath = folder + "/" + uniqueName;
                     String staticIp = System.getenv("STATIC_IP");
                     if (staticIp == null) {
-                        staticIp = "localhost:7070";
+                        staticIp = "52.23.26.163:7070";
                     }
                     String fullUrl = "http://" + staticIp + "/uploads/" + relativePath;
                     

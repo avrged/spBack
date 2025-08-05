@@ -649,6 +649,6 @@ public class MenuController {
         java.nio.file.Files.copy(uploadedFile.content(), destinationFile.toPath(), 
                                 java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
-        return "http://localhost:7070/uploads/menus/" + uniqueFileName;
+        return "http://52.23.26.163:7070/uploads/menus/" + uniqueFileName;
     }
 }

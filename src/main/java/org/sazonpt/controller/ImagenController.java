@@ -398,7 +398,7 @@ public class ImagenController {
         java.nio.file.Files.copy(uploadedFile.content(), destinationFile.toPath(), 
                                 java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
-        return "http://localhost:7070/uploads/images/" + uniqueFileName;
+        return "http://52.23.26.163:7070/uploads/images/" + uniqueFileName;
     }
 
     public void eliminarImagenPorRestaurantero(Context ctx) {
