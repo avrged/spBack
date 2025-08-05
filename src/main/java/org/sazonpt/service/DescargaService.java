@@ -1,6 +1,7 @@
 package org.sazonpt.service;
 
 import org.sazonpt.model.Descarga;
+import org.sazonpt.model.dto.EstadisticaDescargaDTO;
 import org.sazonpt.repository.DescargaRepository;
 
 import java.sql.SQLException;
@@ -10,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class DescargaService {
-    // Actualiza solo el primer registro de descarga para un restaurantero
     public boolean actualizarPrimeraDescargaPorRestaurantero(int idRestaurantero, Descarga datos) {
         try {
             List<Descarga> descargas = descargaRepository.findByRestaurantero(idRestaurantero);
@@ -18,7 +18,6 @@ public class DescargaService {
                 return false;
             }
             Descarga descarga = descargas.get(0);
-            // Solo actualiza los campos relevantes
             descarga.setCantidad_descargas(datos.getCantidad_descargas());
             descarga.setOpinion(datos.getOpinion());
             descarga.setOrigen(datos.getOrigen());
@@ -60,7 +59,6 @@ public class DescargaService {
         }
 
         try {
-            // Verificar que el restaurantero existe
             if (!descargaRepository.restauranteroExists(idRestaurantero)) {
                 throw new IllegalArgumentException("El restaurantero especificado no existe");
             }
@@ -72,7 +70,6 @@ public class DescargaService {
     }
 
     public List<Descarga> obtenerDescargasPorOrigen(String origen) {
-        // Validar origen usando el enum
         if (origen == null || origen.trim().isEmpty()) {
             throw new IllegalArgumentException("El origen es obligatorio");
         }
@@ -89,7 +86,6 @@ public class DescargaService {
     }
 
     public List<Descarga> obtenerDescargasPorOpinion(String opinion) {
-        // Validar opinión usando el enum
         if (opinion == null || opinion.trim().isEmpty()) {
             throw new IllegalArgumentException("La opinión es obligatoria");
         }
@@ -106,10 +102,8 @@ public class DescargaService {
     }
 
     public Descarga crearDescarga(Descarga descarga) {
-        // Validaciones
         validarDescarga(descarga);
 
-        // Verificar que el restaurantero existe
         try {
             if (!descargaRepository.restauranteroExists(descarga.getId_restaurantero())) {
                 throw new IllegalArgumentException("El restaurantero especificado no existe");
@@ -130,7 +124,6 @@ public class DescargaService {
             throw new IllegalArgumentException("ID de descarga inválido");
         }
 
-        // Verificar que la descarga existe
         try {
             if (!descargaRepository.existsById(id)) {
                 throw new IllegalArgumentException("La descarga no existe");
@@ -139,10 +132,8 @@ public class DescargaService {
             throw new RuntimeException("Error al verificar la descarga: " + e.getMessage(), e);
         }
 
-        // Validaciones
         validarDescargaActualizacion(descargaActualizada);
 
-        // Establecer el ID
         descargaActualizada.setId_descarga(id);
 
         try {
@@ -157,7 +148,6 @@ public class DescargaService {
             throw new IllegalArgumentException("ID de descarga inválido");
         }
 
-        // Verificar que la descarga existe
         try {
             if (!descargaRepository.existsById(id)) {
                 throw new IllegalArgumentException("La descarga no existe");
@@ -181,7 +171,6 @@ public class DescargaService {
             throw new IllegalArgumentException("ID de restaurantero inválido");
         }
 
-        // Verificar que la descarga existe
         try {
             if (!descargaRepository.existsById(idDescarga)) {
                 throw new IllegalArgumentException("La descarga no existe");
@@ -209,14 +198,12 @@ public class DescargaService {
         }
     }
 
-    // Métodos de estadísticas
     public int getTotalDescargasByRestaurantero(int idRestaurantero) {
         if (idRestaurantero <= 0) {
             throw new IllegalArgumentException("ID de restaurantero inválido");
         }
 
         try {
-            // Verificar que el restaurantero existe
             if (!descargaRepository.restauranteroExists(idRestaurantero)) {
                 throw new IllegalArgumentException("El restaurantero especificado no existe");
             }
@@ -228,7 +215,6 @@ public class DescargaService {
     }
 
     public List<Descarga> getTopDescargasByOrigen(String origen, int limit) {
-        // Validar origen
         if (origen == null || origen.trim().isEmpty()) {
             throw new IllegalArgumentException("El origen es obligatorio");
         }
@@ -252,7 +238,6 @@ public class DescargaService {
         }
     }
 
-    // Método para crear descarga con parámetros específicos
     public Descarga crearDescargaPorRestaurantero(int idRestaurantero, int cantidadDescargas, 
                                                   String origen, String opinion) {
         Descarga descarga = new Descarga();
@@ -264,18 +249,15 @@ public class DescargaService {
         return crearDescarga(descarga);
     }
 
-    // Métodos de validación privados
     private void validarDescarga(Descarga descarga) {
         if (descarga == null) {
             throw new IllegalArgumentException("La descarga no puede ser nula");
         }
 
-        // Validar cantidad de descargas
         if (descarga.getCantidad_descargas() < 0) {
             throw new IllegalArgumentException("La cantidad de descargas no puede ser negativa");
         }
 
-        // Validar origen
         if (descarga.getOrigen() == null || descarga.getOrigen().trim().isEmpty()) {
             throw new IllegalArgumentException("El origen es obligatorio");
         }
@@ -284,7 +266,6 @@ public class DescargaService {
             throw new IllegalArgumentException("Origen inválido. Valores permitidos: Nacional, Extranjero");
         }
 
-        // Validar opinión
         if (descarga.getOpinion() == null || descarga.getOpinion().trim().isEmpty()) {
             throw new IllegalArgumentException("La opinión es obligatoria");
         }
@@ -293,7 +274,6 @@ public class DescargaService {
             throw new IllegalArgumentException("Opinión inválida. Valores permitidos: La comida, La ubicacion, Recomendacion, El horario, La vista");
         }
 
-        // Validar ID de restaurantero
         if (descarga.getId_restaurantero() <= 0) {
             throw new IllegalArgumentException("ID de restaurantero inválido");
         }
@@ -304,19 +284,16 @@ public class DescargaService {
             throw new IllegalArgumentException("La descarga no puede ser nula");
         }
 
-        // Validar cantidad de descargas
         if (descarga.getCantidad_descargas() < 0) {
             throw new IllegalArgumentException("La cantidad de descargas no puede ser negativa");
         }
 
-        // Validar origen si se proporciona
         if (descarga.getOrigen() != null && !descarga.getOrigen().trim().isEmpty()) {
             if (!Descarga.Origen.esValido(descarga.getOrigen())) {
                 throw new IllegalArgumentException("Origen inválido. Valores permitidos: Nacional, Extranjero");
             }
         }
-
-        // Validar opinión si se proporciona  
+ 
         if (descarga.getOpinion() != null && !descarga.getOpinion().trim().isEmpty()) {
             if (!Descarga.TipoOpinion.esValido(descarga.getOpinion())) {
                 throw new IllegalArgumentException("Opinión inválida. Valores permitidos: La comida, La ubicacion, Recomendacion, El horario, La vista");
@@ -324,14 +301,12 @@ public class DescargaService {
         }
     }
 
-    // Método utilitario para obtener estadísticas completas de un restaurantero
     public Map<String, Object> obtenerEstadisticasRestaurantero(int idRestaurantero) {
         if (idRestaurantero <= 0) {
             throw new IllegalArgumentException("ID de restaurantero inválido");
         }
 
         try {
-            // Verificar que el restaurantero existe
             if (!descargaRepository.restauranteroExists(idRestaurantero)) {
                 throw new IllegalArgumentException("El restaurantero especificado no existe");
             }
@@ -348,6 +323,14 @@ public class DescargaService {
             return estadisticas;
         } catch (SQLException e) {
             throw new RuntimeException("Error al obtener las estadísticas: " + e.getMessage(), e);
+        }
+    }
+
+    public List<EstadisticaDescargaDTO> obtenerEstadisticasAgrupadasPorOrigenYOpinion() {
+        try {
+            return descargaRepository.getEstadisticasAgrupadasPorOrigenYOpinion();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener estadísticas agrupadas: " + e.getMessage(), e);
         }
     }
 }

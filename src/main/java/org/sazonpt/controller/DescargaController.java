@@ -412,4 +412,24 @@ public class DescargaController {
             ctx.status(500).json(response);
         }
     }
+
+    public void obtenerEstadisticasAgrupadasPorOrigenYOpinion(Context ctx) {
+        try {
+            var estadisticas = descargaService.obtenerEstadisticasAgrupadasPorOrigenYOpinion();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", estadisticas);
+            response.put("message", "Estadísticas agrupadas por origen y opinión obtenidas correctamente");
+            response.put("total", estadisticas.size());
+            
+            ctx.status(200).json(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al obtener estadísticas agrupadas: " + e.getMessage());
+            
+            ctx.status(500).json(response);
+        }
+    }
 }

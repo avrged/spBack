@@ -2,6 +2,7 @@ package org.sazonpt.repository;
 
 import org.sazonpt.config.DBConfig;
 import org.sazonpt.model.Descarga;
+import org.sazonpt.model.dto.EstadisticaDescargaDTO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -313,5 +314,33 @@ public class DescargaRepository {
             }
         }
         return descargas;
+    }
+
+    public List<EstadisticaDescargaDTO> getEstadisticasAgrupadasPorOrigenYOpinion() throws SQLException {
+        List<EstadisticaDescargaDTO> estadisticas = new ArrayList<>();
+        String sql = """
+            SELECT 
+                origen AS Origen,
+                opinion AS Opinion,
+                SUM(cantidad_descargas) AS TotalDescargas
+            FROM descarga
+            GROUP BY origen, opinion
+            ORDER BY TotalDescargas DESC
+            """;
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                EstadisticaDescargaDTO estadistica = new EstadisticaDescargaDTO();
+                estadistica.setOrigen(rs.getString("Origen"));
+                estadistica.setOpinion(rs.getString("Opinion"));
+                estadistica.setTotalDescargas(rs.getInt("TotalDescargas"));
+                
+                estadisticas.add(estadistica);
+            }
+        }
+        return estadisticas;
     }
 }

@@ -32,5 +32,6 @@ public class DescargaRoutes {
 
         app.get("/descargas/estadisticas/restaurantero/{idRestaurantero}/total", descargaController::obtenerTotalDescargasPorRestaurantero);
         app.get("/descargas/estadisticas/top", descargaController::obtenerTopDescargasPorOrigen);
+        app.get("/descargas/estadisticas/agrupadas", descargaController::obtenerEstadisticasAgrupadasPorOrigenYOpinion);
     }
 }
