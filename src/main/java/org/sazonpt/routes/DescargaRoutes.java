@@ -1,7 +1,8 @@
 package org.sazonpt.routes;
 
-import io.javalin.Javalin;
 import org.sazonpt.controller.DescargaController;
+
+import io.javalin.Javalin;
 
 public class DescargaRoutes {
     
@@ -12,14 +13,14 @@ public class DescargaRoutes {
     }
     
     public void register(Javalin app) {
-        // Rutas CRUD básicas para descargas
+       
         app.get("/descargas", descargaController::obtenerTodasLasDescargas);
         app.post("/descargas", descargaController::crearDescarga);
         app.get("/descargas/{id}", descargaController::obtenerDescargaPorId);
         app.put("/descargas/{id}", descargaController::actualizarDescarga);
         app.delete("/descargas/{id}", descargaController::eliminarDescarga);
 
-        // Nuevo endpoint: actualizar descarga por id_restaurantero (solo el primer registro encontrado)
+        
         app.put("/descargas/restaurantero/{idRestaurantero}", descargaController::actualizarDescargaPorRestaurantero);
 
         // Rutas de filtrado por diferentes criterios
