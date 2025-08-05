@@ -26,9 +26,12 @@ public class Solicitud_registroEstadoController {
                 ctx.status(404).json(Map.of("success", false, "message", "No hay solicitud pendiente para este restaurantero"));
                 return;
             }
-            boolean ok = solicitudService.cambiarEstadoSolicitud(solicitudPendiente.get().getId_solicitud(), "aprobada");
+            int idSolicitud = solicitudPendiente.get().getId_solicitud();
+            int idRestauranteroSolicitud = solicitudPendiente.get().getId_restaurantero();
+            int idAdministrador = 1; // ID por defecto, puedes cambiarlo si tienes autenticación
+            boolean ok = solicitudService.aprobarSolicitudConRevision(idSolicitud, idRestauranteroSolicitud, idAdministrador);
             if (ok) {
-                ctx.json(Map.of("success", true, "message", "Solicitud aprobada correctamente"));
+                ctx.json(Map.of("success", true, "message", "Solicitud aprobada correctamente y revisión registrada"));
             } else {
                 ctx.status(500).json(Map.of("success", false, "message", "No se pudo aprobar la solicitud"));
             }
