@@ -19,6 +19,9 @@ public class DescargaRoutes {
         app.put("/descargas/{id}", descargaController::actualizarDescarga);
         app.delete("/descargas/{id}", descargaController::eliminarDescarga);
 
+        // Nuevo endpoint: actualizar descarga por id_restaurantero (solo el primer registro encontrado)
+        app.put("/descargas/restaurantero/{idRestaurantero}", descargaController::actualizarDescargaPorRestaurantero);
+
         // Rutas de filtrado por diferentes criterios
         app.get("/descargas/restaurantero/{id}", descargaController::obtenerDescargasPorRestaurantero);
         app.get("/descargas/origen/{origen}", descargaController::obtenerDescargasPorOrigen);

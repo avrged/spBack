@@ -19,14 +19,16 @@ public class RegistroRestauranteService {
     private final MenuRepository menuRepository;
     private final RestauranteroRepository restauranteroRepository;
     private final ZonaService zonaService;
-    
+    private final DescargaRepository descargaRepository;
+
     public RegistroRestauranteService(Solicitud_registroRepository solicitudRepository,
                                     RestauranteRepository restauranteRepository,
                                     ImagenRepository imagenRepository,
                                     ComprobanteRepository comprobanteRepository,
                                     MenuRepository menuRepository,
                                     RestauranteroRepository restauranteroRepository,
-                                    ZonaService zonaService) {
+                                    ZonaService zonaService,
+                                    DescargaRepository descargaRepository) {
         this.solicitudRepository = solicitudRepository;
         this.restauranteRepository = restauranteRepository;
         this.imagenRepository = imagenRepository;
@@ -34,6 +36,7 @@ public class RegistroRestauranteService {
         this.menuRepository = menuRepository;
         this.restauranteroRepository = restauranteroRepository;
         this.zonaService = zonaService;
+        this.descargaRepository = descargaRepository;
     }
     
     /**
@@ -97,6 +100,12 @@ public class RegistroRestauranteService {
 
             // 7. Guardar menú
             String menuCreado = crearMenu(datos, idRestaurante, idSolicitud, datos.getIdRestaurantero());
+
+
+            // Crear registro en descarga solo con id_restaurantero
+            Descarga descarga = new Descarga();
+            descarga.setId_restaurantero(datos.getIdRestaurantero());
+            descargaRepository.save(descarga);
 
             return String.format("Restaurante registrado exitosamente. ID: %d, Solicitud: %d. " +
                     "Imágenes: %s, Comprobantes: %s, Menú: %s",

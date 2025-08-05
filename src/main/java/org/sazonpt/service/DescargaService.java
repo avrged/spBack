@@ -10,6 +10,23 @@ import java.util.Map;
 import java.util.Optional;
 
 public class DescargaService {
+    // Actualiza solo el primer registro de descarga para un restaurantero
+    public boolean actualizarPrimeraDescargaPorRestaurantero(int idRestaurantero, Descarga datos) {
+        try {
+            List<Descarga> descargas = descargaRepository.findByRestaurantero(idRestaurantero);
+            if (descargas.isEmpty()) {
+                return false;
+            }
+            Descarga descarga = descargas.get(0);
+            // Solo actualiza los campos relevantes
+            descarga.setCantidad_descargas(datos.getCantidad_descargas());
+            descarga.setOpinion(datos.getOpinion());
+            descarga.setOrigen(datos.getOrigen());
+            return descargaRepository.update(descarga);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar la descarga por restaurantero: " + e.getMessage(), e);
+        }
+    }
     
     private final DescargaRepository descargaRepository;
 

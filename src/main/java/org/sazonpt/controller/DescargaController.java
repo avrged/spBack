@@ -11,6 +11,35 @@ import java.util.Map;
 import java.util.Optional;
 
 public class DescargaController {
+    // PUT /descargas/restaurantero/{idRestaurantero}
+    public void actualizarDescargaPorRestaurantero(io.javalin.http.Context ctx) {
+        try {
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            Descarga body = objectMapper.readValue(ctx.body(), Descarga.class);
+            boolean actualizada = descargaService.actualizarPrimeraDescargaPorRestaurantero(idRestaurantero, body);
+            if (actualizada) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("message", "Descarga actualizada correctamente");
+                ctx.status(200).json(response);
+            } else {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "No se encontró descarga para ese restaurantero");
+                ctx.status(404).json(response);
+            }
+        } catch (NumberFormatException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "ID de restaurantero inválido");
+            ctx.status(400).json(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al actualizar la descarga: " + e.getMessage());
+            ctx.status(500).json(response);
+        }
+    }
     
     private final DescargaService descargaService;
     private final ObjectMapper objectMapper;

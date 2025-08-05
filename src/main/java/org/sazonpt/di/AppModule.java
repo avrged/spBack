@@ -155,6 +155,7 @@ public class AppModule {
         ComprobanteRepository comprobanteRepository = new ComprobanteRepository();
         MenuRepository menuRepository = new MenuRepository();
         RestauranteroRepository restauranteroRepository = new RestauranteroRepository();
+        DescargaRepository descargaRepository = new DescargaRepository();
         
         // Crear ZonaService para la dependencia
         ZonaRepository zonaRepository = new ZonaRepository();
@@ -167,7 +168,8 @@ public class AppModule {
             comprobanteRepository,
             menuRepository,
             restauranteroRepository,
-            zonaService
+            zonaService,
+            descargaRepository
         );
         
         // Crear el controlador
