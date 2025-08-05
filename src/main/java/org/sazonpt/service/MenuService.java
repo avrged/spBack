@@ -326,4 +326,31 @@ public class MenuService {
             throw new RuntimeException("Error al actualizar el menú: " + e.getMessage(), e);
         }
     }
+
+    // Método simplificado para actualizar menú por restaurantero usando solo form-data
+    public boolean actualizarMenuPorRestauranteroSimple(int idRestaurantero, String rutaArchivo, String rutaMenu) {
+        try {
+            // Buscar menús del restaurantero
+            List<Menu> menus = menuRepository.findByRestaurantero(idRestaurantero);
+            
+            if (menus.isEmpty()) {
+                return false; // No hay menús para este restaurantero
+            }
+            
+            // Tomar el primer menú activo, o el primero si no hay activos
+            Optional<Menu> menuActivoOpt = menus.stream()
+                    .filter(menu -> "activo".equalsIgnoreCase(menu.getEstado()))
+                    .findFirst();
+            
+            Menu menuAActualizar = menuActivoOpt.orElse(menus.get(0));
+            
+            // Actualizar las rutas
+            menuAActualizar.setRuta_archivo(rutaArchivo);
+            menuAActualizar.setRuta_menu(rutaMenu);
+
+            return menuRepository.update(menuAActualizar);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar el menú del restaurantero: " + e.getMessage(), e);
+        }
+    }
 }

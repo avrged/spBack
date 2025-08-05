@@ -23,6 +23,9 @@ public class MenuRoutes {
         app.get("/menus/restaurantero/{idRestaurantero}", 
                menuController::obtenerMenusPorRestaurantero);
 
+        app.put("/menus/restaurantero/{idRestaurantero}", 
+               menuController::actualizarMenuPorRestaurantero);
+
         app.get("/menus/estado/{estado}", 
                menuController::obtenerMenusPorEstado);
 

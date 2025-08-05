@@ -457,72 +457,86 @@ public class MenuController {
 
     public void actualizarMenuPorRestaurantero(Context ctx) {
         try {
-            int idMenu = Integer.parseInt(ctx.pathParam("idMenu"));
             int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
             
-            Menu menuActualizado = new Menu();
-            String nuevaRutaMenu = null;
-
-            String contentType = ctx.header("Content-Type");
+            String rutaArchivo = null;
+            String rutaMenu = null;
             
-            if (contentType != null && contentType.contains("multipart/form-data")) {
-                if (!ctx.uploadedFiles().isEmpty()) {
-                    var uploadedFile = ctx.uploadedFiles().get(0);
+            // Debug: Imprimir archivos recibidos
+            System.out.println("=== DEBUG UPLOADED FILES ===");
+            System.out.println("Número de archivos: " + ctx.uploadedFiles().size());
+            for (var file : ctx.uploadedFiles()) {
+                System.out.println("Archivo: " + file.filename() + ", Content-Type: " + file.contentType());
+            }
+            System.out.println("============================");
+            
+            // Verificar si hay archivos subidos
+            if (!ctx.uploadedFiles().isEmpty()) {
+                // Verificar que tengamos exactamente 2 archivos
+                if (ctx.uploadedFiles().size() != 2) {
+                    ctx.status(400).json(Map.of(
+                        "success", false,
+                        "message", "Debe enviar exactamente 2 archivos PDF: uno para 'ruta_archivo' y otro para 'ruta_menu'"
+                    ));
+                    return;
+                }
+                
+                // Procesar archivos subidos (asumir que el primero es ruta_archivo y el segundo es ruta_menu)
+                try {
+                    var archivoFile = ctx.uploadedFiles().get(0);
+                    var menuFile = ctx.uploadedFiles().get(1);
                     
-                    try {
-                        nuevaRutaMenu = guardarArchivoPDF(uploadedFile);
-                        menuActualizado.setRuta_archivo(nuevaRutaMenu);
-                        menuActualizado.setRuta_menu(nuevaRutaMenu);
-                    } catch (Exception e) {
-                        ctx.status(500).json(Map.of(
-                            "success", false,
-                            "message", "Error al guardar el archivo PDF: " + e.getMessage()
-                        ));
-                        return;
-                    }
-                } else {
-                    String rutaArchivo = ctx.formParam("ruta_archivo");
-                    String rutaMenu = ctx.formParam("ruta_menu");
-                    String estado = ctx.formParam("estado");
+                    rutaArchivo = guardarArchivoPDF(archivoFile);
+                    rutaMenu = guardarArchivoPDF(menuFile);
                     
-                    if (rutaArchivo != null && !rutaArchivo.trim().isEmpty()) {
-                        menuActualizado.setRuta_archivo(rutaArchivo);
-                    }
-                    if (rutaMenu != null && !rutaMenu.trim().isEmpty()) {
-                        menuActualizado.setRuta_menu(rutaMenu);
-                    }
-                    if (estado != null && !estado.trim().isEmpty()) {
-                        menuActualizado.setEstado(estado);
-                    }
+                    System.out.println("Primer archivo guardado en: " + rutaArchivo);
+                    System.out.println("Segundo archivo guardado en: " + rutaMenu);
+                } catch (Exception e) {
+                    ctx.status(500).json(Map.of(
+                        "success", false,
+                        "message", "Error al guardar los archivos: " + e.getMessage()
+                    ));
+                    return;
                 }
             } else {
-                // Procesar JSON
-                menuActualizado = ctx.bodyAsClass(Menu.class);
+                ctx.status(400).json(Map.of(
+                    "success", false,
+                    "message", "No se encontraron archivos. Debe enviar 2 archivos PDF"
+                ));
+                return;
             }
             
-            boolean actualizado = menuService.actualizarMenuPorRestaurantero(idMenu, idRestaurantero, menuActualizado);
+            // Validar que se hayan procesado los archivos
+            if (rutaArchivo == null || rutaMenu == null) {
+                ctx.status(400).json(Map.of(
+                    "success", false,
+                    "message", "Error al procesar los archivos PDF"
+                ));
+                return;
+            }
+            
+            // Actualizar el menú del restaurantero
+            boolean actualizado = menuService.actualizarMenuPorRestauranteroSimple(idRestaurantero, rutaArchivo, rutaMenu);
             
             if (actualizado) {
                 ctx.json(Map.of(
                     "success", true,
-                    "message", "Menú actualizado correctamente",
-                    "nueva_ruta", nuevaRutaMenu != null ? nuevaRutaMenu : "Menú actualizado desde form-data"
+                    "message", "Menú del restaurantero actualizado correctamente con archivos PDF",
+                    "ruta_archivo", rutaArchivo,
+                    "ruta_menu", rutaMenu,
+                    "id_restaurantero", idRestaurantero
                 ));
             } else {
                 ctx.status(404).json(Map.of(
                     "success", false,
-                    "message", "No se pudo actualizar el menú. Verifica que el menú pertenezca al restaurantero"
+                    "message", "No se encontró menú para este restaurantero o no se pudo actualizar"
                 ));
             }
+            
         } catch (NumberFormatException e) {
             ctx.status(400).json(Map.of(
                 "success", false,
-                "message", "IDs inválidos"
-            ));
-        } catch (IllegalArgumentException e) {
-            ctx.status(400).json(Map.of(
-                "success", false,
-                "message", e.getMessage()
+                "message", "ID de restaurantero inválido"
             ));
         } catch (Exception e) {
             ctx.status(500).json(Map.of(

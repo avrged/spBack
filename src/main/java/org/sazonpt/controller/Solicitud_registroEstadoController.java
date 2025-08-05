@@ -39,4 +39,44 @@ public class Solicitud_registroEstadoController {
             ctx.status(500).json(Map.of("success", false, "message", "Error: " + e.getMessage()));
         }
     }
+
+    public void rechazarPorRestaurantero(Context ctx) {
+        try {
+            int idRestaurantero = Integer.parseInt(ctx.pathParam("idRestaurantero"));
+            
+            // Obtener TODAS las solicitudes del restaurantero (sin filtrar por estado)
+            var solicitudes = solicitudService.obtenerSolicitudesPorRestaurantero(idRestaurantero);
+            
+            if (solicitudes.isEmpty()) {
+                ctx.status(404).json(Map.of("success", false, "message", "No hay solicitudes para este restaurantero"));
+                return;
+            }
+            
+            // Tomar la primera solicitud encontrada (sin importar el estado)
+            var solicitud = solicitudes.get(0);
+            int idSolicitud = solicitud.getId_solicitud();
+            String estadoActual = solicitud.getEstado();
+            
+            // Eliminar la solicitud completamente (incluyendo revisiones asociadas)
+            boolean eliminada = solicitudService.eliminarSolicitudCompleta(idSolicitud, idRestaurantero);
+            
+            if (eliminada) {
+                ctx.json(Map.of(
+                    "success", true, 
+                    "message", "Solicitud eliminada correctamente (estado anterior: " + estadoActual + ")",
+                    "id_solicitud", idSolicitud,
+                    "estado_anterior", estadoActual
+                ));
+            } else {
+                ctx.status(500).json(Map.of("success", false, "message", "No se pudo eliminar la solicitud"));
+            }
+            
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(Map.of("success", false, "message", "ID de restaurantero inválido"));
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).json(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("success", false, "message", "Error: " + e.getMessage()));
+        }
+    }
 }

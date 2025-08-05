@@ -233,6 +233,33 @@ public class Solicitud_registroService {
         }
     }
 
+    // Nuevo método para eliminación en cascada
+    public boolean eliminarSolicitudCompleta(int idSolicitud, int idRestaurantero) {
+        try {
+            if (!solicitudRepository.existsById(idSolicitud)) {
+                throw new IllegalArgumentException("La solicitud de registro no existe");
+            }
+
+            // 1. Primero eliminar todas las revisiones asociadas a la solicitud
+            boolean revisionesEliminadas = revisionRepository.deleteByIdSolicitud(idSolicitud);
+            System.out.println("✅ Revisiones eliminadas para solicitud ID: " + idSolicitud);
+
+            // 2. Luego eliminar la solicitud
+            boolean solicitudEliminada = solicitudRepository.delete(idSolicitud, idRestaurantero);
+            
+            if (solicitudEliminada) {
+                System.out.println("✅ Solicitud eliminada completamente ID: " + idSolicitud);
+                return true;
+            } else {
+                System.err.println("❌ Error al eliminar la solicitud ID: " + idSolicitud);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al eliminar la solicitud de registro completamente: " + e.getMessage(), e);
+        }
+    }
+
     public boolean existeSolicitud(int id) {
         try {
             return solicitudRepository.existsById(id);

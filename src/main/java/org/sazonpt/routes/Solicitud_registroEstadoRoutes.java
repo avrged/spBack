@@ -13,5 +13,7 @@ public class Solicitud_registroEstadoRoutes {
 
     public void register(Javalin app) {
         app.put("/solicitudes/restaurantero/{idRestaurantero}/aprobar", estadoController::aprobarPorRestaurantero);
+        app.delete("/solicitudes/restaurantero/{idRestaurantero}/rechazar", estadoController::rechazarPorRestaurantero);
+        
     }
 }

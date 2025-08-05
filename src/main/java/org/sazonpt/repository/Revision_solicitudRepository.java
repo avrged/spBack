@@ -247,6 +247,18 @@ public class Revision_solicitudRepository {
         }
     }
 
+    // Nuevo método para eliminar todas las revisiones de una solicitud
+    public boolean deleteByIdSolicitud(int idSolicitud) throws SQLException {
+        String sql = "DELETE FROM revision_solicitud WHERE id_solicitud = ?";
+
+        try (Connection conn = DBConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idSolicitud);
+            return stmt.executeUpdate() >= 0; // Puede ser 0 si no hay revisiones
+        }
+    }
+
     public boolean actualizarEstadoSolicitud(int idSolicitud, String nuevoEstado) throws SQLException {
         String sql = "UPDATE solicitud_registro SET estado = ? WHERE id_solicitud = ?";
 
